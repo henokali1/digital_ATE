@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location List</title>
+</head>
+<body>
+    <h1>Location List</h1>
+    <a href="{% url 'location_create' %}">Add New Location</a>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+        {% for location in locations %}
+        <tr>
+            <td>{{ location.name }}</td>
+            <td>
+                <a href="{% url 'location_update' location.id %}">Edit</a> |
+                <a href="{% url 'location_delete' location.id %}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
