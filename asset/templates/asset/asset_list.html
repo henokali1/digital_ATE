@@ -1,67 +1,69 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Asset List</title>
-</head>
-<body>
-    <h1>Asset List</h1>
+{% extends 'base.html' %}
+{% block title %}
+Asset List
+{% endblock %}
 
-    {% if user.is_authenticated %}
-        <p>Welcome, {{ user.username }}!</p>
-        <a href="{% url 'asset_create' %}">Add New Asset</a>
-    {% endif %}
+{% block content %}
+<table class="table table-striped">
+<thead>
+    <tr>
+        <th>Name</th>
+        <th>Serial Number</th>
+        <th>Tag ID</th>
+        <th>Section</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th>Manufacturer</th>
+        <th>Model Number</th>
+        <th>Part Number</th>
+        <th>Quantity</th>
+        <th>Remarks</th>
+        <th>Photo</th>
+        {% if user.is_authenticated %}
+            <th>Actions</th>
+        {% endif %}
+    </tr>
+</thead>
+<tbody>
+    {% for asset in assets %}
+    <tr>
+        <td>{{ asset.name }}</td>
+        <td>{{ asset.serial_number }}</td>
+        <td>{{ asset.tag_id }}</td>
+        <td>{{ asset.section }}</td>
+        <td>{{ asset.location }}</td>
+        <td>{{ asset.status }}</td>
+        <td>{{ asset.manufacturer }}</td>
+        <td>{{ asset.model_number }}</td>
+        <td>{{ asset.part_number }}</td>
+        <td>{{ asset.quantity }}</td>
+        <td>{{ asset.remarks }}</td>
+        <td>
+            {% if asset.photo %}
+                <a href="{{ asset.photo.url }}" target="_blank">
+                    <img src="{{ asset.photo.url }}" alt="{{ asset.name }}" class="thumbnail">
+                </a>
+            {% else %}
+                <p>No photo available</p>
+            {% endif %}
+        </td>
+        {% if user.is_authenticated %}
+        <td>
+            <a href="{% url 'asset_edit' asset.id %}">Edit</a> | 
+            <a href="{% url 'asset_delete' asset.id %}">Delete</a>
+        </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Serial Number</th>
-                <th>Tag ID</th>
-                <th>Section</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Manufacturer</th>
-                <th>Model Number</th>
-                <th>Part Number</th>
-                <th>Quantity</th>
-                <th>Remarks</th>
-                <th>Photo</th>
-                {% if user.is_authenticated %}
-                    <th>Actions</th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for asset in assets %}
-            <tr>
-                <td>{{ asset.name }}</td>
-                <td>{{ asset.serial_number }}</td>
-                <td>{{ asset.tag_id }}</td>
-                <td>{{ asset.section }}</td>
-                <td>{{ asset.location }}</td>
-                <td>{{ asset.status }}</td>
-                <td>{{ asset.manufacturer }}</td>
-                <td>{{ asset.model_number }}</td>
-                <td>{{ asset.part_number }}</td>
-                <td>{{ asset.quantity }}</td>
-                <td>{{ asset.remarks }}</td>
-                <td>
-                    {% if asset.photo %}
-                        <img src="{{ asset.photo.url }}" alt="{{ asset.name }}" width="100">
-                    {% else %}
-                        <p>No photo available</p>
-                    {% endif %}
-                </td>
-                {% if user.is_authenticated %}
-                <td>
-                    <a href="{% url 'asset_edit' asset.id %}">Edit</a> | 
-                    <a href="{% url 'asset_delete' asset.id %}">Delete</a>
-                </td>
-                {% endif %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<style>
+    .thumbnail {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+</style>
 
-</body>
-</html>
+{% endblock %}
