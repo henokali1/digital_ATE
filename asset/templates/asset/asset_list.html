@@ -52,12 +52,12 @@
                         <p>No photo available</p>
                     {% endif %}
                 </td>
+                {% if user.is_authenticated %}
                 <td>
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'asset_edit' asset.id %}">Edit</a> | 
-                        <a href="{% url 'asset_delete' asset.id %}">Delete</a>
-                    {% endif %}
+                    <a href="{% url 'asset_edit' asset.id %}">Edit</a> | 
+                    <a href="{% url 'asset_delete' asset.id %}">Delete</a>
                 </td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
