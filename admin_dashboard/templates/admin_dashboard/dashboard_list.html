@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Item</button>
+    </form>
+
+    <h2>Dashboard Items</h2>
+    <ul>
+        {% for item in items %}
+            <li>
+                <a href="/{{ item.url }}" target="_blank"><strong>{{ item.title }}</strong></a>
+                [<a href="{% url 'dashboard_edit' item.id %}">Edit</a> | 
+                <a href="{% url 'dashboard_delete' item.id %}">Delete</a>]
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

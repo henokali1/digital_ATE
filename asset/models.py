@@ -23,6 +23,11 @@ class Asset(models.Model):
     section = models.CharField(max_length=50, choices=SECTION_CHOICES, default='Communication')
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Spare')
+    manufacturer = models.CharField(max_length=50, default='NA')
+    model_number = models.CharField(max_length=50, default='NA')
+    part_number = models.CharField(max_length=50, default='NA')
+    quantity = models.IntegerField(default=1)
+    remarks = models.CharField(max_length=250, blank=True, null=True)
     photo = models.ImageField(upload_to='assets_photos/', blank=True, null=True)
 
     def __str__(self):

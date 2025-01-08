@@ -9,8 +9,6 @@
     {% if user.is_authenticated %}
         <p>Welcome, {{ user.username }}!</p>
         <a href="{% url 'asset_create' %}">Add New Asset</a>
-    {% else %}
-        <p>You need to be logged in to edit or delete assets.</p>
     {% endif %}
 
     <table border="1">
@@ -22,6 +20,11 @@
                 <th>Section</th>
                 <th>Location</th>
                 <th>Status</th>
+                <th>Manufacturer</th>
+                <th>Model Number</th>
+                <th>Part Number</th>
+                <th>Quantity</th>
+                <th>Remarks</th>
                 <th>Photo</th>
                 {% if user.is_authenticated %}
                     <th>Actions</th>
@@ -37,6 +40,11 @@
                 <td>{{ asset.section }}</td>
                 <td>{{ asset.location }}</td>
                 <td>{{ asset.status }}</td>
+                <td>{{ asset.manufacturer }}</td>
+                <td>{{ asset.model_number }}</td>
+                <td>{{ asset.part_number }}</td>
+                <td>{{ asset.quantity }}</td>
+                <td>{{ asset.remarks }}</td>
                 <td>
                     {% if asset.photo %}
                         <img src="{{ asset.photo.url }}" alt="{{ asset.name }}" width="100">
