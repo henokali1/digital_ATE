@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FANS ATE - CMMS Homepage</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f8fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+        .logo {
+            width: 200px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        h1 {
+            color: #68B2E3;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-bottom: 30px;
+        }
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .service-card {
+            background-color: #eef5fc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+        .service-card h3 {
+            margin-bottom: 10px;
+            color: #68B2E3;
+        }
+        .service-card p {
+            color: #333;
+        }
+        .service-card-link {
+            text-decoration: none;
+        }
+        footer {
+            margin-top: 40px;
+            color: #888;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .logo {
+                position: static;
+                margin: 0 auto 20px;
+                display: block;
+            }
+            h1, h2 {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="/static/fans-logo.png" alt="FANS Logo" class="logo">
+        <h1>Air Traffic Engineering</h1>
+        <h2>Computerized Maintenance Management System</h2>
+
+        <div class="services">
+            <a href="/asset/" target="_blank" class="service-card-link">
+                <div class="service-card">
+                    <h3>Asset Management</h3>
+                    <!-- <p>Track and manage all assets within the maintenance system.</p> -->
+                </div>
+            </a>
+            <div class="service-card">
+                <h3>Logbook</h3>
+                <!-- <p>Maintain a detailed logbook of all maintenance activities for future reference.</p> -->
+            </div>
+            <div class="service-card">
+                <h3>Job Card Management</h3>
+                <!-- <p>Create, assign, and track job cards for maintenance tasks.</p> -->
+            </div>
+            <div class="service-card">
+                <h3>Preventive Maintenance</h3>
+                <!-- <p>Schedule and manage preventive maintenance activities.</p> -->
+            </div>
+            <div class="service-card">
+                <h3>Corrective Maintenance</h3>
+                <!-- <p>Log and manage corrective maintenance tasks to ensure operational continuity.</p> -->
+            </div>
+            <div class="service-card">
+                <h3>Daily Inspection</h3>
+                <!-- <p>Conduct regular inspections to ensure system reliability and compliance.</p> -->
+            </div>
+            <div class="service-card">
+                <h3>Reporting and Analytics</h3>
+                <!-- <p>Generate reports and analytics to improve maintenance processes.</p> -->
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2025 Fujairah Air Navigation Services. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>
