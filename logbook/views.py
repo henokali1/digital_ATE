@@ -3,7 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import LogEntryForm
 from .models import Location, LogEntry
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def create_log_entry(request):
     if request.method == 'POST':
         form = LogEntryForm(request.POST, request.FILES)
@@ -14,11 +16,13 @@ def create_log_entry(request):
         form = LogEntryForm()
     return render(request, 'logbook/create_log_entry.html', {'form': form})
 
+@login_required
 def log_list(request):
     logs = LogEntry.objects.all()
     return render(request, 'logbook/log_list.html', {'logs': logs})
 
 # Edit an existing LogEntry
+@login_required
 def update_log_entry(request, pk):
     log_entry = get_object_or_404(LogEntry, pk=pk)
     if request.method == "POST":
@@ -31,6 +35,7 @@ def update_log_entry(request, pk):
     return render(request, 'logbook/log_form.html', {'form': form})
 
 # Delete a LogEntry
+@login_required
 def delete_log_entry(request, pk):
     log_entry = get_object_or_404(LogEntry, pk=pk)
     if request.method == "POST":

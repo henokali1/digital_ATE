@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'logbook',
     'location',
     'admin_dashboard',
+    'preventive_maintenance',
+    'corrective_maintenance',
     'maintenance',
 ]
 
@@ -61,7 +63,7 @@ ROOT_URLCONF = 'digital_ATE.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -134,3 +136,5 @@ STATICFILES_DIRS = [Path(BASE_DIR) / "static"]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'

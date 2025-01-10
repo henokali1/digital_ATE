@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Corrective Maintenance Records</h2>
+<a href="{% url 'maintenance_create' %}">Add New Record</a>
+<table>
+    <tr>
+        <th>Asset</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Duration (Hours)</th>
+        <th>Type</th>
+        <th>Actions</th>
+    </tr>
+    {% for record in records %}
+    <tr>
+        <td>{{ record.asset }}</td>
+        <td>{{ record.start_date }}</td>
+        <td>{{ record.end_date }}</td>
+        <td>{{ record.duration }}</td>
+        <td>{{ record.type }}</td>
+        <td>
+            <a href="{% url 'maintenance_update' record.id %}">Edit</a>
+            <a href="{% url 'maintenance_delete' record.id %}">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
