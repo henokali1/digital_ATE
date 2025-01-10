@@ -85,10 +85,8 @@
 <body>
     <div class="container">
         <a href="/"><img src="/static/fans-logo.png" alt="FANS Logo" class="logo"></a>
-        <h1>Air Traffic Engineering</h1>
-        <h2>Computerized Maintenance Management System</h2>
-
-        
+        <h1>{% block heading_h1 %}{% endblock %}</h1>
+        <h2>{% block heading_h2 %}{% endblock %}</h2>
     <!-- Main Content -->
     <div class="content">
         {% block content %}

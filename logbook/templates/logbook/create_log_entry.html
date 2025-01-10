@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Create Asset
+New Log
 {% endblock %}
 
 {% block heading_h1 %}
-Create Asset
+Log Entry Form
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@ Create Asset
         <div class="col-md-6">
             <form method="POST" enctype="multipart/form-data" class="bg-light p-4 rounded">
                 {% csrf_token %}
-                <h4 class="text-center mb-4">Asset Information</h4>
+                <h4 class="text-center mb-4">Create/Update Log Entry</h4>
                 
                 <!-- Render form fields -->
                 {% for field in form %}

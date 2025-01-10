@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}
+Log List
+{% endblock %}
+{% block heading_h1 %}Log List{% endblock %}
+{% block content %}
+
+<a href="/logbook/new/" class="btn btn-primary mb-3 create-log-btn">Create Log</a>
+<table class="table table-striped">
+<thead>
+    <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Location</th>
+        <th>Initials</th>
+        <th>Remarks</th>
+        <th>Photo</th>
+        {% if user.is_authenticated %}
+            <th>Actions</th>
+        {% endif %}
+    </tr>
+</thead>
+<tbody>
+    {% for log in logs %}
+    <tr>
+        <td>{{ log.date }}</td>
+        <td>{{ log.time }}</td>
+        <td>{{ log.location }}</td>
+        <td>{{ log.initials }}</td>
+        <td>{{ log.remarks }}</td>
+        <td>
+            {% if log.photos %}
+                <a href="{{ log.photos.url }}" target="_blank">
+                    <img src="{{ log.photos.url }}" alt="{{ log.name }}" class="thumbnail">
+                </a>
+            {% else %}
+                <p>No photo available</p>
+            {% endif %}
+        </td>
+        {% if user.username == "cns.ce@fans.ae" %}
+        <td>
+            <a href="{% url 'logbook:update_log_entry' log.id %}">Edit</a> | 
+            <a href="{% url 'logbook:delete_log_entry' log.id %}">Delete</a>
+        </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+
+<style>
+    .thumbnail {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+    .create-log-btn {
+        float: left;
+    }
+</style>
+
+{% endblock %}

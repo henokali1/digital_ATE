@@ -1,10 +1,8 @@
 {% extends 'base.html' %}
-{% block title %}
-ATE CMMS
-{% endblock %}
-
+{% block title %}ATE CMMS{% endblock %}
+{% block heading_h1 %}<h1>Air Traffic Engineering</h1>{% endblock %}
+{% block heading_h2 %}<h2>Computerized Maintenance Management System</h2>{% endblock %}
 {% block content %}
-
 <div class="services">
     <a href="/asset/" class="service-card-link">
         <div class="service-card">
@@ -12,10 +10,12 @@ ATE CMMS
             <!-- <p>Track and manage all assets within the maintenance system.</p> -->
         </div>
     </a>
-    <div class="service-card">
-        <h3>Logbook</h3>
-        <!-- <p>Maintain a detailed logbook of all maintenance activities for future reference.</p> -->
-    </div>
+    <a href="/logbook/" class="service-card-link">
+        <div class="service-card">
+            <h3>Logbook</h3>
+            <!-- <p>Maintain a detailed logbook of all maintenance activities for future reference.</p> -->
+        </div>
+    </a>
     <div class="service-card">
         <h3>Job Card Management</h3>
         <!-- <p>Create, assign, and track job cards for maintenance tasks.</p> -->

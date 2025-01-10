@@ -2,8 +2,9 @@
 {% block title %}
 Asset List
 {% endblock %}
-
+{% block heading_h1 %}Asset List{% endblock %}
 {% block content %}
+<a href="/asset/create/" class="btn btn-primary mb-3 create-asset-btn">Create Asset</a>
 <table class="table table-striped">
 <thead>
     <tr>
@@ -63,6 +64,9 @@ Asset List
         width: 100px;
         height: 100px;
         object-fit: cover;
+    }
+    .create-asset-btn {
+        float: left;
     }
 </style>
 

@@ -11,6 +11,7 @@ urlpatterns = [
     path('asset/', include('asset.urls')),
     path('location/', include('location.urls')),
     path('dashboard/', include('admin_dashboard.urls')),
+    path('logbook/', include('logbook.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
