@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}ATE CMMS{% endblock %}
+{% block title %}ATE MMS{% endblock %}
 {% block heading_h1 %}<h1>Air Traffic Engineering</h1>{% endblock %}
-{% block heading_h2 %}<h2>Computerized Maintenance Management System</h2>{% endblock %}
+{% block heading_h2 %}<h2>Maintenance Management System</h2>{% endblock %}
 {% block content %}
 <div class="services">
     <a href="/asset/" class="service-card-link">
@@ -14,6 +14,12 @@
         <div class="service-card">
             <h3>Logbook</h3>
             <!-- <p>Maintain a detailed logbook of all maintenance activities for future reference.</p> -->
+        </div>
+    </a>
+    <a href="/job_card/" class="service-card-link">
+        <div class="service-card">
+            <h3>Job Card Management</h3>
+            <!-- <p>Create, assign, and track job cards for maintenance tasks.</p> -->
         </div>
     </a>
     <a href="/preventive_maintenance/" class="service-card-link">
@@ -33,8 +39,8 @@
         <!-- <p>Conduct regular inspections to ensure system reliability and compliance.</p> -->
     </div>
     <div class="service-card">
-        <h3>Job Card Management</h3>
-        <!-- <p>Create, assign, and track job cards for maintenance tasks.</p> -->
+        <h3>Manual</h3>
+        <p>A Library of OEM Manuals and SOP's</p>
     </div>
     <div class="service-card">
         <h3>Reporting and Analytics</h3>

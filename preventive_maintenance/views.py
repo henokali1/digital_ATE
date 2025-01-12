@@ -18,7 +18,8 @@ def maintenance_create(request):
             maintenance = form.save(commit=False)
             maintenance.logged_by = request.user
             maintenance.save()
-            return redirect('maintenance_list')
+            records = PreventiveMaintenance.objects.all()
+            return render(request, 'preventive_maintenance/list.html', {'records': records})
     else:
         form = PreventiveMaintenanceForm()
     return render(request, 'preventive_maintenance/form.html', {'form': form})
@@ -32,7 +33,8 @@ def maintenance_update(request, pk):
         form = PreventiveMaintenanceForm(request.POST, request.FILES, instance=maintenance)
         if form.is_valid():
             form.save()
-            return redirect('maintenance_list')
+            records = PreventiveMaintenance.objects.all()
+            return render(request, 'preventive_maintenance/list.html', {'records': records})
     else:
         form = PreventiveMaintenanceForm(instance=maintenance)
     return render(request, 'preventive_maintenance/form.html', {'form': form})
@@ -44,5 +46,6 @@ def maintenance_delete(request, pk):
     maintenance = get_object_or_404(PreventiveMaintenance, pk=pk)
     if request.method == 'POST':
         maintenance.delete()
-        return redirect('maintenance_list')
+        records = PreventiveMaintenance.objects.all()
+        return render(request, 'preventive_maintenance/list.html', {'records': records})
     return render(request, 'preventive_maintenance/confirm_delete.html', {'maintenance': maintenance})

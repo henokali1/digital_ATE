@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'admin_dashboard',
     'preventive_maintenance',
     'corrective_maintenance',
-    'maintenance',
+    'job_card',
 ]
 
 MIDDLEWARE = [

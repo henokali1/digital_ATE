@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class MaintenanceConfig(AppConfig):
+class JobCardConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'maintenance'
+    name = 'job_card'

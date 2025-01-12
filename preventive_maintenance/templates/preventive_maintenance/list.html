@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2>Preventive Maintenance Records</h2>
-<a href="{% url 'maintenance_create' %}">Add New Record</a>
+<a href="/preventive_maintenance/create/">Add New Record</a>
 <table>
     <tr>
         <th>Date</th>
@@ -28,8 +28,8 @@
             {% endif %}
         </td>
         <td>
-            <a href="{% url 'maintenance_update' record.id %}">Edit</a>
-            <a href="{% url 'maintenance_delete' record.id %}">Delete</a>
+            <a href="/preventive_maintenance/{{record.id}}/update/">Edit</a>
+            <a href="/preventive_maintenance/{{record.id}}/delete/">Delete</a>
         </td>
     </tr>
     {% endfor %}

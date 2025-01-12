@@ -41,7 +41,7 @@ class CorrectiveMaintenance(models.Model):
         # Calculate duration in hours
         start_datetime = datetime.combine(self.start_date, self.start_time)
         end_datetime = datetime.combine(self.end_date, self.end_time)
-        self.duration = (end_datetime - start_datetime).total_seconds() / 3600
+        self.duration = round((end_datetime - start_datetime).total_seconds() / 3600, 2)
         super().save(*args, **kwargs)
 
     def __str__(self):
