@@ -20,10 +20,10 @@
             <td>{{ job_card.status }}</td>
             <td>{{ job_card.maintenance_type }}</td>
             <td>
-                {% if job_card.maintenance_type == "Preventive" %}
+                {% if job_card.maintenance_type == "Preventive" and job_card.preventive_maintenance_id == None %}
                     <a href="/preventive_maintenance/create/?jc={{ job_card.pk }}">Add Preventive Maintenance</a>
                 {%  endif %}
-                {% if job_card.maintenance_type == "Corrective" %}
+                {% if job_card.maintenance_type == "Corrective" and job_card.corrective_maintenance_id == None %}
                     <a href="/corrective_maintenance/create/?jc={{ job_card.pk }}">Add Corrective Maintenance</a>
                 {%  endif %}
             </td>
@@ -32,8 +32,11 @@
                 <a href="{% url 'job_card_delete' job_card.pk %}">Delete</a>
             </td>
             <td>
-                {% if job_card %}
-                    <p>Linking to Job Card: {{ job_card.pk }}</p>
+                {% if job_card.preventive_maintenance_id %}
+                    <a href="/preventive_maintenance/{{ job_card.preventive_maintenance_id }}/update/">PM</a>
+                {% endif %}
+                {% if job_card.corrective_maintenance_id %}
+                    <a href="/corrective_maintenance/update/{{ job_card.corrective_maintenance_id }}/">CM</a>
                 {% endif %}
             </td>
         </tr>

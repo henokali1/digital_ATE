@@ -14,7 +14,6 @@ def maintenance_list(request):
 # Create View
 # @login_required
 def maintenance_create(request):
-    
     try:
         jc_id = request.GET.get('jc')
         job_card = None

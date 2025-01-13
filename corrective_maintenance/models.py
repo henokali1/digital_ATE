@@ -47,4 +47,4 @@ class CorrectiveMaintenance(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.asset} - {self.start_date} - {self.type}"
+        return f"{self.pk}"
