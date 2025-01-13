@@ -6,6 +6,8 @@ class PreventiveMaintenanceForm(forms.ModelForm):
         model = PreventiveMaintenance
         exclude = ['logged_at', 'logged_by']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'time': forms.TimeInput(attrs={'type': 'time'}),
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'start_time': forms.TimeInput(attrs={'type': 'time'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_time': forms.TimeInput(attrs={'type': 'time'}),
         }

@@ -5,21 +5,18 @@
 <a href="/preventive_maintenance/create/">Add New Record</a>
 <table>
     <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Section</th>
-        <th>Location</th>
         <th>Asset</th>
+        <th>Location</th>
+        <th>Duration</th>
+        <th>Remarks</th>
         <th>Photo</th>
-        <th>Actions</th>
     </tr>
     {% for record in records %}
     <tr>
-        <td>{{ record.date }}</td>
-        <td>{{ record.time }}</td>
-        <td>{{ record.section }}</td>
-        <td>{{ record.location }}</td>
         <td>{{ record.asset }}</td>
+        <td>{{ record.location }}</td>
+        <td>{{ record.duration }}</td>
+        <td>{{ record.remarks }}</td>
         <td>
             {% if record.photo %}
                 <img src="{{ record.photo.url }}" alt="Photo" style="width: 100px; height: auto;">
