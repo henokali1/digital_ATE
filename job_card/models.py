@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from location.models import Location
+from preventive_maintenance.models import PreventiveMaintenance
+from corrective_maintenance.models import CorrectiveMaintenance
 from django.utils.timezone import now
 import uuid
 
@@ -19,16 +21,26 @@ class JobCard(models.Model):
         ('Rejected', 'Rejected'),
     ]
 
+    MAINTENANCE_TYPE = [
+        ('Preventive', 'Preventive'),
+        ('Corrective', 'Corrective'),
+        ('Not Required', 'Not Required'),
+    ]
+
     created_at = models.DateTimeField(default=now, editable=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True)
     job_card_number = models.CharField(
         max_length=50, unique=True, editable=False
     )
     task_description = models.CharField(max_length=255)
     assigned_users = models.ManyToManyField(User, related_name='assigned_jobs', blank=True)
     priority_level = models.CharField(max_length=10, choices=PRIORITY_CHOICES, blank=True, null=True)
+    maintenance_type = models.CharField(max_length=15, choices=MAINTENANCE_TYPE, default='Not Required')
     location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='Pending')
+    preventive_maintenance_id = models.ForeignKey(PreventiveMaintenance, on_delete=models.CASCADE, blank=True, null=True)
+    corrective_maintenance_id = models.ForeignKey(CorrectiveMaintenance, on_delete=models.CASCADE, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.job_card_number:

@@ -10,12 +10,12 @@
             {{ form.task_description }}
         </div>
         <div class="form-group">
-            <label for="assigned_users">Assigned Users</label>
-            {{ form.assigned_users }}
-        </div>
-        <div class="form-group">
             <label for="priority_level">Priority Level</label>
             {{ form.priority_level }}
+        </div>
+        <div class="form-group">
+            <label for="maintenance_type">Maintenance Type</label>
+            {{ form.maintenance_type }}
         </div>
         <div class="form-group">
             <label for="location">Location</label>
@@ -24,6 +24,10 @@
         <div class="form-group">
             <label for="status">Status</label>
             {{ form.status }}
+        </div>
+        <div class="form-group">
+            <label for="assigned_users">Assigned Users</label>
+            {{ form.assigned_users }}
         </div>
         <button type="submit" class="btn btn-primary">Save</button>
         <a href="{% url 'job_card_list' %}" class="btn btn-secondary">Cancel</a>

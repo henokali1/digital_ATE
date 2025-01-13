@@ -8,7 +8,7 @@
             <th>Job Card Number</th>
             <th>Task Description</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th>Maintenance Type</th>
         </tr>
     </thead>
     <tbody>
@@ -17,6 +17,15 @@
             <td>{{ job_card.job_card_number }}</td>
             <td>{{ job_card.task_description }}</td>
             <td>{{ job_card.status }}</td>
+            <td>{{ job_card.maintenance_type }}</td>
+            <td>
+                {% if job_card.maintenance_type == "Preventive" %}
+                    <a href="/preventive_maintenance/create/?jc={{ job_card.pk }}">Add Preventive Maintenance</a>
+                {%  endif %}
+                {% if job_card.maintenance_type == "Corrective" %}
+                    <a href="/corrective_maintenance/create/?jc={{ job_card.pk }}">Add Corrective Maintenance</a>
+                {%  endif %}
+            </td>
             <td>
                 <a href="{% url 'job_card_update' job_card.pk %}">Edit</a>
                 <a href="{% url 'job_card_delete' job_card.pk %}">Delete</a>
