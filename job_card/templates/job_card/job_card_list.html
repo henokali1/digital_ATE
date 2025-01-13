@@ -9,6 +9,7 @@
             <th>Task Description</th>
             <th>Status</th>
             <th>Maintenance Type</th>
+            <th>JC</th>
         </tr>
     </thead>
     <tbody>
@@ -29,6 +30,11 @@
             <td>
                 <a href="{% url 'job_card_update' job_card.pk %}">Edit</a>
                 <a href="{% url 'job_card_delete' job_card.pk %}">Delete</a>
+            </td>
+            <td>
+                {% if job_card %}
+                    <p>Linking to Job Card: {{ job_card.pk }}</p>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

@@ -35,4 +35,4 @@ class PreventiveMaintenance(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.asset} - {self.date}"
+        return f"{self.pk}"

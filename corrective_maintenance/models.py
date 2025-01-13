@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from location.models import Location
 from asset.models import Asset
+# from job_card.models import JobCard
 
 class CorrectiveMaintenance(models.Model):
     TYPE_CHOICES = [
@@ -22,6 +23,7 @@ class CorrectiveMaintenance(models.Model):
 
     logged_at = models.DateTimeField(auto_now_add=True)
     logged_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    # job_card_id = models.ForeignKey(JobCard, on_delete=models.CASCADE, blank=True, null=True)
     start_date = models.DateField()
     start_time = models.TimeField()
     end_date = models.DateField()
