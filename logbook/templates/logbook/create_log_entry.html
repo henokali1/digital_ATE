@@ -11,40 +11,93 @@ Log Entry Form
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <form method="POST" enctype="multipart/form-data" class="bg-light p-4 rounded">
                 {% csrf_token %}
                 <h4 class="text-center mb-4">Create/Update Log Entry</h4>
                 
-                <!-- Render form fields -->
                 {% for field in form %}
                     <div class="form-group mb-3">
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="text-danger small">
-                                {{ field.errors|striptags }}
+                        <div class="d-flex align-items-center">
+                            <div class="form-label-container text-end">
+                                {{ field.label_tag }}
                             </div>
-                        {% endif %}
+                            <div class="flex-grow-1 ms-3">
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="text-danger small">
+                                        {{ field.errors|striptags }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
                 
-                <button type="submit" class="btn btn-primary w-100">Save</button>
+                <div class="d-flex">
+                    <div class="form-label-container"></div>
+                    <div class="flex-grow-1 ms-3">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
 </div>
 
 <style>
-    /* Additional styling to make the form more appealing */
     form input, form select, form textarea {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
         border-radius: 0.25rem;
-        height: calc(2.5rem + 2px);
         font-size: 1rem;
+    }
+
+    /* Style for multiple select */
+    select[multiple] {
+        height: auto;
+        min-height: 120px;
     }
 
     .form-group label {
         font-weight: bold;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+
+    .form-label-container {
+        width: 120px;
+        flex-shrink: 0;
+    }
+
+    /* Custom styling for file input */
+    input[type="file"] {
+        padding: 0.375rem 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .d-flex {
+            flex-direction: column;
+        }
+        
+        .form-label-container {
+            width: 100%;
+            text-align: left !important;
+            margin-bottom: 0.5rem;
+        }
+        
+        .ms-3 {
+            margin-left: 0 !important;
+        }
+        
+        .btn-primary {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}

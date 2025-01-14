@@ -7,9 +7,10 @@ class LogEntry(models.Model):
     date = models.DateField()
     time = models.TimeField()
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    initials = models.ForeignKey(User, on_delete=models.CASCADE, related_name='logbook_entries')
+    initials = models.ManyToManyField(User, related_name='logbook_entries')
     photos = models.ImageField(upload_to='logbook_photos/', blank=True)
     remarks = models.TextField()
 
     def __str__(self):
-        return f"Log Entry by {self.initials} on {self.date}"
+        initials_list = ", ".join([user.username for user in self.initials.all()])
+        return f"Log Entry by {initials_list} on {self.date}"

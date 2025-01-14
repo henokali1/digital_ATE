@@ -10,7 +10,11 @@ def create_log_entry(request):
     if request.method == 'POST':
         form = LogEntryForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            # Save the form without committing to handle the many-to-many relationship
+            log_entry = form.save(commit=False)
+            log_entry.save()
+            # Now save the many-to-many data
+            form.save_m2m()
             return redirect('logbook:log_list')
     else:
         form = LogEntryForm()
@@ -32,7 +36,7 @@ def update_log_entry(request, pk):
             return redirect('logbook:log_list')
     else:
         form = LogEntryForm(instance=log_entry)
-    return render(request, 'logbook/log_form.html', {'form': form})
+    return render(request, 'logbook/create_log_entry.html', {'form': form})
 
 # Delete a LogEntry
 @login_required
