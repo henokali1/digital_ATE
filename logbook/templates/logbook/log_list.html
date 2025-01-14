@@ -1,62 +1,145 @@
 {% extends 'base.html' %}
-{% block title %}
-Log List
-{% endblock %}
+{% block title %}Log List{% endblock %}
 {% block heading_h1 %}Log List{% endblock %}
 {% block content %}
 
-<a href="/logbook/new/" class="btn btn-primary mb-3 create-log-btn">Create Log</a>
-<table class="table table-striped">
-<thead>
-    <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Location</th>
-        <th>Initials</th>
-        <th>Remarks</th>
-        <th>Photo</th>
-        {% if user.is_authenticated %}
-            <th>Actions</th>
-        {% endif %}
-    </tr>
-</thead>
-<tbody>
-    {% for log in logs %}
-    <tr>
-        <td>{{ log.date }}</td>
-        <td>{{ log.time }}</td>
-        <td>{{ log.location }}</td>
-        <td>{{ log.initials }}</td>
-        <td>{{ log.remarks }}</td>
-        <td>
-            {% if log.photos %}
-                <a href="{{ log.photos.url }}" target="_blank">
-                    <img src="{{ log.photos.url }}" alt="{{ log.name }}" class="thumbnail">
-                </a>
-            {% else %}
-                <p>No photo available</p>
-            {% endif %}
-        </td>
-        {% if user.username == "cns.ce@fans.ae" %}
-        <td>
-            <a href="{% url 'logbook:update_log_entry' log.id %}">Edit</a> | 
-            <a href="{% url 'logbook:delete_log_entry' log.id %}">Delete</a>
-        </td>
-        {% endif %}
-    </tr>
-    {% endfor %}
-</tbody>
-</table>
+<div class="container-fluid px-3 px-md-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="/logbook/new/" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Create Log
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover border">
+            <thead class="table-light">
+                <tr>
+                    <th class="fw-semibold">Date</th>
+                    <th class="fw-semibold">Time</th>
+                    <th class="fw-semibold">Location</th>
+                    <th class="fw-semibold">Initials</th>
+                    <th class="fw-semibold">Remarks</th>
+                    <th class="fw-semibold">Photo</th>
+                    {% if user.is_authenticated %}
+                        <th class="fw-semibold text-end">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr class="clickable-row" data-href="{% url 'logbook:log_detail' log.id %}">
+                    <td>{{ log.date }}</td>
+                    <td>{{ log.time }}</td>
+                    <td>{{ log.location }}</td>
+                    <td>{{ log.initials }}</td>
+                    <td>
+                        <div class="remarks-cell">{{ log.remarks }}</div>
+                    </td>
+                    <td>
+                        {% if log.photos %}
+                            <img src="{{ log.photos.url }}" alt="Log photo" class="thumbnail">
+                        {% else %}
+                            <span class="text-muted">No photo</span>
+                        {% endif %}
+                    </td>
+                    {% if user.username == "cns.ce@fans.ae" %}
+                    <td class="text-end">
+                        <div class="btn-group">
+                            <a href="{% url 'logbook:update_log_entry' log.id %}" class="btn btn-sm btn-outline-primary action-btn">Edit</a>
+                            <a href="{% url 'logbook:delete_log_entry' log.id %}" class="btn btn-sm btn-outline-danger action-btn">Delete</a>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <style>
-    .thumbnail {
-        width: 100px;
-        height: 100px;
-        object-fit: cover;
+    .table {
+        font-size: 0.95rem;
     }
-    .create-log-btn {
-        float: left;
+
+    .table th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.15s ease-in-out;
+    }
+
+    .clickable-row:hover {
+        background-color: rgba(0, 0, 0, 0.075);
+    }
+
+    .thumbnail {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+    .remarks-cell {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .action-btn {
+        z-index: 2;
+    }
+
+    @media (max-width: 767.98px) {
+        .table {
+            font-size: 0.875rem;
+        }
+
+        .remarks-cell {
+            max-width: 150px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .thumbnail {
+            width: 40px;
+            height: 40px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .table-responsive {
+            margin: 0 -1rem;
+            padding: 0 1rem;
+            width: calc(100% + 2rem);
+        }
     }
 </style>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Don't navigate if clicking on action buttons
+                if (!e.target.closest('.action-btn')) {
+                    window.location.href = this.dataset.href;
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

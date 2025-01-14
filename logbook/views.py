@@ -46,3 +46,8 @@ def delete_log_entry(request, pk):
         log_entry.delete()
         return redirect('logbook:log_list')
     return render(request, 'logbook/log_confirm_delete.html', {'log_entry': log_entry})
+
+@login_required
+def log_detail(request, pk):
+    log = get_object_or_404(LogEntry, pk=pk)
+    return render(request, 'logbook/log_detail.html', {'log': log})
