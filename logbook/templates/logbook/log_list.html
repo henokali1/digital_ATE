@@ -31,7 +31,13 @@
                     <td>{{ log.date }}</td>
                     <td>{{ log.time }}</td>
                     <td>{{ log.location }}</td>
-                    <td>{{ log.initials }}</td>
+                    <td>
+                        <p class="mb-3">
+                            {% for user in log.initials.all %}
+                            <span class="badge rounded-pill bg-primary me-1">{{ user.username }}</span>{% if not forloop.last %}, {% endif %}<br>
+                            {% endfor %}
+                        </p>
+                    </td>
                     <td>
                         <div class="remarks-cell">{{ log.remarks }}</div>
                     </td>

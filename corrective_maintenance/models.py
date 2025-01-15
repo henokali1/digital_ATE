@@ -37,6 +37,7 @@ class CorrectiveMaintenance(models.Model):
     preventive_action = models.TextField()
     root_cause = models.TextField()
     remarks = models.TextField()
+    completed_by = models.ManyToManyField(User, related_name='correctie_maintenance_completed_by')
     photo = models.ImageField(upload_to='uploads/corrective_photos/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
