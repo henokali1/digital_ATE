@@ -1,10 +1,168 @@
 {% extends 'base.html' %}
+{% load form_filters %}
+
+{% block title %}{% if form.instance.pk %}Update Maintenance Record{% else %}New Maintenance Record{% endif %}{% endblock %}
+
+{% block heading_h1 %}Corrective Maintenance{% endblock %}
+{% block heading_h2 %}{% if form.instance.pk %}Update Record{% else %}New Record{% endif %}{% endblock %}
 
 {% block content %}
-<h2>{% if form.instance.pk %}Update Record{% else %}Add New Record{% endif %}</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <!-- Time and Date Section -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-clock-fill me-2"></i>Time and Date
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                                {{ form.start_date|addClass:"form-control" }}
+                                <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                                {{ form.start_time|addClass:"form-control" }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                                {{ form.end_date|addClass:"form-control" }}
+                                <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                                {{ form.end_time|addClass:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classification Section -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-tag-fill me-2"></i>Classification
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.type.id_for_label }}" class="form-label">Type</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-exclamation-triangle"></i></span>
+                                {{ form.type|addClass:"form-select" }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.section.id_for_label }}" class="form-label">Section</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-briefcase"></i></span>
+                                {{ form.section|addClass:"form-select" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location and Asset Section -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-geo-alt-fill me-2"></i>Location and Asset
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                {{ form.location|addClass:"form-select" }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.asset.id_for_label }}" class="form-label">Asset</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-gear"></i></span>
+                                {{ form.asset|addClass:"form-select" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maintenance Details Section -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-tools me-2"></i>Maintenance Details
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="{{ form.corrective_action.id_for_label }}" class="form-label">Corrective Action</label>
+                        {{ form.corrective_action|addClass:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.preventive_action.id_for_label }}" class="form-label">Preventive Action</label>
+                        {{ form.preventive_action|addClass:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.root_cause.id_for_label }}" class="form-label">Root Cause</label>
+                        {{ form.root_cause|addClass:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks</label>
+                        {{ form.remarks|addClass:"form-control" }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff and Documentation Section -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-people-fill me-2"></i>Staff and Documentation
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="{{ form.completed_by.id_for_label }}" class="form-label">Completed By</label>
+                        {{ form.completed_by|addClass:"form-select" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.photo.id_for_label }}" class="form-label">Photo Documentation</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-camera"></i></span>
+                            {{ form.photo|addClass:"form-control" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'maintenance_list' %}" class="btn btn-secondary me-2">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-2"></i>Save Record
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
 {% endblock %}
