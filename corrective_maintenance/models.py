@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from location.models import Location
 from asset.models import Asset
-# from job_card.models import JobCard
 
 class CorrectiveMaintenance(models.Model):
     TYPE_CHOICES = [

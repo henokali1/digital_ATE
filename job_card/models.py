@@ -33,7 +33,7 @@ class JobCard(models.Model):
     job_card_number = models.CharField(
         max_length=50, unique=True, editable=False
     )
-    task_description = models.CharField(max_length=255)
+    task_description = models.CharField(max_length=255) 
     assigned_users = models.ManyToManyField(User, related_name='assigned_jobs', blank=True)
     priority_level = models.CharField(max_length=10, choices=PRIORITY_CHOICES, blank=True, null=True)
     maintenance_type = models.CharField(max_length=15, choices=MAINTENANCE_TYPE, default='Not Required')

@@ -41,3 +41,8 @@ def job_card_delete(request, pk):
         job_card.delete()
         return redirect('job_card_list')
     return render(request, 'job_card/job_card_confirm_delete.html', {'job_card': job_card})
+
+@login_required
+def job_card_detail(request, pk):
+    job_card = get_object_or_404(JobCard, pk=pk)
+    return render(request, 'job_card/job_card_detail.html', {'job_card': job_card})
