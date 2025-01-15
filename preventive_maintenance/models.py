@@ -26,6 +26,7 @@ class PreventiveMaintenance(models.Model):
     PPM_Form = models.FileField(upload_to='uploads/forms/')
     photo = models.ImageField(upload_to='uploads/photos/', blank=True, null=True) 
     remarks = models.TextField()
+    completed_by = models.ManyToManyField(User, related_name='preventive_maintenance_completed_by')
 
     def save(self, *args, **kwargs):
         # Calculate duration in hours

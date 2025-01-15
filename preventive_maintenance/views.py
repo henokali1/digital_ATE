@@ -31,6 +31,8 @@ def maintenance_create(request):
             maintenance = form.save(commit=False)
             maintenance.logged_by = request.user
             maintenance.save()
+            # Now save the many-to-many data
+            form.save_m2m()
 
             # Link the PreventiveMaintenance to the JobCard
             if job_card:

@@ -7,7 +7,7 @@ class CorrectiveMaintenanceForm(forms.ModelForm):
     completed_by = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-        label="Select Users"
+        label="Maintenance Completed By"
     )
     class Meta:
         model = CorrectiveMaintenance
