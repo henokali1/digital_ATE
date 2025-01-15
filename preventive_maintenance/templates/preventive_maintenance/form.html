@@ -1,10 +1,136 @@
 {% extends 'base.html' %}
+{% load form_tags %}
 
 {% block content %}
-<h2>{% if form.instance.pk %}Update Record{% else %}Add New Record{% endif %}</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="bi bi-tools me-2"></i>
+                    {% if form.instance.pk %}Update Maintenance Record{% else %}New Maintenance Record{% endif %}
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Dates and Times Section -->
+                    <div class="row mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="bi bi-calendar-event me-2"></i>Schedule Details
+                        </h5>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date</label>
+                            {{ form.start_date|addclass:"form-control" }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.start_time.id_for_label }}" class="form-label">Start Time</label>
+                            {{ form.start_time|addclass:"form-control" }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date</label>
+                            {{ form.end_date|addclass:"form-control" }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.end_time.id_for_label }}" class="form-label">End Time</label>
+                            {{ form.end_time|addclass:"form-control" }}
+                        </div>
+                    </div>
+
+                    <!-- Location and Asset Section -->
+                    <div class="row mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="bi bi-geo-alt me-2"></i>Location & Equipment
+                        </h5>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.section.id_for_label }}" class="form-label">Section</label>
+                            {{ form.section|addclass:"form-select" }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                            {{ form.location|addclass:"form-select" }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.asset.id_for_label }}" class="form-label">Asset</label>
+                            {{ form.asset|addclass:"form-select" }}
+                        </div>
+                    </div>
+
+                    <!-- Documents Section -->
+                    <div class="row mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="bi bi-file-earmark-text me-2"></i>Documentation
+                        </h5>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.PPM_Form.id_for_label }}" class="form-label">PPM Form</label>
+                            <div class="input-group">
+                                {{ form.PPM_Form|addclass:"form-control" }}
+                                <span class="input-group-text"><i class="bi bi-file-earmark-pdf"></i></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.photo.id_for_label }}" class="form-label">Photo (Optional)</label>
+                            <div class="input-group">
+                                {{ form.photo|addclass:"form-control" }}
+                                <span class="input-group-text"><i class="bi bi-camera"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personnel Section -->
+                    <div class="row mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="bi bi-people me-2"></i>Personnel
+                        </h5>
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.completed_by.id_for_label }}" class="form-label">Completed By</label>
+                            {{ form.completed_by|addclass:"form-select" }}
+                        </div>
+                    </div>
+
+                    <!-- Remarks Section -->
+                    <div class="row mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="bi bi-chat-square-text me-2"></i>Additional Information
+                        </h5>
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks</label>
+                            {{ form.remarks|addclass:"form-control" }}
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'maintenance_list' %}" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Save Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add custom form validation script -->
+<script>
+    // Enable Bootstrap form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
 {% endblock %}
