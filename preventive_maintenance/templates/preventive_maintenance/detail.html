@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Back button -->
+    <div class="mb-4">
+        <a href="/preventive_maintenance/" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Main content card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">
+                <i class="bi bi-tools"></i> Maintenance Record #{{ maintenance.pk }}
+            </h3>
+        </div>
+        
+        <div class="card-body">
+            <!-- Basic Info Section -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-info-circle"></i> Basic Information</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="w-50"><i class="bi bi-building"></i> Section:</th>
+                            <td>{{ maintenance.section }}</td>
+                        </tr>
+                        <tr>
+                            <th><i class="bi bi-geo-alt"></i> Location:</th>
+                            <td>{{ maintenance.location }}</td>
+                        </tr>
+                        <tr>
+                            <th><i class="bi bi-gear"></i> Asset:</th>
+                            <td>{{ maintenance.asset }}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5><i class="bi bi-clock"></i> Time Information</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="w-50">Start:</th>
+                            <td>{{ maintenance.start_date }} {{ maintenance.start_time }}</td>
+                        </tr>
+                        <tr>
+                            <th>End:</th>
+                            <td>{{ maintenance.end_date }} {{ maintenance.end_time }}</td>
+                        </tr>
+                        <tr>
+                            <th>Duration:</th>
+                            <td>{{ maintenance.duration }} hours</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Personnel Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5><i class="bi bi-people"></i> Personnel Information</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="w-25">Logged By:</th>
+                            <td>{{ maintenance.logged_by }}</td>
+                        </tr>
+                        <tr>
+                            <th>Completed By:</th>
+                            <td>
+                                {% for user in maintenance.completed_by.all %}
+                                    <span class="badge bg-secondary me-1">{{ user.get_full_name|default:user.username }}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Documents and Photos Section -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-file-earmark-text"></i> PPM Form</h5>
+                    {% if maintenance.PPM_Form %}
+                        <a href="{{ maintenance.PPM_Form.url }}" class="btn btn-outline-primary" target="_blank">
+                            <i class="bi bi-download"></i> Download Form
+                        </a>
+                    {% else %}
+                        <p class="text-muted">No form uploaded</p>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6">
+                    <h5><i class="bi bi-camera"></i> Photo</h5>
+                    {% if maintenance.photo %}
+                        <img src="{{ maintenance.photo.url }}" alt="Maintenance Photo" class="img-fluid rounded" style="max-height: 200px;">
+                    {% else %}
+                        <p class="text-muted">No photo available</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Remarks Section -->
+            <div class="row">
+                <div class="col-12">
+                    <h5><i class="bi bi-chat-right-text"></i> Remarks</h5>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            {{ maintenance.remarks|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Footer with Actions -->
+        <div class="card-footer bg-light">
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'maintenance_update' maintenance.pk %}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="{% url 'maintenance_delete' maintenance.pk %}" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -71,3 +71,8 @@ def maintenance_delete(request, pk):
         records = PreventiveMaintenance.objects.all()
         return render(request, 'preventive_maintenance/list.html', {'records': records})
     return render(request, 'preventive_maintenance/confirm_delete.html', {'maintenance': maintenance})
+
+@login_required
+def maintenance_detail(request, pk):
+    maintenance = get_object_or_404(PreventiveMaintenance, pk=pk)
+    return render(request, 'preventive_maintenance/detail.html', {'maintenance': maintenance})
