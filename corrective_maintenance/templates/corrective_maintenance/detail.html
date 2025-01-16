@@ -134,10 +134,15 @@
             </div>
             <div class="modal-body p-0">
                 <div class="photo-container" style="overflow: hidden; position: relative;">
+                    
+                    {% if record.photo %}
                     <img src="{{ record.photo.url }}" 
                          class="img-fluid w-100 photo-zoomable" 
                          alt="Documentation Photo"
                          id="zoomablePhoto">
+                         {% else %}
+                         <p class="text-muted">No photo available</p>
+                         {% endif %}
                 </div>
             </div>
             <div class="modal-footer">

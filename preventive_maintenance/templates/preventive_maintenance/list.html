@@ -32,7 +32,7 @@
                     </thead>
                     <tbody>
                         {% for record in records %}
-                        <tr class="cursor-pointer" onclick="window.location='{% url 'maintenance_detail' record.pk %}';" style="cursor: pointer;">
+                        <tr class="cursor-pointer" onclick="window.location='/preventive_maintenance/{{record.pk}}';" style="cursor: pointer;">
                             <td>{{ record.pk }}</td>
                             <td>{{ record.asset }}</td>
                             <td>{{ record.location }}</td>
