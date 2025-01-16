@@ -31,7 +31,7 @@
                 </thead>
                 <tbody>
                     {% for record in records %}
-                    <tr class="cursor-pointer" onclick="window.location='{% url 'maintenance_detail' record.id %}'" style="cursor: pointer;">
+                    <tr class="cursor-pointer" onclick="window.location=`{% url 'maintenance_detail' record.id %}`" style="cursor: pointer;">
                         <td>{{ record.asset }}</td>
                         <td>{{ record.location }}</td>
                         <td>{{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</td>
