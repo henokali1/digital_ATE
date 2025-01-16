@@ -63,3 +63,8 @@ def maintenance_delete(request, pk):
         maintenance.delete()
         return redirect('maintenance_list')
     return render(request, 'corrective_maintenance/confirm_delete.html', {'object': maintenance})
+
+@login_required
+def maintenance_detail(request, pk):
+    record = get_object_or_404(CorrectiveMaintenance, pk=pk)
+    return render(request, 'corrective_maintenance/detail.html', {'record': record})

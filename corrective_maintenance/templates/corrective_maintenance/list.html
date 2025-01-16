@@ -31,7 +31,7 @@
                 </thead>
                 <tbody>
                     {% for record in records %}
-                    <tr>
+                    <tr class="cursor-pointer" onclick="window.location='{% url 'maintenance_detail' record.id %}'" style="cursor: pointer;">
                         <td>{{ record.asset }}</td>
                         <td>{{ record.location }}</td>
                         <td>{{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</td>
@@ -43,131 +43,14 @@
                             </span>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#detailModal{{ record.id }}">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <a href="{% url 'maintenance_update' record.id %}" class="btn btn-sm btn-warning me-2">
+                            <a href="{% url 'maintenance_update' record.id %}" class="btn btn-sm btn-warning me-2" onclick="event.stopPropagation();">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <a href="{% url 'maintenance_delete' record.id %}" class="btn btn-sm btn-danger">
+                            <a href="{% url 'maintenance_delete' record.id %}" class="btn btn-sm btn-danger" onclick="event.stopPropagation();">
                                 <i class="bi bi-trash"></i>
                             </a>
                         </td>
                     </tr>
-
-                    <!-- Detail Modal for each record -->
-                    <div class="modal fade" id="detailModal{{ record.id }}" tabindex="-1" aria-labelledby="detailModalLabel{{ record.id }}" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                            <div class="modal-content">
-                                <div class="modal-header bg-primary text-white">
-                                    <h5 class="modal-title" id="detailModalLabel{{ record.id }}">
-                                        <i class="bi bi-info-circle me-2"></i>Maintenance Record Details
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row g-4">
-                                        <!-- Basic Info Section -->
-                                        <div class="col-md-6">
-                                            <div class="card h-100">
-                                                <div class="card-header bg-light">
-                                                    <i class="bi bi-info-circle me-2"></i>Basic Information
-                                                </div>
-                                                <div class="card-body">
-                                                    <p><strong><i class="bi bi-gear me-2"></i>Asset:</strong> {{ record.asset }}</p>
-                                                    <p><strong><i class="bi bi-building me-2"></i>Location:</strong> {{ record.location }}</p>
-                                                    <p><strong><i class="bi bi-tag me-2"></i>Type:</strong> {{ record.type }}</p>
-                                                    <p><strong><i class="bi bi-diagram-3 me-2"></i>Section:</strong> {{ record.section }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Time Info Section -->
-                                        <div class="col-md-6">
-                                            <div class="card h-100">
-                                                <div class="card-header bg-light">
-                                                    <i class="bi bi-clock-history me-2"></i>Time Information
-                                                </div>
-                                                <div class="card-body">
-                                                    <p><strong><i class="bi bi-calendar-check me-2"></i>Start:</strong> {{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</p>
-                                                    <p><strong><i class="bi bi-calendar-x me-2"></i>End:</strong> {{ record.end_date|date:"M d, Y" }} {{ record.end_time|time:"H:i" }}</p>
-                                                    <p><strong><i class="bi bi-hourglass-split me-2"></i>Duration:</strong> {{ record.duration }} hours</p>
-                                                    <p><strong><i class="bi bi-clock-history me-2"></i>Logged:</strong> {{ record.logged_at|date:"M d, Y H:i" }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Maintenance Details Section -->
-                                        <div class="col-12">
-                                            <div class="card">
-                                                <div class="card-header bg-light">
-                                                    <i class="bi bi-tools me-2"></i>Maintenance Details
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="mb-3">
-                                                        <h6><i class="bi bi-wrench me-2"></i>Corrective Action</h6>
-                                                        <p class="text-muted">{{ record.corrective_action }}</p>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <h6><i class="bi bi-shield-check me-2"></i>Preventive Action</h6>
-                                                        <p class="text-muted">{{ record.preventive_action }}</p>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <h6><i class="bi bi-search me-2"></i>Root Cause</h6>
-                                                        <p class="text-muted">{{ record.root_cause }}</p>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <h6><i class="bi bi-chat-text me-2"></i>Remarks</h6>
-                                                        <p class="text-muted">{{ record.remarks }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Personnel Section -->
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-header bg-light">
-                                                    <i class="bi bi-people me-2"></i>Personnel
-                                                </div>
-                                                <div class="card-body">
-                                                    <p><strong><i class="bi bi-person-check me-2"></i>Logged By:</strong> {{ record.logged_by }}</p>
-                                                    <p><strong><i class="bi bi-people-fill me-2"></i>Completed By:</strong></p>
-                                                    <ul class="list-unstyled ms-4">
-                                                        {% for user in record.completed_by.all %}
-                                                        <li><i class="bi bi-person me-2"></i>{{ user }}</li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Photo Section -->
-                                        {% if record.photo %}
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-header bg-light">
-                                                    <i class="bi bi-camera me-2"></i>Documentation Photo
-                                                </div>
-                                                <div class="card-body text-center">
-                                                    <img src="{{ record.photo.url }}" class="img-fluid rounded" alt="Documentation Photo">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                        <i class="bi bi-x-circle me-2"></i>Close
-                                    </button>
-                                    <a href="{% url 'maintenance_update' record.id %}" class="btn btn-primary">
-                                        <i class="bi bi-pencil me-2"></i>Edit Record
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     {% endfor %}
                 </tbody>
             </table>

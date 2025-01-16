@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Maintenance Record Detail{% endblock %}
+{% block heading_h1 %}Corrective Maintenance{% endblock %}
+{% block heading_h2 %}Record Details{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <a href="{% url 'maintenance_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to List
+            </a>
+            <a href="{% url 'maintenance_update' record.id %}" class="btn btn-warning ms-2">
+                <i class="bi bi-pencil me-2"></i>Edit Record
+            </a>
+            <a href="{% url 'maintenance_delete' record.id %}" class="btn btn-danger ms-2">
+                <i class="bi bi-trash me-2"></i>Delete Record
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Basic Info Section -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-info-circle me-2"></i>Basic Information
+                </div>
+                <div class="card-body">
+                    <p><strong><i class="bi bi-gear me-2"></i>Asset:</strong> {{ record.asset }}</p>
+                    <p><strong><i class="bi bi-building me-2"></i>Location:</strong> {{ record.location }}</p>
+                    <p><strong><i class="bi bi-tag me-2"></i>Type:</strong> 
+                        <span class="badge {% if record.type == 'Outage' %}bg-danger{% elif record.type == 'Warning' %}bg-warning{% elif record.type == 'Alarm' %}bg-info{% else %}bg-secondary{% endif %}">
+                            {{ record.type }}
+                        </span>
+                    </p>
+                    <p><strong><i class="bi bi-diagram-3 me-2"></i>Section:</strong> {{ record.section }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Info Section -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-clock-history me-2"></i>Time Information
+                </div>
+                <div class="card-body">
+                    <p><strong><i class="bi bi-calendar-check me-2"></i>Start:</strong> {{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</p>
+                    <p><strong><i class="bi bi-calendar-x me-2"></i>End:</strong> {{ record.end_date|date:"M d, Y" }} {{ record.end_time|time:"H:i" }}</p>
+                    <p><strong><i class="bi bi-hourglass-split me-2"></i>Duration:</strong> {{ record.duration }} hours</p>
+                    <p><strong><i class="bi bi-clock-history me-2"></i>Logged:</strong> {{ record.logged_at|date:"M d, Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Details Section -->
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-tools me-2"></i>Maintenance Details
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6><i class="bi bi-wrench me-2"></i>Corrective Action</h6>
+                        <p class="text-muted">{{ record.corrective_action }}</p>
+                    </div>
+                    <div class="mb-4">
+                        <h6><i class="bi bi-shield-check me-2"></i>Preventive Action</h6>
+                        <p class="text-muted">{{ record.preventive_action }}</p>
+                    </div>
+                    <div class="mb-4">
+                        <h6><i class="bi bi-search me-2"></i>Root Cause</h6>
+                        <p class="text-muted">{{ record.root_cause }}</p>
+                    </div>
+                    <div class="mb-4">
+                        <h6><i class="bi bi-chat-text me-2"></i>Remarks</h6>
+                        <p class="text-muted">{{ record.remarks }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personnel Section -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-people me-2"></i>Personnel
+                </div>
+                <div class="card-body">
+                    <p><strong><i class="bi bi-person-check me-2"></i>Logged By:</strong> {{ record.logged_by }}</p>
+                    <p><strong><i class="bi bi-people-fill me-2"></i>Completed By:</strong></p>
+                    <ul class="list-unstyled ms-4">
+                        {% for user in record.completed_by.all %}
+                        <li><i class="bi bi-person me-2"></i>{{ user }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Photo Section -->
+        {% if record.photo %}
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-camera me-2"></i>Documentation Photo
+                </div>
+                <div class="card-body text-center">
+                    <img src="{{ record.photo.url }}" 
+                         class="img-fluid rounded cursor-zoom-in" 
+                         alt="Documentation Photo"
+                         data-bs-toggle="modal" 
+                         data-bs-target="#photoModal"
+                         style="cursor: pointer;">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Photo Modal -->
+<div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="photoModalLabel">
+                    <i class="bi bi-zoom-in me-2"></i>Documentation Photo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="photo-container" style="overflow: hidden; position: relative;">
+                    <img src="{{ record.photo.url }}" 
+                         class="img-fluid w-100 photo-zoomable" 
+                         alt="Documentation Photo"
+                         id="zoomablePhoto">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="zoom-controls me-auto">
+                    <button class="btn btn-outline-primary" id="zoomIn">
+                        <i class="bi bi-zoom-in"></i>
+                    </button>
+                    <button class="btn btn-outline-primary mx-2" id="zoomOut">
+                        <i class="bi bi-zoom-out"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" id="resetZoom">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </button>
+                </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add custom styles -->
+<style>
+    .photo-container {
+        position: relative;
+        overflow: auto;
+        max-height: 80vh;
+    }
+
+    .photo-zoomable {
+        transform-origin: 0 0;
+        transition: transform 0.1s ease-out;
+    }
+
+    .cursor-zoom-in {
+        cursor: zoom-in;
+    }
+
+    .modal-xl {
+        max-width: 90vw;
+    }
+</style>
+
+<!-- Add JavaScript for zoom functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const photo = document.getElementById('zoomablePhoto');
+    const zoomIn = document.getElementById('zoomIn');
+    const zoomOut = document.getElementById('zoomOut');
+    const resetZoom = document.getElementById('resetZoom');
+    
+    let currentScale = 1;
+    const ZOOM_STEP = 0.25;
+    const MAX_ZOOM = 4;
+    const MIN_ZOOM = 0.5;
+
+    // Initialize panzoom
+    let isDragging = false;
+    let startX, startY, translateX = 0, translateY = 0;
+    
+    photo.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+        photo.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        
+        updateTransform();
+    });
+
+    document.addEventListener('mouseup', function() {
+        isDragging = false;
+        photo.style.cursor = 'grab';
+    });
+
+    // Zoom controls
+    zoomIn.addEventListener('click', function() {
+        if (currentScale < MAX_ZOOM) {
+            currentScale += ZOOM_STEP;
+            updateTransform();
+        }
+    });
+
+    zoomOut.addEventListener('click', function() {
+        if (currentScale > MIN_ZOOM) {
+            currentScale -= ZOOM_STEP;
+            updateTransform();
+        }
+    });
+
+    resetZoom.addEventListener('click', function() {
+        currentScale = 1;
+        translateX = 0;
+        translateY = 0;
+        updateTransform();
+    });
+
+    // Mouse wheel zoom
+    photo.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        const delta = Math.sign(e.deltaY) * -0.1;
+        const newScale = currentScale + delta;
+        
+        if (newScale >= MIN_ZOOM && newScale <= MAX_ZOOM) {
+            currentScale = newScale;
+            updateTransform();
+        }
+    });
+
+    function updateTransform() {
+        photo.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
+    }
+
+    // Reset zoom when modal is closed
+    const photoModal = document.getElementById('photoModal');
+    photoModal.addEventListener('hidden.bs.modal', function() {
+        currentScale = 1;
+        translateX = 0;
+        translateY = 0;
+        updateTransform();
+    });
+});
+</script>
+{% endblock %}
