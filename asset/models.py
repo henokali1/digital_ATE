@@ -22,7 +22,7 @@ class Asset(models.Model):
     tag_id = models.CharField(max_length=50, unique=True)
     section = models.CharField(max_length=50, choices=SECTION_CHOICES, default='Communication')
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Spare')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In Use')
     manufacturer = models.CharField(max_length=50, default='NA')
     model_number = models.CharField(max_length=50, default='NA')
     part_number = models.CharField(max_length=50, default='NA')
