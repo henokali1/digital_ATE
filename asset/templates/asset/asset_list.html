@@ -2,72 +2,120 @@
 {% block title %}
 Asset List
 {% endblock %}
-{% block heading_h1 %}Asset List{% endblock %}
+{% block heading_h1 %}Asset Management{% endblock %}
+{% block heading_h2 %}Complete Asset Inventory{% endblock %}
+
 {% block content %}
-<a href="/asset/create/" class="btn btn-primary mb-3 create-asset-btn">Create Asset</a>
-<table class="table table-striped">
-<thead>
-    <tr>
-        <th>Name</th>
-        <th>Serial Number</th>
-        <th>Tag ID</th>
-        <th>Section</th>
-        <th>Location</th>
-        <th>Status</th>
-        <th>Manufacturer</th>
-        <th>Model Number</th>
-        <th>Part Number</th>
-        <th>Quantity</th>
-        <th>Remarks</th>
-        <th>Photo</th>
-        {% if user.is_authenticated %}
-            <th>Actions</th>
-        {% endif %}
-    </tr>
-</thead>
-<tbody>
-    {% for asset in assets %}
-    <tr>
-        <td>{{ asset.name }}</td>
-        <td>{{ asset.serial_number }}</td>
-        <td>{{ asset.tag_id }}</td>
-        <td>{{ asset.section }}</td>
-        <td>{{ asset.location }}</td>
-        <td>{{ asset.status }}</td>
-        <td>{{ asset.manufacturer }}</td>
-        <td>{{ asset.model_number }}</td>
-        <td>{{ asset.part_number }}</td>
-        <td>{{ asset.quantity }}</td>
-        <td>{{ asset.remarks }}</td>
-        <td>
-            {% if asset.photo %}
-                <a href="{{ asset.photo.url }}" target="_blank">
-                    <img src="{{ asset.photo.url }}" alt="{{ asset.name }}" class="thumbnail">
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a href="/asset/create/" class="btn btn-primary">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Create Asset
                 </a>
-            {% else %}
-                <p>No photo available</p>
-            {% endif %}
-        </td>
-        {% if user.is_authenticated %}
-        <td>
-            <a href="{% url 'asset_edit' asset.id %}">Edit</a> | 
-            <a href="{% url 'asset_delete' asset.id %}">Delete</a>
-        </td>
-        {% endif %}
-    </tr>
-    {% endfor %}
-</tbody>
-</table>
+            </div>
+            <div class="input-group w-25">
+                <input type="text" class="form-control" id="assetSearch" placeholder="Search assets...">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th><i class="bi bi-tag-fill me-2"></i>Name</th>
+                        <th><i class="bi bi-upc-scan me-2"></i>Serial Number</th>
+                        <th><i class="bi bi-qr-code me-2"></i>Tag ID</th>
+                        <th><i class="bi bi-diagram-3 me-2"></i>Section</th>
+                        <th><i class="bi bi-geo-alt-fill me-2"></i>Location</th>
+                        <th><i class="bi bi-activity me-2"></i>Status</th>
+                        <th><i class="bi bi-camera me-2"></i>Photo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assets %}
+                    <tr class="asset-row" data-href="{% url 'asset_detail' asset.id %}" role="button">
+                        <td class="fw-bold">{{ asset.name }}</td>
+                        <td><span class="badge bg-secondary">{{ asset.serial_number }}</span></td>
+                        <td><span class="badge bg-info">{{ asset.tag_id }}</span></td>
+                        <td>{{ asset.section }}</td>
+                        <td>{{ asset.location }}</td>
+                        <td>
+                            {% if asset.status == 'In Use' %}
+                                <span class="badge bg-success">{{ asset.status }}</span>
+                            {% elif asset.status == 'Spare' %}
+                                <span class="badge bg-info">{{ asset.status }}</span>
+                            {% elif asset.status == 'Under Maintenance' %}
+                                <span class="badge bg-warning">{{ asset.status }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ asset.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if asset.photo %}
+                                <img src="{{ asset.photo.url }}" alt="{{ asset.name }}" class="thumbnail">
+                            {% else %}
+                                <span class="badge bg-secondary"><i class="bi bi-image me-1"></i>No photo</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <style>
     .thumbnail {
-        width: 100px;
-        height: 100px;
+        width: 40px;
+        height: 40px;
         object-fit: cover;
+        border-radius: 4px;
     }
-    .create-asset-btn {
-        float: left;
+    .table th {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .table td {
+        font-size: 0.9rem;
+    }
+    .badge {
+        font-weight: 500;
+    }
+    .card {
+        border: none;
+        margin-bottom: 2rem;
+    }
+    .asset-row {
+        cursor: pointer;
+    }
+    .asset-row:hover {
+        background-color: rgba(0,0,0,.075);
     }
 </style>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Make rows clickable
+    document.querySelectorAll('.asset-row').forEach(row => {
+        row.addEventListener('click', function() {
+            window.location.href = this.dataset.href;
+        });
+    });
+
+    // Simple search functionality
+    const searchInput = document.getElementById('assetSearch');
+    searchInput.addEventListener('keyup', function() {
+        const searchText = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        tableRows.forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            row.style.display = rowText.includes(searchText) ? '' : 'none';
+        });
+    });
+});
+</script>
 {% endblock %}

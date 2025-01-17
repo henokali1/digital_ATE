@@ -26,6 +26,11 @@ def asset_create(request):
         form = AssetForm()
     return render(request, 'asset/asset_form.html', {'form': form})
 
+@login_required
+def asset_detail(request, id):
+    asset = get_object_or_404(Asset, id=id)
+    return render(request, 'asset/asset_detail.html', {'asset': asset})
+
 # Update an existing asset
 @login_required
 def asset_edit(request, id):

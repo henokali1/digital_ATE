@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %}{{ asset.name }} Details{% endblock %}
+{% block heading_h1 %}Asset Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Back button and status -->
+        <div class="col-12 mb-4">
+            <a href="{% url 'asset_list' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to List
+            </a>
+            <span class="float-end">
+                {% if asset.status == 'In Use' %}
+                    <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-2"></i>{{ asset.status }}</span>
+                {% elif asset.status == 'Spare' %}
+                    <span class="badge bg-info fs-6"><i class="bi bi-box me-2"></i>{{ asset.status }}</span>
+                {% elif asset.status == 'Under Maintenance' %}
+                    <span class="badge bg-warning fs-6"><i class="bi bi-tools me-2"></i>{{ asset.status }}</span>
+                {% else %}
+                    <span class="badge bg-danger fs-6"><i class="bi bi-x-circle me-2"></i>{{ asset.status }}</span>
+                {% endif %}
+            </span>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle me-2"></i>Basic Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-tag me-2"></i>Name</label>
+                                <p class="fs-5 fw-bold mb-3">{{ asset.name }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-upc-scan me-2"></i>Serial Number</label>
+                                <p class="badge bg-secondary fs-6 mb-3">{{ asset.serial_number }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-qr-code me-2"></i>Tag ID</label>
+                                <p class="badge bg-info fs-6 mb-3">{{ asset.tag_id }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-diagram-3 me-2"></i>Section</label>
+                                <p class="mb-3">{{ asset.section }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-geo-alt me-2"></i>Location</label>
+                                <p class="mb-3">{{ asset.location }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-123 me-2"></i>Quantity</label>
+                                <p class="mb-3">{{ asset.quantity }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-card-text me-2"></i>Technical Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-building me-2"></i>Manufacturer</label>
+                                <p class="mb-3">{{ asset.manufacturer }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-box me-2"></i>Model Number</label>
+                                <p class="mb-3">{{ asset.model_number }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-hash me-2"></i>Part Number</label>
+                                <p class="mb-3">{{ asset.part_number }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <label class="text-muted"><i class="bi bi-chat-text me-2"></i>Remarks</label>
+                                <p class="mb-3">{{ asset.remarks|default:"No remarks" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar with photo and actions -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-camera me-2"></i>Asset Photo
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if asset.photo %}
+                        <img src="{{ asset.photo.url }}" alt="{{ asset.name }}" class="img-fluid rounded mb-3">
+                    {% else %}
+                        <div class="no-photo-placeholder">
+                            <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                            <p class="text-muted">No photo available</p>
+                        </div>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'asset_edit' asset.id %}" class="btn btn-primary">
+                                <i class="bi bi-pencil-fill me-2"></i>Edit Asset
+                            </a>
+                            <a href="{% url 'asset_delete' asset.id %}" class="btn btn-danger">
+                                <i class="bi bi-trash-fill me-2"></i>Delete Asset
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .detail-item label {
+        font-size: 0.875rem;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    .detail-item p {
+        font-size: 1rem;
+    }
+    .no-photo-placeholder {
+        padding: 2rem;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+    }
+    @media (max-width: 768px) {
+        .card {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+{% endblock %}
