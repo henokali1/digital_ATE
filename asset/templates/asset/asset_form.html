@@ -1,290 +1,237 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Create Asset{% endblock %}
+{% block title %}{% if form.instance.id %}Edit Asset{% else %}Create New Asset{% endif %}{% endblock %}
 
-{% block heading_h1 %}Create Asset{% endblock %}
-
-{% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="card-title mb-0">
-                        <i class="bi bi-plus-circle-fill me-2"></i>
-                        Asset Information
-                    </h4>
-                </div>
-                <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        
-                        <div class="row g-3">
-                            <!-- Asset Name -->
-                            <div class="col-md-6">
-                                <label for="{{ form.name.auto_id }}" class="form-label">
-                                    <i class="bi bi-tag me-1"></i>Asset Name
-                                </label>
-                                {{ form.name }}
-                                {% if form.name.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.name.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Serial Number -->
-                            <div class="col-md-6">
-                                <label for="{{ form.serial_number.auto_id }}" class="form-label">
-                                    <i class="bi bi-upc-scan me-1"></i>Serial Number
-                                </label>
-                                {{ form.serial_number }}
-                                {% if form.serial_number.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.serial_number.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Tag ID -->
-                            <div class="col-md-6">
-                                <label for="{{ form.tag_id.auto_id }}" class="form-label">
-                                    <i class="bi bi-qr-code me-1"></i>Tag ID
-                                </label>
-                                {{ form.tag_id }}
-                                {% if form.tag_id.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.tag_id.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Section -->
-                            <div class="col-md-6">
-                                <label for="{{ form.section.auto_id }}" class="form-label">
-                                    <i class="bi bi-diagram-3 me-1"></i>Section
-                                </label>
-                                {{ form.section }}
-                                {% if form.section.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.section.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Location -->
-                            <div class="col-md-6">
-                                <label for="{{ form.location.auto_id }}" class="form-label">
-                                    <i class="bi bi-geo-alt me-1"></i>Location
-                                </label>
-                                {{ form.location }}
-                                {% if form.location.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.location.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Status -->
-                            <div class="col-md-6">
-                                <label for="{{ form.status.auto_id }}" class="form-label">
-                                    <i class="bi bi-activity me-1"></i>Status
-                                </label>
-                                {{ form.status }}
-                                {% if form.status.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.status.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Manufacturer -->
-                            <div class="col-md-6">
-                                <label for="{{ form.manufacturer.auto_id }}" class="form-label">
-                                    <i class="bi bi-building me-1"></i>Manufacturer
-                                </label>
-                                {{ form.manufacturer }}
-                                {% if form.manufacturer.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.manufacturer.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Model Number -->
-                            <div class="col-md-6">
-                                <label for="{{ form.model_number.auto_id }}" class="form-label">
-                                    <i class="bi bi-hash me-1"></i>Model Number
-                                </label>
-                                {{ form.model_number }}
-                                {% if form.model_number.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.model_number.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Part Number -->
-                            <div class="col-md-6">
-                                <label for="{{ form.part_number.auto_id }}" class="form-label">
-                                    <i class="bi bi-puzzle me-1"></i>Part Number
-                                </label>
-                                {{ form.part_number }}
-                                {% if form.part_number.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.part_number.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Quantity -->
-                            <div class="col-md-6">
-                                <label for="{{ form.quantity.auto_id }}" class="form-label">
-                                    <i class="bi bi-123 me-1"></i>Quantity
-                                </label>
-                                {{ form.quantity }}
-                                {% if form.quantity.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.quantity.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Remarks -->
-                            <div class="col-12">
-                                <label for="{{ form.remarks.auto_id }}" class="form-label">
-                                    <i class="bi bi-chat-left-text me-1"></i>Remarks
-                                </label>
-                                {{ form.remarks }}
-                                {% if form.remarks.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.remarks.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Photo Upload -->
-                            <div class="col-12">
-                                <label for="{{ form.photo.auto_id }}" class="form-label">
-                                    <i class="bi bi-camera me-1"></i>Photo
-                                </label>
-                                {{ form.photo }}
-                                {% if form.photo.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.photo.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-save me-2"></i>Save Asset
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
-    /* Form field styles */
-    input[type="text"],
-    input[type="number"],
-    select,
-    textarea {
-        display: block;
-        width: 100%;
-        padding: 0.375rem 0.75rem;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5;
-        color: #212529;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        min-height: 42px;
-        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    .form-check-input {
+        width: 2em;
+        height: 2em;
+        margin-top: 0;
     }
-
-    select {
-        padding-right: 2.25rem;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 0.75rem center;
-        background-size: 16px 12px;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-
-    textarea {
-        min-height: 100px;
+    .section-title {
+        color: #0d6efd;
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+        font-weight: 600;
     }
-
-    input[type="file"] {
-        padding: 0.375rem 0.75rem;
+    .required-field::after {
+        content: "*";
+        color: red;
+        margin-left: 4px;
     }
-
-    .form-label {
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-    }
-
-    /* Error styles */
-    .invalid-feedback {
-        display: block;
-        color: #dc3545;
-        font-size: 0.875em;
-        margin-top: 0.25rem;
-    }
-
-    /* Card styles */
-    .card {
-        border: none;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    }
-
-    .card-header {
-        background-color: #0d6efd;
-        padding: 1rem;
-    }
-
-    /* Responsive adjustments */
     @media (max-width: 768px) {
-        .container {
-            padding: 10px;
-        }
-        
-        .card {
-            border-radius: 0;
-        }
-        
-        .col-md-6 {
-            padding: 0 15px;
+        .form-section {
+            padding: 15px;
         }
     }
 </style>
+{% endblock %}
 
-<script>
-    // Form validation
-    (function () {
-        'use strict'
-        var forms = document.querySelectorAll('.needs-validation')
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
-</script>
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">
+                    {% if form.instance.id %}
+                        <i class="bi bi-pencil-square"></i> Edit Asset
+                    {% else %}
+                        <i class="bi bi-plus-circle"></i> Create New Asset
+                    {% endif %}
+                </h1>
+                <a href="{% url 'asset_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    Please correct the errors below.
+                </div>
+                {% endif %}
+
+                <!-- Basic Information Section -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-info-circle"></i> Basic Information
+                    </h2>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.name.id_for_label }}" class="form-label required-field">Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.serial_number.id_for_label }}" class="form-label required-field">Serial Number</label>
+                            {{ form.serial_number }}
+                            {% if form.serial_number.errors %}
+                            <div class="invalid-feedback d-block">{{ form.serial_number.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.tag_id.id_for_label }}" class="form-label">Tag ID</label>
+                            {{ form.tag_id }}
+                            <div class="form-text">{{ form.tag_id.help_text }}</div>
+                            {% if form.tag_id.errors %}
+                            <div class="invalid-feedback d-block">{{ form.tag_id.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Classification Section -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-tag"></i> Classification
+                    </h2>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.section.id_for_label }}" class="form-label required-field">Section</label>
+                            {{ form.section }}
+                            <div class="form-text">{{ form.section.help_text }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.status.id_for_label }}" class="form-label required-field">Status</label>
+                            {{ form.status }}
+                            <div class="form-text">{{ form.status.help_text }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Section -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-geo-alt"></i> Location Information
+                    </h2>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.location.id_for_label }}" class="form-label required-field">Location</label>
+                            {{ form.location }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.position_rack.id_for_label }}" class="form-label">Position/Rack</label>
+                            {{ form.position_rack }}
+                            <div class="form-text">{{ form.position_rack.help_text }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Details Section -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-gear"></i> Technical Details
+                    </h2>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="{{ form.manufacturer.id_for_label }}" class="form-label">Manufacturer</label>
+                            {{ form.manufacturer }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.model_number.id_for_label }}" class="form-label">Model Number</label>
+                            {{ form.model_number }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.part_number.id_for_label }}" class="form-label">Part Number</label>
+                            {{ form.part_number }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Maintenance Requirements Section -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-tools"></i> Maintenance Requirements
+                    </h2>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.morning_shift_daily_inspection_required }}
+                                <label class="form-check-label" for="{{ form.morning_shift_daily_inspection_required.id_for_label }}">
+                                    Morning Shift Inspection
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.night_shift_daily_inspection_required }}
+                                <label class="form-check-label" for="{{ form.night_shift_daily_inspection_required.id_for_label }}">
+                                    Night Shift Inspection
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.preventive_maintenance_required }}
+                                <label class="form-check-label" for="{{ form.preventive_maintenance_required.id_for_label }}">
+                                    Preventive Maintenance
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.corrective_maintenance_required }}
+                                <label class="form-check-label" for="{{ form.corrective_maintenance_required.id_for_label }}">
+                                    Corrective Maintenance
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Information Section -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-card-text"></i> Additional Information
+                    </h2>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks</label>
+                            {{ form.remarks }}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.photo.id_for_label }}" class="form-label">Photo</label>
+                            {{ form.photo }}
+                            {% if form.instance.photo %}
+                            <div class="mt-2">
+                                <img src="{{ form.instance.photo.url }}" alt="Asset Photo" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                            {% endif %}
+                            {% if form.photo.errors %}
+                            <div class="invalid-feedback d-block">{{ form.photo.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'asset_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> 
+                        {% if form.instance.id %}Update{% else %}Create{% endif %} Asset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

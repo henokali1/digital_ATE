@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}Import Assets{% endblock %}
+{% block heading_h1 %}Asset Import{% endblock %}
+{% block heading_h2 %}Import Multiple Assets from CSV{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <!-- Main Import Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary bg-gradient text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-file-earmark-arrow-up me-2"></i>Import Assets from CSV
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" class="mb-4">
+                    {% csrf_token %}
+                    
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        {{ form.as_p }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload me-2"></i>Upload and Import
+                        </button>
+                        <a href="{% url 'download_sample_csv' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-download me-2"></i>Download Sample CSV
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Instructions Card -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>Import Instructions
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6 class="fw-bold mb-3">Required CSV Format:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Column</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>name</td>
+                                <td><span class="badge bg-danger">Yes</span></td>
+                                <td>Asset name</td>
+                            </tr>
+                            <tr>
+                                <td>serial_number</td>
+                                <td><span class="badge bg-danger">Yes</span></td>
+                                <td>Unique serial number</td>
+                            </tr>
+                            <tr>
+                                <td>section</td>
+                                <td><span class="badge bg-danger">Yes</span></td>
+                                <td>Must be one of: Communication, Navigation, Surveillance, Aviation Networks, Miscellaneous</td>
+                            </tr>
+                            <tr>
+                                <td>location</td>
+                                <td><span class="badge bg-danger">Yes</span></td>
+                                <td>Must match an existing location</td>
+                            </tr>
+                            <tr>
+                                <td>status</td>
+                                <td><span class="badge bg-danger">Yes</span></td>
+                                <td>Must be one of: In Use, Spare, Under Maintenance, Unserviceable</td>
+                            </tr>
+                            <tr>
+                                <td>tag_id</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>Will be auto-generated if empty</td>
+                            </tr>
+                            <tr>
+                                <td>position_rack</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>Position or rack name</td>
+                            </tr>
+                            <tr>
+                                <td>manufacturer</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>Manufacturer name</td>
+                            </tr>
+                            <tr>
+                                <td>model_number</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>Model number</td>
+                            </tr>
+                            <tr>
+                                <td>part_number</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>Part number</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-muted">
+                                    <small>Boolean fields (default to false if not specified):</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>morning_shift_daily_inspection_required</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>true/false</td>
+                            </tr>
+                            <tr>
+                                <td>night_shift_daily_inspection_required</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>true/false</td>
+                            </tr>
+                            <tr>
+                                <td>preventive_maintenance_required</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>true/false (defaults to true)</td>
+                            </tr>
+                            <tr>
+                                <td>corrective_maintenance_required</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>true/false</td>
+                            </tr>
+                            <tr>
+                                <td>remarks</td>
+                                <td><span class="badge bg-secondary">No</span></td>
+                                <td>Additional notes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    <strong>Tip:</strong> Download the sample CSV file to see the correct format and column headers.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        margin-bottom: 2rem;
+    }
+    .table th {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .table td {
+        font-size: 0.9rem;
+    }
+    .badge {
+        font-weight: 500;
+    }
+</style>
+{% endblock %}

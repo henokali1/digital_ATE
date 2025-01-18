@@ -9,14 +9,36 @@ Asset List
 <div class="card shadow-sm">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <a href="/asset/create/" class="btn btn-primary">
+            <!-- Action Buttons Group -->
+            <div class="d-flex gap-2">
+                <a href="{% url 'asset_create' %}" class="btn btn-primary">
                     <i class="bi bi-plus-circle-fill me-2"></i>Create Asset
                 </a>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="importExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-arrow-down-up me-2"></i>Import/Export
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="importExportDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'import_assets' %}">
+                                <i class="bi bi-file-earmark-arrow-up me-2"></i>Import from CSV
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'download_sample_csv' %}">
+                                <i class="bi bi-download me-2"></i>Download Sample CSV
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="input-group w-25">
+
+            <!-- Search Box -->
+            <div class="input-group" style="max-width: 300px;">
                 <input type="text" class="form-control" id="assetSearch" placeholder="Search assets...">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
             </div>
         </div>
 
@@ -64,6 +86,72 @@ Asset List
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        {% if assets.paginator.num_pages > 1 %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="pagination-info">
+                <small class="text-muted">
+                    Showing items {{ assets.start_index }} to {{ assets.end_index }} of {{ assets.paginator.count }}
+                </small>
+            </div>
+            <nav aria-label="Asset list navigation">
+                <ul class="pagination mb-0">
+                    {% if assets.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ assets.previous_page_number }}" aria-label="Previous">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                    </li>
+                    {% endif %}
+
+                    {% for num in assets.paginator.page_range %}
+                        {% if assets.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > assets.number|add:'-3' and num < assets.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if assets.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ assets.next_page_number }}" aria-label="Next">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ assets.paginator.num_pages }}" aria-label="Last">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -94,6 +182,43 @@ Asset List
     .asset-row:hover {
         background-color: rgba(0,0,0,.075);
     }
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+    }
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+    .dropdown-item i {
+        width: 1.2em;
+    }
+    /* Pagination Styles */
+    .pagination {
+        gap: 0.25rem;
+    }
+    .page-link {
+        border-radius: 4px;
+        padding: 0.5rem 0.75rem;
+        color: #0d6efd;
+        border: 1px solid #dee2e6;
+        font-size: 0.9rem;
+    }
+    .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+        color: #0a58ca;
+    }
+    .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
 </style>
 
 <script>
@@ -116,6 +241,14 @@ document.addEventListener('DOMContentLoaded', function() {
             row.style.display = rowText.includes(searchText) ? '' : 'none';
         });
     });
+
+    // Preserve search parameter when paginating
+    const searchParams = new URLSearchParams(window.location.search);
+    const searchValue = searchParams.get('search');
+    if (searchValue) {
+        searchInput.value = searchValue;
+        searchInput.dispatchEvent(new Event('keyup'));
+    }
 });
 </script>
 {% endblock %}
