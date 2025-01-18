@@ -9,6 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from .forms import AssetForm, CSVImportForm
 from location.models import Location
+from django.db.models import Q
 import io
 
 
@@ -16,13 +17,32 @@ import io
 def home(request):
     return HttpResponse("Welcome to Digital ATE!")
 
+
 # List all assets
 @login_required
 def asset_list(request):
-    asset_list = Asset.objects.all().order_by('-id')  # Order by newest first
-    items_per_page = 10  # You can adjust this number
+    # Get search query
+    search_query = request.GET.get('search', '')
     
-    paginator = Paginator(asset_list, items_per_page)
+    # Base queryset
+    queryset = Asset.objects.all()
+    
+    # Apply search if there's a query
+    if search_query:
+        queryset = queryset.filter(
+            Q(name__icontains=search_query) |
+            Q(serial_number__icontains=search_query) |
+            Q(tag_id__icontains=search_query) |
+            Q(section__icontains=search_query) |
+            Q(location__name__icontains=search_query) |
+            Q(status__icontains=search_query)
+        ).distinct()
+    
+    # Order by newest first
+    queryset = queryset.order_by('-id')
+    
+    # Pagination
+    paginator = Paginator(queryset, 10)  # Show 10 items per page
     page = request.GET.get('page', 1)
     
     try:
@@ -34,8 +54,10 @@ def asset_list(request):
     
     return render(request, 'asset/asset_list.html', {
         'assets': assets,
+        'search_query': search_query,
         'user': request.user
     })
+
 
 # Create a new asset
 @login_required

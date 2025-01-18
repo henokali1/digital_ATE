@@ -34,11 +34,24 @@ Asset List
             </div>
 
             <!-- Search Box -->
+            <!-- Search Form -->
             <div class="input-group" style="max-width: 300px;">
-                <input type="text" class="form-control" id="assetSearch" placeholder="Search assets...">
-                <span class="input-group-text">
-                    <i class="bi bi-search"></i>
-                </span>
+                <form method="get" class="d-flex w-100">
+                    <input type="text" 
+                        class="form-control" 
+                        name="search" 
+                        placeholder="Search assets..." 
+                        value="{{ search_query }}"
+                        aria-label="Search assets">
+                    <button class="btn btn-outline-primary" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    {% if search_query %}
+                    <a href="{% url 'asset_list' %}" class="btn btn-outline-secondary ms-1" title="Clear search">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                    {% endif %}
+                </form>
             </div>
         </div>
 
@@ -89,69 +102,72 @@ Asset List
 
         <!-- Pagination -->
         {% if assets.paginator.num_pages > 1 %}
-        <div class="d-flex justify-content-between align-items-center mt-4">
-            <div class="pagination-info">
-                <small class="text-muted">
-                    Showing items {{ assets.start_index }} to {{ assets.end_index }} of {{ assets.paginator.count }}
-                </small>
-            </div>
-            <nav aria-label="Asset list navigation">
-                <ul class="pagination mb-0">
-                    {% if assets.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1" aria-label="First">
-                            <i class="bi bi-chevron-double-left"></i>
-                        </a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ assets.previous_page_number }}" aria-label="Previous">
-                            <i class="bi bi-chevron-left"></i>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link"><i class="bi bi-chevron-left"></i></span>
-                    </li>
-                    {% endif %}
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <div class="pagination-info">
+        <small class="text-muted">
+            Showing items {{ assets.start_index }} to {{ assets.end_index }} of {{ assets.paginator.count }}
+            {% if search_query %}
+            (filtered from search: "{{ search_query }}")
+            {% endif %}
+        </small>
+    </div>
+    <nav aria-label="Asset list navigation">
+        <ul class="pagination mb-0">
+            {% if assets.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ assets.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+            </li>
+            {% endif %}
 
-                    {% for num in assets.paginator.page_range %}
-                        {% if assets.number == num %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ num }}</span>
-                            </li>
-                        {% elif num > assets.number|add:'-3' and num < assets.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
+            {% for num in assets.paginator.page_range %}
+                {% if assets.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > assets.number|add:'-3' and num < assets.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
 
-                    {% if assets.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ assets.next_page_number }}" aria-label="Next">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ assets.paginator.num_pages }}" aria-label="Last">
-                            <i class="bi bi-chevron-double-right"></i>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link"><i class="bi bi-chevron-right"></i></span>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-        {% endif %}
+            {% if assets.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ assets.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ assets.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
     </div>
 </div>
 
