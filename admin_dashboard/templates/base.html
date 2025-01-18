@@ -26,11 +26,46 @@
             text-align: center;
             position: relative;
         }
-        .logo {
-            width: 100px; /* Adjusted size */
+        .logo-container {
             position: absolute;
             top: 20px;
             left: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        .logo-container:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+        .logo {
+            width: 100px;
+        }
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 135px;  /* Positioned after the logo */
+            z-index: 100;
+        }
+        .home-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #68B2E3;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .home-icon:hover {
+            background-color: #4a9ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            color: white;
+        }
+        .home-icon i {
+            font-size: 1.5rem;
         }
         .logout-button {
             position: absolute;
@@ -77,10 +112,15 @@
             font-size: 14px;
         }
         @media (max-width: 768px) {
-            .logo {
+            .logo-container {
                 position: static;
                 margin: 0 auto 20px;
                 display: block;
+            }
+            .home-button {
+                position: absolute;
+                top: 20px;
+                left: 20px;
             }
             h1, h2 {
                 margin-top: 0;
@@ -91,7 +131,16 @@
 </head>
 <body>
     <div class="container">
-        <a href="/"><img src="/static/fans-logo.png" alt="FANS Logo" class="logo"></a>
+        <div class="logo-container" title="Go to Home">
+            <a href="/">
+                <img src="/static/fans-logo.png" alt="FANS Logo - Click to go home" class="logo">
+            </a>
+        </div>
+        <div class="home-button">
+            <a href="/" class="home-icon" title="Go to Home">
+                <i class="bi bi-house-fill"></i>
+            </a>
+        </div>
         {% if user.is_authenticated %}
         <form method="POST" action="{% url 'logout' %}" class="logout-button">
             {% csrf_token %}
@@ -100,11 +149,11 @@
         {% endif %}
         <h1>{% block heading_h1 %}{% endblock %}</h1>
         <h2>{% block heading_h2 %}{% endblock %}</h2>
-    <!-- Main Content -->
-    <div class="content">
-        {% block content %}
-        {% endblock %}
-    </div>
+        <!-- Main Content -->
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
 
         <footer>
             &copy; <span id="currentYear"></span> Fujairah Air Navigation Services. All rights reserved.
