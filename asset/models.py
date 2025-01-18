@@ -1,3 +1,4 @@
+# asset/models.py
 from django.db import models
 from location.models import Location
 import uuid
