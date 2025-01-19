@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'preventive_maintenance',
     'corrective_maintenance',
     'job_card',
+    'daily_inspection',
 ]
 
 MIDDLEWARE = [
