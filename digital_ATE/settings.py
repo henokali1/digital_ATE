@@ -47,8 +47,6 @@ INSTALLED_APPS = [
     'preventive_maintenance',
     'corrective_maintenance',
     'job_card',
-    # 'daily_inspection',
-    'daily_inspection.apps.DailyInspectionConfig',
 ]
 
 MIDDLEWARE = [
@@ -142,8 +140,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-# Schedule daily inspections
-CRONJOBS = [
-    ('0 0 * * *', 'django.core.management.call_command', ['create_daily_inspections']),  # Run at 00:00 for morning shift daily inspection
-    ('0 14 * * *', 'django.core.management.call_command', ['create_daily_inspections']), # Run at 14:00 for night shift daily inspection
-]
