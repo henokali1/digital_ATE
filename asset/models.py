@@ -49,4 +49,4 @@ class Asset(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return f'{self.name} - {self.location} - {self.position_rack}'
