@@ -4,8 +4,19 @@ from django.contrib.auth.models import User
 from asset.models import Asset
 from django.utils import timezone
 
+
+class InspectionIdent(models.Model):
+    inspection_ident = models.AutoField(primary_key=True)
+    initiated_at = models.DateTimeField(default=timezone.now, editable=False)
+    shift = models.CharField(max_length=5, null=True, blank=True)
+
+    def __str__(self):
+        return f"Inspection ID: {self.inspection_ident} - Shift: {self.shift} - initiated_at: {self.initiated_at}"
+
+
 class DailyInspection(models.Model):
     created_at = models.DateTimeField(default=timezone.now, editable=False)
+    inspection_ident = models.ForeignKey(InspectionIdent, on_delete=models.CASCADE, null=True, blank=True, related_name='daily_inspections')                                                                                                                                                                                                                                                                                                                                                                                                                  
     STATUS_CHOICES = [
         ('OK', 'Ok'),
         ('WARNING', 'Warning'),
@@ -31,3 +42,6 @@ class DailyInspection(models.Model):
     shift = models.CharField(max_length=5, choices=SHIFT_CHOICES)
     remarks = models.TextField(blank=True, null=True)
     photo = models.ImageField(upload_to='inspection_photos/', blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.created_at} - {self.shift} - {self.asset}'
