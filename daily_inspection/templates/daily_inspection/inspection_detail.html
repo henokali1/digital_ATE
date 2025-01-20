@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Inspection Detail{% endblock %}
+
+{% block heading_h1 %}Inspection Details{% endblock %}
+{% block heading_h2 %}Inspection ID: {{ inspection.inspection_ident }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="mb-4">
+                    <a href="{% url 'inspection_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="bi bi-hash text-primary" style="font-size: 2rem;"></i>
+                                <h5 class="mt-2">Inspection ID</h5>
+                                <p class="mb-0">{{ inspection.inspection_ident }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="bi bi-calendar-date text-primary" style="font-size: 2rem;"></i>
+                                <h5 class="mt-2">Initiated At</h5>
+                                <p class="mb-0">{{ inspection.initiated_at|date:"d M Y" }}</p>
+                                <p class="mb-0">{{ inspection.initiated_at|time:"H:i" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                {% if inspection.shift == 'DAY' %}
+                                    <i class="bi bi-sun-fill text-warning" style="font-size: 2rem;"></i>
+                                    <h5 class="mt-2">Shift</h5>
+                                    <p class="mb-0">Day Shift</p>
+                                {% else %}
+                                    <i class="bi bi-moon-fill text-primary" style="font-size: 2rem;"></i>
+                                    <h5 class="mt-2">Shift</h5>
+                                    <p class="mb-0">Night Shift</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if inspection.daily_inspections.all %}
+                <div class="mt-4">
+                    <h4 class="mb-3">Associated Inspections</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Asset</th>
+                                    <th>Status</th>
+                                    <th>Inspected At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for daily_inspection in inspection.daily_inspections.all %}
+                                <tr>
+                                    <td>{{ daily_inspection.asset }}</td>
+                                    <td>
+                                        <span class="badge {% if daily_inspection.status == 'OK' %}bg-success{% elif daily_inspection.status == 'WARNING' %}bg-warning{% elif daily_inspection.status == 'ALARM' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {{ daily_inspection.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ daily_inspection.inspected_at|date:"d M Y H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

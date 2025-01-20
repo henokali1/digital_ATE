@@ -15,6 +15,7 @@ urlpatterns = [
     path('preventive_maintenance/', include('preventive_maintenance.urls')),
     path('corrective_maintenance/', include('corrective_maintenance.urls')),
     path('job_card/', include('job_card.urls')),
+    path('', include('daily_inspection.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
