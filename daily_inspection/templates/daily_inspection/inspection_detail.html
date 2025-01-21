@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load inspection_tags %}
 
 {% block title %}Inspection Detail{% endblock %}
 
@@ -159,7 +160,7 @@
                         {{ location.grouper }}
                     </h5>
                     <span class="location-badge">
-                        {{ location.list|length }} Asset{{ location.list|length|pluralize }}
+                        {{ location.list|count_inspected }}/{{ location.list|length }} Asset{{ location.list|length|pluralize }}
                     </span>
                 </div>
             </div>
@@ -177,7 +178,7 @@
                                     {{ rack.grouper|default:"No Rack Assigned" }}
                                 </h6>
                                 <span class="rack-badge">
-                                    {{ rack.list|length }} Item{{ rack.list|length|pluralize }}
+                                    {{ rack.list|count_inspected }}/{{ rack.list|length }} Item{{ rack.list|length|pluralize }}
                                 </span>
                             </div>
                         </div>
@@ -203,7 +204,7 @@
                                             </small>
                                         </div>
                                         <div class="col-md-6 text-md-end">
-                                            <select name="status" class="form-select status-badge {% if daily_inspection.status %}status-{{ daily_inspection.status }}{% endif %}" data-form-id="{{ daily_inspection.id }}" required>
+                                            Status: <select name="status" class="form-select status-badge {% if daily_inspection.status %}status-{{ daily_inspection.status }}{% endif %}" data-form-id="{{ daily_inspection.id }}" required>
                                                 <option value="" {% if not daily_inspection.status %}selected{% endif %}>Select status</option>
                                                 {% for status_value, status_label in daily_inspection.STATUS_CHOICES %}
                                                 <option value="{{ status_value }}" {% if daily_inspection.status == status_value %}selected{% endif %}>
@@ -218,7 +219,7 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="remarks-{{ daily_inspection.id }}" class="form-label">
-                                                    <i class="bi bi-pencil-square"></i> Remarks
+                                                    <i class="bi bi-pencil-square"></i> Remarks (Optional)
                                                 </label>
                                                 <textarea 
                                                     class="form-control"
@@ -250,7 +251,7 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="photo-{{ daily_inspection.id }}" class="form-label">
-                                                    <i class="bi bi-camera"></i> Update Photo
+                                                    <i class="bi bi-camera"></i> Photo (Optional)
                                                 </label>
                                                 <input 
                                                     type="file" 
@@ -324,6 +325,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function updateBadgeCounts() {
+        // Update location badges
+        document.querySelectorAll('.location-card').forEach(locationCard => {
+            const locationForms = locationCard.querySelectorAll('form');
+            const totalAssets = locationForms.length;
+            const inspectedAssets = Array.from(locationForms).filter(form => {
+                const statusSelect = form.querySelector('select[name="status"]');
+                return statusSelect && statusSelect.value !== '';
+            }).length;
+            
+            const locationBadge = locationCard.querySelector('.location-badge');
+            if (locationBadge) {
+                locationBadge.textContent = `${inspectedAssets}/${totalAssets} Asset${totalAssets !== 1 ? 's' : ''}`;
+            }
+        });
+
+        // Update rack badges
+        document.querySelectorAll('.rack-card').forEach(rackCard => {
+            const rackForms = rackCard.querySelectorAll('form');
+            const totalItems = rackForms.length;
+            const inspectedItems = Array.from(rackForms).filter(form => {
+                const statusSelect = form.querySelector('select[name="status"]');
+                return statusSelect && statusSelect.value !== '';
+            }).length;
+            
+            const rackBadge = rackCard.querySelector('.rack-badge');
+            if (rackBadge) {
+                rackBadge.textContent = `${inspectedItems}/${totalItems} Item${totalItems !== 1 ? 's' : ''}`;
+            }
+        });
+    }
+
     function debounce(func, wait) {
         let timeout;
         return function(...args) {
@@ -352,10 +385,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 showUpdateStatus('Changes saved!', 'saved');
                 
                 // Update timestamp
-                const now = new Date().toLocaleString();
                 const timeElement = form.querySelector('.text-muted');
                 if (timeElement) {
-                    timeElement.textContent = now;
+                    timeElement.textContent = responseData.timestamp;
                 }
 
                 // Update progress indicators
@@ -387,6 +419,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         progressBar.className = `progress-bar ${badgeClass}`;
                     }
                 }
+
+                // Update location and rack badges
+                updateBadgeCounts();
             } else {
                 throw new Error('Network response was not ok');
             }

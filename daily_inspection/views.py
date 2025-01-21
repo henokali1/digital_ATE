@@ -152,3 +152,4 @@ def inspection_detail(request, inspection_id):
     }
     
     return render(request, 'daily_inspection/inspection_detail.html', context)
+
