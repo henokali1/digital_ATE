@@ -36,28 +36,54 @@
         margin-top: 10px;
     }
     
-    .form-buttons {
-        margin-top: 20px;
+    .location-card {
+        margin-bottom: 2rem;
     }
 
     .rack-card {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
+        border: none;
     }
 
-    .rack-header {
-        background-color: #e9ecef;
+    .location-header {
+        background-color: #e3e6f0;
         transition: background-color 0.3s ease;
     }
 
-    .rack-header:hover {
-        background-color: #dee2e6;
+    .location-header:hover {
+        background-color: #d1d3e2;
         cursor: pointer;
+    }
+
+    .rack-header {
+        background-color: #f8f9fc;
+        transition: background-color 0.3s ease;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+    }
+
+    .rack-header:hover {
+        background-color: #eaecf4;
+        cursor: pointer;
+    }
+
+    .location-title {
+        color: #2c3338;
+        font-size: 1.3rem;
+        margin: 0;
     }
 
     .rack-title {
         color: #495057;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         margin: 0;
+    }
+
+    .location-badge {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+        background-color: #4e73df;
+        color: white;
+        border-radius: 20px;
     }
 
     .rack-badge {
@@ -67,111 +93,179 @@
         color: white;
         border-radius: 20px;
     }
+
+    .update-indicator {
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        border-radius: 4px;
+        z-index: 1050;
+        transition: opacity 0.3s ease;
+    }
+
+    .saving { display: block; background-color: #ffc107; color: #000; }
+    .saved { display: block; background-color: #198754; color: white; }
+    .error { display: block; background-color: #dc3545; color: white; }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Update Status Indicator -->
+<div id="updateIndicator" class="update-indicator">
+    <i class="bi bi-arrow-repeat"></i> <span id="updateStatus">Updating...</span>
+</div>
+
+<!-- Progress Summary -->
+<div class="row justify-content-center mb-4">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <h5 class="text-muted mb-2">Inspection Progress</h5>
+                    <div class="d-flex justify-content-center align-items-center gap-2">
+                        <span class="badge bg-primary">{{ inspected_assets }} / {{ total_assets }} Assets Inspected</span>
+                        <span class="badge {% if progress_percentage == 100 %}bg-success{% elif progress_percentage > 50 %}bg-info{% else %}bg-warning{% endif %}">
+                            {{ progress_percentage|floatformat:1 }}% Complete
+                        </span>
+                    </div>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar {% if progress_percentage == 100 %}bg-success{% elif progress_percentage > 50 %}bg-info{% else %}bg-warning{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ progress_percentage }}%"
+                         aria-valuenow="{{ progress_percentage }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
 <div class="row justify-content-center">
     <div class="col-md-10">
-        {% regroup daily_inspections by asset.position_rack as rack_list %}
+        {% regroup daily_inspections by asset.location as location_list %}
         
-        {% for rack in rack_list %}
-        <div class="card rack-card shadow">
-            <div class="card-header rack-header" data-bs-toggle="collapse" data-bs-target="#rack-{{ forloop.counter }}">
+        {% for location in location_list %}
+        <div class="card location-card shadow">
+            <div class="card-header location-header" data-bs-toggle="collapse" data-bs-target="#location-{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="rack-title">
-                        <i class="bi bi-hdd-rack me-2"></i>
-                        {{ rack.grouper|default:"No Rack Assigned" }}
+                    <h5 class="location-title">
+                        <i class="bi bi-building me-2"></i>
+                        {{ location.grouper }}
                     </h5>
-                    <span class="rack-badge">
-                        {{ rack.list|length }} Asset{{ rack.list|length|pluralize }}
+                    <span class="location-badge">
+                        {{ location.list|length }} Asset{{ location.list|length|pluralize }}
                     </span>
                 </div>
             </div>
             
-            <div id="rack-{{ forloop.counter }}" class="collapse {% if forloop.first %}show{% endif %}">
-                <div class="card-body">
-                    {% for daily_inspection in rack.list %}
-                    <form class="inspection-form" method="POST" action="{% url 'inspection_detail' inspection.inspection_ident %}" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="hidden" name="inspection_id" value="{{ daily_inspection.id }}">
+            <div id="location-{{ forloop.counter }}" class="collapse {% if forloop.first %}show{% endif %}">
+                <div class="card-body py-3">
+                    {% regroup location.list by asset.position_rack as rack_list %}
+                    
+                    {% for rack in rack_list %}
+                    <div class="card rack-card">
+                        <div class="card-header rack-header" data-bs-toggle="collapse" data-bs-target="#rack-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="rack-title">
+                                    <i class="bi bi-hdd-rack me-2"></i>
+                                    {{ rack.grouper|default:"No Rack Assigned" }}
+                                </h6>
+                                <span class="rack-badge">
+                                    {{ rack.list|length }} Item{{ rack.list|length|pluralize }}
+                                </span>
+                            </div>
+                        </div>
                         
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <h4 class="asset-name">
-                                    <i class="bi bi-hdd-fill"></i>
-                                    {{ daily_inspection.asset.name }}
-                                </h4>
-                                <small class="text-muted">
-                                    Section: {{ daily_inspection.asset.section }}
-                                    {% if daily_inspection.asset.serial_number %}
-                                    | SN: {{ daily_inspection.asset.serial_number }}
-                                    {% endif %}
-                                </small>
-                            </div>
-                            <div class="col-md-6 text-md-end">
-                                <select name="status" class="form-select status-badge status-{{ daily_inspection.status }}" required>
-                                    {% for status_value, status_label in daily_inspection.STATUS_CHOICES %}
-                                    <option value="{{ status_value }}" {% if daily_inspection.status == status_value %}selected{% endif %}>
-                                        {{ status_label }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
+                        <div id="rack-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="collapse {% if forloop.first %}show{% endif %}">
+                            <div class="card-body">
+                                {% for daily_inspection in rack.list %}
+                                <form class="inspection-form" id="form-{{ daily_inspection.id }}" method="POST" action="{% url 'inspection_detail' inspection.inspection_ident %}" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="inspection_id" value="{{ daily_inspection.id }}">
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <h4 class="asset-name">
+                                                <i class="bi bi-hdd-fill"></i>
+                                                {{ daily_inspection.asset.name }}
+                                            </h4>
+                                            <small class="text-muted">
+                                                Section: {{ daily_inspection.asset.section }}
+                                                {% if daily_inspection.asset.serial_number %}
+                                                | SN: {{ daily_inspection.asset.serial_number }}
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                        <div class="col-md-6 text-md-end">
+                                            <select name="status" class="form-select status-badge {% if daily_inspection.status %}status-{{ daily_inspection.status }}{% endif %}" data-form-id="{{ daily_inspection.id }}" required>
+                                                <option value="" {% if not daily_inspection.status %}selected{% endif %}>Select status</option>
+                                                {% for status_value, status_label in daily_inspection.STATUS_CHOICES %}
+                                                <option value="{{ status_value }}" {% if daily_inspection.status == status_value %}selected{% endif %}>
+                                                    {{ status_label }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
 
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label for="remarks-{{ daily_inspection.id }}" class="form-label">
-                                        <i class="bi bi-pencil-square"></i> Remarks
-                                    </label>
-                                    <textarea 
-                                        class="form-control" 
-                                        id="remarks-{{ daily_inspection.id }}" 
-                                        name="remarks" 
-                                        rows="3"
-                                    >{{ daily_inspection.remarks|default:'' }}</textarea>
-                                </div>
-                            </div>
-                        </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="remarks-{{ daily_inspection.id }}" class="form-label">
+                                                    <i class="bi bi-pencil-square"></i> Remarks
+                                                </label>
+                                                <textarea 
+                                                    class="form-control"
+                                                    id="remarks-{{ daily_inspection.id }}"
+                                                    name="remarks"
+                                                    rows="3"
+                                                    data-form-id="{{ daily_inspection.id }}"
+                                                >{{ daily_inspection.remarks|default:'' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="photo-{{ daily_inspection.id }}" class="form-label">
-                                        <i class="bi bi-camera"></i> Update Photo
-                                    </label>
-                                    <input 
-                                        type="file" 
-                                        class="form-control" 
-                                        id="photo-{{ daily_inspection.id }}" 
-                                        name="photo" 
-                                        accept="image/*"
-                                    >
-                                    {% if daily_inspection.photo %}
-                                    <img src="{{ daily_inspection.photo.url }}" alt="Inspection photo" class="photo-preview">
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        <i class="bi bi-clock"></i> Last Updated
-                                    </label>
-                                    <p class="text-muted">
-                                        {{ daily_inspection.inspected_at|default:'Not yet inspected'|date:"d M Y H:i" }}
-                                    </p>
-                                </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="photo-{{ daily_inspection.id }}" class="form-label">
+                                                    <i class="bi bi-camera"></i> Update Photo
+                                                </label>
+                                                <input 
+                                                    type="file" 
+                                                    class="form-control" 
+                                                    id="photo-{{ daily_inspection.id }}" 
+                                                    name="photo" 
+                                                    accept="image/*"
+                                                    data-form-id="{{ daily_inspection.id }}"
+                                                >
+                                                {% if daily_inspection.photo %}
+                                                <img src="{{ daily_inspection.photo.url }}" alt="Inspection photo" class="photo-preview">
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    <i class="bi bi-clock"></i> Last Updated
+                                                </label>
+                                                <p class="text-muted">
+                                                    {{ daily_inspection.inspected_at|default:'Not yet inspected'|date:"d M Y H:i" }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                {% endfor %}
                             </div>
                         </div>
-
-                        <div class="form-buttons text-end">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Update Inspection
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
@@ -184,14 +278,120 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Update status select styling when changed
-    const statusSelects = document.querySelectorAll('select[name="status"]');
-    statusSelects.forEach(select => {
+    const updateIndicator = document.getElementById('updateIndicator');
+    const updateStatus = document.getElementById('updateStatus');
+    let updateTimeout;
+
+    function showUpdateStatus(message, type) {
+        updateIndicator.className = 'update-indicator ' + type;
+        updateStatus.textContent = message;
+        
+        if (type === 'saved') {
+            setTimeout(() => {
+                updateIndicator.style.opacity = '0';
+                setTimeout(() => {
+                    updateIndicator.style.display = 'none';
+                    updateIndicator.style.opacity = '1';
+                }, 300);
+            }, 2000);
+        }
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    async function submitForm(formId) {
+        const form = document.getElementById('form-' + formId);
+        const formData = new FormData(form);
+
+        showUpdateStatus('Saving changes...', 'saving');
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                showUpdateStatus('Changes saved!', 'saved');
+                
+                // Update timestamp
+                const now = new Date().toLocaleString();
+                const timeElement = form.querySelector('.text-muted');
+                if (timeElement) {
+                    timeElement.textContent = now;
+                }
+
+                // Update progress indicators
+                if (responseData.progress) {
+                    const progressBadge = document.querySelector('.badge.bg-primary');
+                    const percentageBadge = document.querySelector('.badge:not(.bg-primary)');
+                    const progressBar = document.querySelector('.progress-bar');
+
+                    if (progressBadge) {
+                        progressBadge.textContent = `${responseData.progress.inspected} / ${responseData.progress.total} Assets Inspected`;
+                    }
+
+                    if (percentageBadge && progressBar) {
+                        const percentage = responseData.progress.percentage;
+                        let badgeClass = 'bg-warning';
+                        if (percentage === 100) {
+                            badgeClass = 'bg-success';
+                        } else if (percentage > 50) {
+                            badgeClass = 'bg-info';
+                        }
+
+                        // Update percentage badge
+                        percentageBadge.textContent = `${percentage.toFixed(1)}% Complete`;
+                        percentageBadge.className = `badge ${badgeClass}`;
+
+                        // Update progress bar
+                        progressBar.style.width = `${percentage}%`;
+                        progressBar.setAttribute('aria-valuenow', percentage);
+                        progressBar.className = `progress-bar ${badgeClass}`;
+                    }
+                }
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showUpdateStatus('Error saving changes', 'error');
+        }
+    }
+
+    const debouncedSubmit = debounce(submitForm, 1000);
+
+    // Handle status changes
+    document.querySelectorAll('select[name="status"]').forEach(select => {
         select.addEventListener('change', function() {
-            // Remove all status classes
-            this.className = 'form-select status-badge';
-            // Add new status class
-            this.classList.add('status-' + this.value);
+            this.className = 'form-select status-badge status-' + this.value;
+            debouncedSubmit(this.dataset.formId);
+        });
+    });
+
+    // Handle remarks changes
+    document.querySelectorAll('textarea[name="remarks"]').forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            debouncedSubmit(this.dataset.formId);
+        });
+    });
+
+    // Handle photo upload
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                submitForm(this.dataset.formId);
+            }
         });
     });
 });

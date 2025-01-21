@@ -1,24 +1,23 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_protect
 from .models import InspectionIdent, DailyInspection
+from django.contrib import messages
 
 def inspection_list(request):
     inspections = InspectionIdent.objects.all().order_by('-initiated_at')
     return render(request, 'daily_inspection/inspection_list.html', {'inspections': inspections})
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.utils import timezone
-from django.views.decorators.http import require_http_methods
-from .models import InspectionIdent, DailyInspection
-
 @require_http_methods(["GET", "POST"])
 def inspection_detail(request, inspection_id):
     inspection = get_object_or_404(InspectionIdent, inspection_ident=inspection_id)
     daily_inspections = inspection.daily_inspections.all().order_by('asset__position_rack', 'asset__name')
+
+    # Calculate progress statistics
+    total_assets = daily_inspections.count()
+    inspected_assets = daily_inspections.exclude(status='').exclude(status__isnull=True).count()
+    progress_percentage = (inspected_assets / total_assets * 100) if total_assets > 0 else 0
 
     if request.method == 'POST':
         inspection_id = request.POST.get('inspection_id')
@@ -39,10 +38,31 @@ def inspection_detail(request, inspection_id):
         if request.user not in daily_inspection.inspected_by.all():
             daily_inspection.inspected_by.add(request.user)
         
+        # Recalculate progress after update
+        inspected_assets = daily_inspections.exclude(status='').exclude(status__isnull=True).count()
+        progress_percentage = (inspected_assets / total_assets * 100) if total_assets > 0 else 0
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Inspection updated successfully',
+                'timestamp': timezone.now().strftime('%d %b %Y %H:%M'),
+                'progress': {
+                    'inspected': inspected_assets,
+                    'total': total_assets,
+                    'percentage': round(progress_percentage, 1)
+                }
+            })
+        
         messages.success(request, 'Inspection updated successfully.')
         return redirect('inspection_detail', inspection_id=inspection.inspection_ident)
 
-    return render(request, 'daily_inspection/inspection_detail.html', {
+    context = {
         'inspection': inspection,
         'daily_inspections': daily_inspections,
-    })
+        'total_assets': total_assets,
+        'inspected_assets': inspected_assets,
+        'progress_percentage': progress_percentage
+    }
+    
+    return render(request, 'daily_inspection/inspection_detail.html', context)
