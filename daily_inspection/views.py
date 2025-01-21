@@ -67,8 +67,17 @@ def inspection_list(request):
         inspection.inspected_count = inspected_count
         inspection.progress_percentage = progress_percentage
 
+         # Get Status Counts
+        status_counts = inspection.daily_inspections.values('status').annotate(count=Count('status'))
+        inspection.status_counts = {item['status']: item['count'] for item in status_counts if item['status']}  # Filter out null statuses and put into a dictionary
+        
+        # Check if an item has not been given a status or if status is null
+        pending_count = total_count - inspected_count
+        inspection.pending_count = pending_count
+     
+
     return render(request, 'daily_inspection/inspection_list.html', {
-        'inspections': inspections
+        'inspections': inspections,
     })
 
 
@@ -152,4 +161,3 @@ def inspection_detail(request, inspection_id):
     }
     
     return render(request, 'daily_inspection/inspection_detail.html', context)
-
