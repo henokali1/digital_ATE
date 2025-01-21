@@ -159,6 +159,8 @@
             &copy; <span id="currentYear"></span> Fujairah Air Navigation Services. All rights reserved.
         </footer>
     </div>
+    {% block extra_js %}
+    {% endblock %}
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>

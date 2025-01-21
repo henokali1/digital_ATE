@@ -31,7 +31,7 @@ class DailyInspection(models.Model):
         ('NIGHT', 'Night'),
     ]
 
-    status = models.CharField(max_length=30, blank=True, null=True) 
+    status = models.CharField(max_length=30, blank=True, null=True, choices=STATUS_CHOICES) 
     inspected_at = models.DateTimeField(blank=True, null=True)
     inspected_by = models.ManyToManyField(
         User,

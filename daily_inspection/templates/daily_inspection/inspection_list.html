@@ -5,28 +5,37 @@
 {% block heading_h1 %}Daily Inspections{% endblock %}
 {% block heading_h2 %}View all inspection records{% endblock %}
 
+{% block extra_css %}
+<style>
+    .table tbody tr {
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f0f0f0 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-10">
         <div class="card shadow">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table">
                         <thead class="table-light">
                             <tr>
-                                <th><i class="bi bi-hash"></i> ID</th>
                                 <th><i class="bi bi-calendar-date"></i> Date</th>
-                                <th><i class="bi bi-clock"></i> Time</th>
                                 <th><i class="bi bi-person-workspace"></i> Shift</th>
-                                <th><i class="bi bi-arrow-right"></i> Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for inspection in inspections %}
-                            <tr>
-                                <td>{{ inspection.inspection_ident }}</td>
+                            <tr onclick="window.location='{% url 'inspection_detail' inspection.inspection_ident %}'">
                                 <td>{{ inspection.initiated_at|date:"d M Y" }}</td>
-                                <td>{{ inspection.initiated_at|time:"H:i" }}</td>
                                 <td>
                                     {% if inspection.shift == 'DAY' %}
                                         <span class="badge bg-warning text-dark">
@@ -38,16 +47,10 @@
                                         </span>
                                     {% endif %}
                                 </td>
-                                <td>
-                                    <a href="{% url 'inspection_detail' inspection.inspection_ident %}" 
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i> View
-                                    </a>
-                                </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center py-4">
+                                <td colspan="2" class="text-center py-4">
                                     <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
                                     <p class="text-muted mt-2">No inspections found</p>
                                 </td>
