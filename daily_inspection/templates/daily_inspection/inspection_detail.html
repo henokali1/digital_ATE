@@ -193,7 +193,7 @@
                                         <div class="col-md-6">
                                             <h4 class="asset-name">
                                                 <i class="bi bi-hdd-fill"></i>
-                                                <a href="/asset/{{daily_inspection.asset.id}}">{{ daily_inspection.asset.name }}</a>
+                                                {{ daily_inspection.asset.name }}
                                             </h4>
                                             <small class="text-muted">
                                                 Section: {{ daily_inspection.asset.section }}
@@ -270,9 +270,21 @@
                                                 <label class="form-label">
                                                     <i class="bi bi-clock"></i> Last Updated
                                                 </label>
-                                                <p class="text-muted">
+                                                <p class="text-muted mb-1">
                                                     {{ daily_inspection.inspected_at|default:'Not yet inspected'|date:"d M Y H:i" }}
                                                 </p>
+                                                {% if daily_inspection.status %}
+                                                <p class="text-muted mb-0">
+                                                    <small>
+                                                        <i class="bi bi-person"></i> Inspected by: 
+                                                        {% for user in daily_inspection.inspected_by.all %}
+                                                            {{ user.get_full_name|default:user.username }}{% if not forloop.last %}, {% endif %}
+                                                        {% empty %}
+                                                            -
+                                                        {% endfor %}
+                                                    </small>
+                                                </p>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
