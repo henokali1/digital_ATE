@@ -4,10 +4,34 @@ from django.http import JsonResponse
 from django.utils import timezone
 from .models import InspectionIdent, DailyInspection
 from django.contrib import messages
+from django.shortcuts import render
+from django.db.models import Count, Q
+from .models import InspectionIdent, DailyInspection
 
 def inspection_list(request):
     inspections = InspectionIdent.objects.all().order_by('-initiated_at')
-    return render(request, 'daily_inspection/inspection_list.html', {'inspections': inspections})
+    
+    # Add progress information to each inspection
+    for inspection in inspections:
+        # Get total count of daily inspections
+        total_count = inspection.daily_inspections.count()
+        
+        # Get count of inspected assets (where status is not null or empty)
+        inspected_count = inspection.daily_inspections.exclude(
+            Q(status__isnull=True) | Q(status='')
+        ).count()
+        
+        # Calculate percentage
+        progress_percentage = (inspected_count / total_count * 100) if total_count > 0 else 0
+        
+        # Add attributes to the inspection object
+        inspection.total_count = total_count
+        inspection.inspected_count = inspected_count
+        inspection.progress_percentage = progress_percentage
+
+    return render(request, 'daily_inspection/inspection_list.html', {
+        'inspections': inspections
+    })
 
 @require_http_methods(["GET", "POST"])
 def inspection_detail(request, inspection_id):

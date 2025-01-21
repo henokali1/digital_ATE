@@ -16,6 +16,23 @@
         background-color: #f0f0f0 !important;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
+
+    .progress {
+        height: 10px;
+        width: 150px;
+        margin-top: 5px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+    }
+
+    .progress-stats {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .inspection-progress {
+        min-width: 200px;
+    }
 </style>
 {% endblock %}
 
@@ -30,6 +47,7 @@
                             <tr>
                                 <th><i class="bi bi-calendar-date"></i> Date</th>
                                 <th><i class="bi bi-person-workspace"></i> Shift</th>
+                                <th><i class="bi bi-graph-up"></i> Progress</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,10 +65,29 @@
                                         </span>
                                     {% endif %}
                                 </td>
+                                <td class="inspection-progress">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <div class="progress-stats mb-1">
+                                                {{ inspection.inspected_count }} / {{ inspection.total_count }} Assets
+                                                <span class="float-end">{{ inspection.progress_percentage|floatformat:1 }}%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar {% if inspection.progress_percentage == 100 %}bg-success{% elif inspection.progress_percentage > 50 %}bg-info{% else %}bg-warning{% endif %}" 
+                                                     role="progressbar" 
+                                                     style="width: {{ inspection.progress_percentage }}%"
+                                                     aria-valuenow="{{ inspection.progress_percentage }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="2" class="text-center py-4">
+                                <td colspan="3" class="text-center py-4">
                                     <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
                                     <p class="text-muted mt-2">No inspections found</p>
                                 </td>
