@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.utils import timezone
 from .models import InspectionIdent, DailyInspection
@@ -7,6 +8,43 @@ from django.contrib import messages
 from django.shortcuts import render
 from django.db.models import Count, Q
 from .models import InspectionIdent, DailyInspection
+from logbook.models import LogEntry
+from django.utils.timezone import localtime
+
+@require_POST
+def save_to_logbook(request):
+    try:
+        inspection_id = request.POST.get('inspection_id')
+        daily_inspection = get_object_or_404(DailyInspection, id=inspection_id)
+        
+        current_time = timezone.localtime()
+        
+        # Create log entry
+        log_entry = LogEntry.objects.create(
+            date=current_time.date(),
+            time=current_time.time(),
+            location=daily_inspection.asset.location,
+            remarks=f"[{daily_inspection.asset.name}] {daily_inspection.remarks}"
+        )
+        
+        # Add the photo if it exists
+        if daily_inspection.photo:
+            log_entry.photos = daily_inspection.photo
+            
+        # Add the current user to the log entry
+        log_entry.initials.add(request.user)
+        log_entry.save()
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Successfully saved to logbook'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
 
 def inspection_list(request):
     inspections = InspectionIdent.objects.all().order_by('-initiated_at')
@@ -33,6 +71,7 @@ def inspection_list(request):
         'inspections': inspections
     })
 
+
 @require_http_methods(["GET", "POST"])
 def inspection_detail(request, inspection_id):
     inspection = get_object_or_404(InspectionIdent, inspection_ident=inspection_id)
@@ -47,20 +86,43 @@ def inspection_detail(request, inspection_id):
         inspection_id = request.POST.get('inspection_id')
         daily_inspection = get_object_or_404(DailyInspection, id=inspection_id)
         
+        # Get the old remarks to check if they've changed
+        old_remarks = daily_inspection.remarks
+        new_remarks = request.POST.get('remarks')
+        
         # Update the inspection
         daily_inspection.status = request.POST.get('status')
-        daily_inspection.remarks = request.POST.get('remarks')
+        daily_inspection.remarks = new_remarks
         daily_inspection.inspected_at = timezone.now()
         
         # Handle photo upload
-        if request.FILES.get('photo'):
-            daily_inspection.photo = request.FILES['photo']
+        photo = request.FILES.get('photo')
+        if photo:
+            daily_inspection.photo = photo
         
         daily_inspection.save()
         
         # Add the current user to inspected_by if not already added
         if request.user not in daily_inspection.inspected_by.all():
             daily_inspection.inspected_by.add(request.user)
+
+        # Create a log entry if there are remarks or photos
+        if (new_remarks and new_remarks != old_remarks) or photo:
+            current_time = localtime(timezone.now())
+            log_entry = LogEntry.objects.create(
+                date=current_time.date(),
+                time=current_time.time(),
+                location=daily_inspection.asset.location,
+                remarks=f"[{daily_inspection.asset.name}] {new_remarks}" if new_remarks else f"[{daily_inspection.asset.name}] Photo update"
+            )
+            
+            # Add the photo if available
+            if photo:
+                log_entry.photos = photo
+            
+            # Add the current user to the log entry
+            log_entry.initials.add(request.user)
+            log_entry.save()
         
         # Recalculate progress after update
         inspected_assets = daily_inspections.exclude(status='').exclude(status__isnull=True).count()

@@ -193,7 +193,7 @@
                                         <div class="col-md-6">
                                             <h4 class="asset-name">
                                                 <i class="bi bi-hdd-fill"></i>
-                                                {{ daily_inspection.asset.name }}
+                                                <a href="/asset/{{daily_inspection.asset.id}}">{{ daily_inspection.asset.name }}</a>
                                             </h4>
                                             <small class="text-muted">
                                                 Section: {{ daily_inspection.asset.section }}
@@ -227,6 +227,21 @@
                                                     rows="3"
                                                     data-form-id="{{ daily_inspection.id }}"
                                                 >{{ daily_inspection.remarks|default:'' }}</textarea>
+                                                {% if daily_inspection.remarks %}
+                                                <div class="mt-2 text-end">
+                                                    <button type="button" 
+                                                            class="btn btn-outline-primary btn-sm save-to-logbook"
+                                                            data-inspection-id="{{ daily_inspection.id }}"
+                                                            data-asset-name="{{ daily_inspection.asset.name }}"
+                                                            data-location-id="{{ daily_inspection.asset.location.id }}"
+                                                            data-remarks="{{ daily_inspection.remarks }}"
+                                                            data-has-photo="{% if daily_inspection.photo %}true{% else %}false{% endif %}"
+                                                            {% if daily_inspection.photo %}data-photo-url="{{ daily_inspection.photo.url }}"{% endif %}
+                                                    >
+                                                        <i class="bi bi-journal-plus"></i> Save to Logbook
+                                                    </button>
+                                                </div>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -393,6 +408,80 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitForm(this.dataset.formId);
             }
         });
+    });
+
+    // Handle saving to logbook
+    document.querySelectorAll('.save-to-logbook').forEach(button => {
+        button.addEventListener('click', async function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('asset_name', btn.dataset.assetName);
+                formData.append('location_id', btn.dataset.locationId);
+                formData.append('remarks', btn.dataset.remarks);
+                formData.append('inspection_id', btn.dataset.inspectionId);
+
+                const response = await fetch('/save-to-logbook/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+
+                if (response.ok) {
+                    showUpdateStatus('Saved to logbook!', 'saved');
+                    btn.innerHTML = '<i class="bi bi-check-circle"></i> Saved to Logbook';
+                    btn.classList.remove('btn-outline-primary');
+                    btn.classList.add('btn-success');
+                    setTimeout(() => {
+                        btn.disabled = true;
+                    }, 2000);
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showUpdateStatus('Error saving to logbook', 'error');
+            }
+        });
+    });
+
+    // Handle showing/hiding save to logbook button based on remarks
+    document.querySelectorAll('textarea[name="remarks"]').forEach(textarea => {
+        function toggleSaveButton() {
+            const form = textarea.closest('form');
+            const saveButton = form.querySelector('.save-to-logbook');
+            if (saveButton) {
+                saveButton.style.display = textarea.value.trim() ? 'inline-block' : 'none';
+            } else if (textarea.value.trim()) {
+                // Create button if it doesn't exist and there are remarks
+                const buttonDiv = document.createElement('div');
+                buttonDiv.className = 'mt-2 text-end';
+                buttonDiv.innerHTML = `
+                    <button type="button" 
+                            class="btn btn-outline-primary btn-sm save-to-logbook"
+                            data-inspection-id="${textarea.dataset.formId}"
+                            data-asset-name="${textarea.closest('form').querySelector('.asset-name').textContent.trim()}"
+                            data-location-id="${textarea.dataset.locationId}"
+                            data-remarks="${textarea.value}">
+                        <i class="bi bi-journal-plus"></i> Save to Logbook
+                    </button>
+                `;
+                textarea.parentElement.appendChild(buttonDiv);
+            }
+        }
+        
+        textarea.addEventListener('input', toggleSaveButton);
+        // Initial check
+        toggleSaveButton();
     });
 });
 </script>
