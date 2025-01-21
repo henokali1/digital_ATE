@@ -228,21 +228,17 @@
                                                     rows="3"
                                                     data-form-id="{{ daily_inspection.id }}"
                                                 >{{ daily_inspection.remarks|default:'' }}</textarea>
-                                                {% if daily_inspection.remarks %}
-                                                <div class="mt-2 text-end">
+                                                <div class="mt-2 text-end" id="log-button-container-{{ daily_inspection.id }}">
                                                     <button type="button" 
                                                             class="btn btn-outline-primary btn-sm save-to-logbook"
                                                             data-inspection-id="{{ daily_inspection.id }}"
                                                             data-asset-name="{{ daily_inspection.asset.name }}"
                                                             data-location-id="{{ daily_inspection.asset.location.id }}"
-                                                            data-remarks="{{ daily_inspection.remarks }}"
-                                                            data-has-photo="{% if daily_inspection.photo %}true{% else %}false{% endif %}"
-                                                            {% if daily_inspection.photo %}data-photo-url="{{ daily_inspection.photo.url }}"{% endif %}
+                                                            style="display: none;"
                                                     >
                                                         <i class="bi bi-journal-plus"></i> Save to Logbook
                                                     </button>
                                                 </div>
-                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -365,11 +361,13 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    async function submitForm(formId) {
+    async function submitForm(formId, saveToLogbook = false) {
         const form = document.getElementById('form-' + formId);
         const formData = new FormData(form);
 
-        showUpdateStatus('Saving changes...', 'saving');
+        if (!saveToLogbook){
+           showUpdateStatus('Saving changes...', 'saving');
+        }
 
         try {
             const response = await fetch(form.action, {
@@ -382,7 +380,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (response.ok) {
                 const responseData = await response.json();
-                showUpdateStatus('Changes saved!', 'saved');
+                
+                if (!saveToLogbook){
+                    showUpdateStatus('Changes saved!', 'saved');
+                }
                 
                 // Update timestamp
                 const timeElement = form.querySelector('.text-muted');
@@ -427,7 +428,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error:', error);
-            showUpdateStatus('Error saving changes', 'error');
+            if (!saveToLogbook){
+                showUpdateStatus('Error saving changes', 'error');
+            }
         }
     }
 
@@ -444,7 +447,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle remarks changes
     document.querySelectorAll('textarea[name="remarks"]').forEach(textarea => {
         textarea.addEventListener('input', function() {
-            debouncedSubmit(this.dataset.formId);
+             debouncedSubmit(this.dataset.formId);
+             toggleSaveButton(this);
         });
     });
 
@@ -466,10 +470,11 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.disabled = true;
 
             try {
+                const form = this.closest('form');
                 const formData = new FormData();
                 formData.append('asset_name', btn.dataset.assetName);
                 formData.append('location_id', btn.dataset.locationId);
-                formData.append('remarks', btn.dataset.remarks);
+                formData.append('remarks', form.querySelector('textarea[name="remarks"]').value);
                 formData.append('inspection_id', btn.dataset.inspectionId);
 
                 const response = await fetch('/save-to-logbook/', {
@@ -501,34 +506,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle showing/hiding save to logbook button based on remarks
-    document.querySelectorAll('textarea[name="remarks"]').forEach(textarea => {
-        function toggleSaveButton() {
-            const form = textarea.closest('form');
-            const saveButton = form.querySelector('.save-to-logbook');
-            if (saveButton) {
-                saveButton.style.display = textarea.value.trim() ? 'inline-block' : 'none';
-            } else if (textarea.value.trim()) {
-                // Create button if it doesn't exist and there are remarks
-                const buttonDiv = document.createElement('div');
-                buttonDiv.className = 'mt-2 text-end';
-                buttonDiv.innerHTML = `
-                    <button type="button" 
-                            class="btn btn-outline-primary btn-sm save-to-logbook"
-                            data-inspection-id="${textarea.dataset.formId}"
-                            data-asset-name="${textarea.closest('form').querySelector('.asset-name').textContent.trim()}"
-                            data-location-id="${textarea.dataset.locationId}"
-                            data-remarks="${textarea.value}">
-                        <i class="bi bi-journal-plus"></i> Save to Logbook
-                    </button>
-                `;
-                textarea.parentElement.appendChild(buttonDiv);
-            }
-        }
+   // Handle showing/hiding save to logbook button based on remarks
+    function toggleSaveButton(textarea) {
+        const form = textarea.closest('form');
+        const logButtonContainer = form.querySelector(`#log-button-container-${textarea.dataset.formId}`);
+        const saveButton = logButtonContainer.querySelector('.save-to-logbook');
         
-        textarea.addEventListener('input', toggleSaveButton);
+        if(textarea.value.trim()){
+            saveButton.style.display = 'inline-block';
+        } else {
+             saveButton.style.display = 'none';
+        }
+
+        }
+
+    document.querySelectorAll('textarea[name="remarks"]').forEach(textarea => {
         // Initial check
-        toggleSaveButton();
+         toggleSaveButton(textarea);
     });
 });
 </script>

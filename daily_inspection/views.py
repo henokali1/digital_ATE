@@ -10,21 +10,26 @@ from django.db.models import Count, Q
 from .models import InspectionIdent, DailyInspection
 from logbook.models import LogEntry
 from django.utils.timezone import localtime
+from django.contrib.auth.decorators import login_required
 
+@login_required
 @require_POST
 def save_to_logbook(request):
     try:
         inspection_id = request.POST.get('inspection_id')
+        asset_name = request.POST.get('asset_name')
+        location_id = request.POST.get('location_id')
+        remarks = request.POST.get('remarks')
+        
         daily_inspection = get_object_or_404(DailyInspection, id=inspection_id)
-        
         current_time = timezone.localtime()
-        
+
         # Create log entry
         log_entry = LogEntry.objects.create(
             date=current_time.date(),
             time=current_time.time(),
             location=daily_inspection.asset.location,
-            remarks=f"[{daily_inspection.asset.name}] {daily_inspection.remarks}"
+            remarks=f"[{asset_name}:] {remarks}" if remarks else f"[{asset_name}] Photo update"
         )
         
         # Add the photo if it exists
@@ -46,6 +51,7 @@ def save_to_logbook(request):
             'message': str(e)
         }, status=400)
 
+@login_required
 def inspection_list(request):
     inspections = InspectionIdent.objects.all().order_by('-initiated_at')
     
@@ -81,6 +87,7 @@ def inspection_list(request):
     })
 
 
+@login_required
 @require_http_methods(["GET", "POST"])
 def inspection_detail(request, inspection_id):
     inspection = get_object_or_404(InspectionIdent, inspection_ident=inspection_id)
@@ -95,13 +102,9 @@ def inspection_detail(request, inspection_id):
         inspection_id = request.POST.get('inspection_id')
         daily_inspection = get_object_or_404(DailyInspection, id=inspection_id)
         
-        # Get the old remarks to check if they've changed
-        old_remarks = daily_inspection.remarks
-        new_remarks = request.POST.get('remarks')
-        
         # Update the inspection
         daily_inspection.status = request.POST.get('status')
-        daily_inspection.remarks = new_remarks
+        daily_inspection.remarks = request.POST.get('remarks') #Update Remarks
         daily_inspection.inspected_at = timezone.now()
         
         # Handle photo upload
@@ -114,24 +117,6 @@ def inspection_detail(request, inspection_id):
         # Add the current user to inspected_by if not already added
         if request.user not in daily_inspection.inspected_by.all():
             daily_inspection.inspected_by.add(request.user)
-
-        # Create a log entry if there are remarks or photos
-        if (new_remarks and new_remarks != old_remarks) or photo:
-            current_time = localtime(timezone.now())
-            log_entry = LogEntry.objects.create(
-                date=current_time.date(),
-                time=current_time.time(),
-                location=daily_inspection.asset.location,
-                remarks=f"[{daily_inspection.asset.name}] {new_remarks}" if new_remarks else f"[{daily_inspection.asset.name}] Photo update"
-            )
-            
-            # Add the photo if available
-            if photo:
-                log_entry.photos = photo
-            
-            # Add the current user to the log entry
-            log_entry.initials.add(request.user)
-            log_entry.save()
         
         # Recalculate progress after update
         inspected_assets = daily_inspections.exclude(status='').exclude(status__isnull=True).count()
