@@ -41,6 +41,13 @@ class JobCard(models.Model):
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='Pending')
     preventive_maintenance_id = models.ForeignKey(PreventiveMaintenance, on_delete=models.CASCADE, blank=True, null=True)
     corrective_maintenance_id = models.ForeignKey(CorrectiveMaintenance, on_delete=models.CASCADE, blank=True, null=True)
+    acknowledged = models.BooleanField(default=False, editable=False)
+    acknowledged_at = models.DateTimeField(null=True, blank=True, editable=False)
+    remarks = models.TextField(blank=True, null=True)
+    time_to_acknowledge = models.DurationField(null=True, blank=True, editable=False) # New field for time to acknowledge
+    completed_at = models.DateTimeField(null=True, blank=True, editable=False) # New field for completed time
+    time_to_complete = models.DurationField(null=True, blank=True, editable=False) # New field for time to complete
+
 
     def save(self, *args, **kwargs):
         if not self.job_card_number:

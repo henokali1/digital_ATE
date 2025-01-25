@@ -19,6 +19,7 @@
                     <th>Priority</th>
                     <th>Assigned To</th>
                     <th>Maintenance Type</th>
+                    <th>Acknowledgement</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -31,7 +32,7 @@
                         </a>
                     </td>
                     <td>{{ job_card.task_description }}</td>
-                    <td>
+                   <td>
                         <span class="badge {% if job_card.status == 'Completed' %}bg-success
                                          {% elif job_card.status == 'In Progress' %}bg-primary
                                          {% elif job_card.status == 'On Hold' %}bg-warning
@@ -47,17 +48,24 @@
                             {{ job_card.priority_level }}
                         </span>
                     </td>
-                    <td>
+                     <td>
                         
-                        {% for user in job_card.assigned_users.all %}
-                        <div class="list-group-item">
-                            <i class="bi bi-person"></i> <span class="badge rounded-pill bg-primary me-1">{{ user.get_full_name|default:user.username }}</span>
-                        </div>
-                        {% empty %}
-                        <div class="list-group-item text-muted">No users assigned</div>
-                        {% endfor %}
+                         {% for user in job_card.assigned_users.all %}
+                            <div class="list-group-item">
+                                <i class="bi bi-person"></i> <span class="badge rounded-pill bg-primary me-1">{{ user.get_full_name|default:user.username }}</span>
+                            </div>
+                         {% empty %}
+                            <div class="list-group-item text-muted">No users assigned</div>
+                         {% endfor %}
                     </td>
-                    <td>{{ job_card.maintenance_type }}</td>
+                     <td>{{ job_card.maintenance_type }}</td>
+                    <td>
+                        {% if job_card.acknowledged %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Acknowledged</span>
+                        {% else %}
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Not Acknowledged</span>
+                        {% endif %}
+                    </td>
                     <td>
                         <div class="btn-group">
                             <a href="{% url 'job_card_update' job_card.pk %}" class="btn btn-sm btn-outline-primary">
@@ -66,7 +74,7 @@
                             <a href="{% url 'job_card_delete' job_card.pk %}" class="btn btn-sm btn-outline-danger">
                                 <i class="bi bi-trash"></i>
                             </a>
-                            {% if job_card.maintenance_type == "Preventive" and job_card.preventive_maintenance_id == None %}
+                           {% if job_card.maintenance_type == "Preventive" and job_card.preventive_maintenance_id == None %}
                                 <a href="/preventive_maintenance/create/?jc={{ job_card.pk }}" class="btn btn-sm btn-outline-success">
                                     <i class="bi bi-plus-circle"></i> PM
                                 </a>

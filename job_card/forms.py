@@ -10,5 +10,5 @@ class JobCardForm(forms.ModelForm):
     )
     class Meta:
         model = JobCard
-        fields = ['task_description', 'assigned_users', 'priority_level', 'maintenance_type', 'location', 'status']
-        exclude = ['created_at', 'created_by', 'updated_at']
+        fields = ['task_description', 'assigned_users', 'priority_level', 'maintenance_type', 'location', 'status', 'remarks'] 
+        exclude = ['created_at', 'created_by', 'updated_at','acknowledged', 'acknowledged_at'] 

@@ -8,6 +8,11 @@
                 <i class="bi bi-clipboard-data"></i> {{ job_card.job_card_number }}
             </h3>
             <div class="btn-group">
+                 {% if job_card.acknowledged == False and user in job_card.assigned_users.all %}
+                <a href="{% url 'job_card_acknowledge' job_card.pk %}" class="btn btn-light btn-sm">
+                   <i class="bi bi-check-circle"></i> Acknowledge
+                </a>
+                {% endif %}
                 <a href="{% url 'job_card_update' job_card.pk %}" class="btn btn-light btn-sm">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
@@ -85,7 +90,73 @@
                     </div>
                 </div>
             </div>
+             <div class="row mt-3">
+                    <div class="col-md-12">
+                       <div class="card bg-light">
+                           <div class="card-body">
+                             <h6 class="card-title text-muted">Acknowledgement Status</h6>
+                            {% if job_card.acknowledged %}
+                            <span class="badge bg-success fs-6">Acknowledged</span>
+                            <p class="mt-1">Acknowledged At: {{ job_card.acknowledged_at }}</p>
+                                {% if job_card.time_to_acknowledge %}
+                                    <p class="mt-1">Time to Acknowledge: {{ job_card.time_to_acknowledge }}</p>
+                                {% endif %}
+                             {% else %}
+                             <span class="badge bg-danger fs-6">Not Acknowledged</span>
+                            {% endif %}
+
+                           </div>
+                         </div>
+                    </div>
+                </div>
             
+            
+             {% if user in job_card.assigned_users.all %}
+             <div class="row mt-4">
+                 <div class="col-12">
+                    <div class="card bg-light">
+                     <div class="card-body">
+                         <h5 class="text-muted"><i class="bi bi-gear"></i> Update Status & Remarks</h5>
+                             <form method="POST" action="{% url 'job_card_update_status' job_card.pk %}">
+                                 {% csrf_token %}
+                                 <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                        <select name="status" id="status" class="form-select">
+                                            {% for choice in job_card.STATUS_CHOICES %}
+                                                <option value="{{ choice.0 }}" {% if job_card.status == choice.0 %}selected{% endif %}>
+                                                    {{ choice.1 }}
+                                                </option>
+                                            {% endfor %}
+                                         </select>
+                                 </div>
+                                <div class="mb-3">
+                                    <label for="remarks" class="form-label">Remarks</label>
+                                    <textarea name="remarks" id="remarks" class="form-control">{{ job_card.remarks|default:"" }}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                           </form>
+                        </div>
+                    </div>
+                 </div>
+              </div>
+             {% endif %}
+                 {% if job_card.status == 'Completed' %}
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                <h6 class="card-title text-muted">Completion time</h6>
+                                 
+                                  {% if job_card.time_to_complete %}
+                                        <p>Time to complete : {{ job_card.time_to_complete }}</p>
+                                   {% endif %}
+                                
+                                </div>
+                            </div>
+                        </div>
+                   </div>
+                 {% endif %}
+
             <div class="mt-4">
                 <h5 class="text-muted"><i class="bi bi-clock-history"></i> Timeline</h5>
                 <div class="list-group">
