@@ -73,22 +73,115 @@
         .home-icon i {
             font-size: 1.5rem;
         }
-        .theme-logout-container{
+          .theme-logout-container{
              position: absolute;
              top: 20px;
              right: 20px;
-             display: flex;
-             align-items: center;
-             gap: 0.7rem;
              z-index: 101;
+           
         }
-          .theme-button{
-              
+        .theme-logout-container .theme-logout-button {
+              display: flex;
+             align-items: center;
+              background-color: transparent;
+              color: #888;
+               border: 1px solid #ccc;
+              padding: 0.5rem 1rem;
+               border-radius: 0.25rem;
+               cursor: pointer;
+               transition: background-color 0.3s ease;
+               gap: 0.5rem;
+        }
+           .theme-logout-container .theme-logout-button:hover{
+                 background-color: #eee;
+        }
+         .theme-logout-container .theme-logout-button.open{
+               background-color: #eee;
             }
-       
-        .logout-button {
+
+        .theme-logout-container .theme-logout-button.open i{
+           transform: rotate(180deg);
+           }
+
+          .theme-logout-container .options{
+               display: flex;
+               flex-direction: column;
+               background-color: #fff;
+               border-radius: 0.25rem;
+               position: absolute;
+               top: 100%;
+               right: 0;
+               opacity:0;
+               pointer-events: none;
+               transform: translateY(-10px);
+                transition: opacity 0.2s ease, transform 0.2s ease;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1)
+              }
+         .theme-logout-container .options.open{
+              opacity: 1;
+               pointer-events: auto;
+                transform: translateY(0);
+        }
+         .theme-logout-container .options a,
+        .theme-logout-container .options form{
+            display: block;
+            padding: 0.5rem 1rem;
+             text-decoration: none;
+            color: #495057;
+            transition: background-color 0.2s ease;
+               white-space: nowrap;
+        }
+         .theme-logout-container .options a:hover,
+        .theme-logout-container .options form:hover{
+             background-color: #f8f9fa;
+         }
+           .theme-logout-container .options form button{
+                background: transparent;
+             border: none;
+            padding: 0;
+            font-size: 1rem;
+              color: #495057;
+              text-align: left;
+              display: block;
+               width: 100%;
+         }
+         .theme-logout-container .theme-button{
+              display: inline-block;
+          }
+           .theme-button{
+                display: flex;
+                align-items: center;
+           }
+          .theme-button .theme-checkbox {
+            display: none;
+          }
+
+           .theme-button .theme-label{
+             cursor: pointer;
+               display: inline-flex;
+             align-items: center;
+             background-color: #3a3a3a;
+             color: #fff;
+              padding: 0.4rem 0.5rem;
+              border-radius: 0.25rem;
+          }
+        .theme-button .theme-label i{
+              font-size: 1.2em;
+         }
+           .theme-button .light-icon{
+               display: inline-block;
+           }
+           .theme-button .dark-icon{
+               display: none;
             }
-         .create-jobcard-container{
+          body.dark-mode   .theme-button .light-icon {
+            display: none;
+        }
+          body.dark-mode  .theme-button .dark-icon {
+            display: inline-block;
+            color: #e0e0e0
+         }
+        .create-jobcard-container{
               display: inline-block;
               margin-left: 5px;
            
@@ -181,21 +274,30 @@
                 <i class="bi bi-house-fill"></i>
             </a>
         </div>
-        <div class="theme-logout-container">
-            <div class="theme-button">
-                 <input type="checkbox" id="theme-toggle" class="theme-checkbox">
-                  <label for="theme-toggle" class="theme-label">
-                      <i class="bi bi-brightness-high-fill light-icon"></i>
-                      <i class="bi bi-moon-fill dark-icon"></i>
-                   </label>
+      {% if user.is_authenticated %}
+           <div class="theme-logout-container">
+            <button id="theme-logout-button" class="theme-logout-button">
+                <i class="bi bi-gear"></i>
+                Options
+                <i class="bi bi-chevron-down"></i>
+            </button>
+                 <div class="options">
+                    <div class="theme-button" style="padding: 0 1rem;">
+                      <input type="checkbox" id="theme-toggle" class="theme-checkbox">
+                         <label for="theme-toggle" class="theme-label">
+                             <i class="bi bi-brightness-high-fill light-icon"></i>
+                              <i class="bi bi-moon-fill dark-icon"></i>
+                         </label>
+                    </div>
+                    
+                   <form method="POST" action="{% url 'logout' %}">
+                     {% csrf_token %}
+                      <button type="submit" class="create-log-btn"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                  </form>
+                   <a href="{% url 'accounts:change_password' %}"><i class="bi bi-key-fill me-2"></i>Change Password</a>
+                </div>
             </div>
-            {% if user.is_authenticated %}
-            <form method="POST" action="{% url 'logout' %}" class="logout-button">
-               {% csrf_token %}
-               <button type="submit" class="btn btn-primary mb-3 create-log-btn">Logout</button>
-            </form>
-            {% endif %}
-          </div>
+          {% endif %}
        
         <h1>{% block heading_h1 %}{% endblock %}</h1>
         <h2>{% block heading_h2 %}{% endblock %}</h2>
@@ -214,37 +316,27 @@
     <script src="{% static 'js/dark-mode.js' %}"></script>
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
-    </script>
-    <style>
-       .theme-checkbox {
-            display: none;
-        }
+          document.addEventListener('DOMContentLoaded', function() {
+                const button = document.getElementById('theme-logout-button');
+                 const options = document.querySelector('.theme-logout-container .options');
+                
+                  button.addEventListener('click', function(){
+                     options.classList.toggle('open');
+                    button.classList.toggle('open');
+                    });
 
-         .theme-label{
-           cursor: pointer;
-             display: inline-flex;
-            align-items: center;
-             background-color: #3a3a3a;
-            color: #fff;
-              padding: 0.5rem 0.75rem;
-             border-radius: 0.25rem;
-         }
-         .theme-label i{
-             font-size: 1.2em;
-         }
-        .light-icon{
-            display: inline-block;
-        }
-        .dark-icon{
-            display: none;
-        }
-        body.dark-mode  .light-icon {
-            display: none;
-        }
-        body.dark-mode .dark-icon {
-            display: inline-block;
-            color: #e0e0e0
-        }
-    </style>
+                  document.addEventListener('click', function(event){
+                     const isClickInsideButton = button.contains(event.target)
+                     const isClickInsideOption = options.contains(event.target)
+
+                       if(!isClickInsideButton && !isClickInsideOption) {
+                        options.classList.remove('open');
+                            button.classList.remove('open');
+                     }
+                });
+          })
+
+    </script>
+    
 </body>
 </html>
