@@ -141,3 +141,15 @@ body.dark-mode .location-title,
 body.dark-mode .rack-title{
       color: #fff;
 }
+body.dark-mode .table th,
+body.dark-mode .table td{
+    color: #fff;
+    border-color: #444;
+}
+body.dark-mode .table tbody tr {
+        background-color: #3a3a3a;
+}
+
+body.dark-mode .table-responsive > .table-bordered{
+    border-color: #444;
+}

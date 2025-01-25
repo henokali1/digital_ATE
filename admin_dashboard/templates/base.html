@@ -73,16 +73,44 @@
         .home-icon i {
             font-size: 1.5rem;
         }
-         .theme-button{
+        .theme-logout-container{
              position: absolute;
              top: 20px;
-             right: 75px;
+             right: 20px;
+             display: flex;
+             align-items: center;
+             gap: 0.7rem;
+             z-index: 101;
+        }
+          .theme-button{
+              
             }
        
         .logout-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            }
+         .create-jobcard-container{
+              display: inline-block;
+              margin-left: 5px;
+           
+        }
+        .create-jobcard-btn {
+           
+             padding: 0.5rem 1rem;
+             display: inline-flex;
+             align-items: center;
+            background-color: var(--primary-color);
+             color: white;
+              border-radius: 0.375rem;
+            border: none;
+            transition: all 0.3s ease;
+           
+            font-size: 1rem;
+        }
+           .create-jobcard-btn:hover {
+            background-color: #4a9ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            color: white;
         }
         h1 {
             color: var(--primary-color);
@@ -153,19 +181,22 @@
                 <i class="bi bi-house-fill"></i>
             </a>
         </div>
-        <div class="theme-button">
-            <input type="checkbox" id="theme-toggle" class="theme-checkbox">
-            <label for="theme-toggle" class="theme-label">
-                <i class="bi bi-brightness-high-fill light-icon"></i>
-               <i class="bi bi-moon-fill dark-icon"></i>
-            </label>
-        </div>
-         {% if user.is_authenticated %}
-        <form method="POST" action="{% url 'logout' %}" class="logout-button">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary mb-3 create-log-btn">Logout</button>
-        </form>
-        {% endif %}
+        <div class="theme-logout-container">
+            <div class="theme-button">
+                 <input type="checkbox" id="theme-toggle" class="theme-checkbox">
+                  <label for="theme-toggle" class="theme-label">
+                      <i class="bi bi-brightness-high-fill light-icon"></i>
+                      <i class="bi bi-moon-fill dark-icon"></i>
+                   </label>
+            </div>
+            {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'logout' %}" class="logout-button">
+               {% csrf_token %}
+               <button type="submit" class="btn btn-primary mb-3 create-log-btn">Logout</button>
+            </form>
+            {% endif %}
+          </div>
+       
         <h1>{% block heading_h1 %}{% endblock %}</h1>
         <h2>{% block heading_h2 %}{% endblock %}</h2>
         <!-- Main Content -->

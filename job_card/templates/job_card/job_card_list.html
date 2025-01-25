@@ -17,12 +17,16 @@
                     <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
                      <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
                  </select>
-                 {% if user.is_superuser %}
-                    <a href="{% url 'job_card_create' %}" class="btn btn-primary">
-                       <i class="bi bi-plus-circle"></i> Create New Job Card
-                    </a>
-                {% endif %}
             </form>
+              
+          {% if user.is_superuser %}
+          <br>
+            <div class="create-jobcard-container">
+                  <a href="{% url 'job_card_create' %}" class="btn create-jobcard-btn" title="Create new Job Card">
+                    <i class="bi bi-plus-lg me-2"></i> Create New Job Card
+                    </a>
+            </div>
+            {% endif %}
        </div>
     </div>
 
@@ -37,7 +41,7 @@
                     <th>Assigned To</th>
                     <th>Maintenance Type</th>
                      <th>Acknowledgement</th>
-                     {% if user.is_superuser %}
+                    {% if user.is_superuser %}
                       <th>Actions</th>
                      {% else %}
                          <th>Actions</th>
@@ -69,14 +73,14 @@
                             {{ job_card.priority_level }}
                         </span>
                     </td>
-                   <td>
-                       {% for user in job_card.assigned_users.all %}
+                    <td>
+                         {% for user in job_card.assigned_users.all %}
                             <div class="list-group-item">
                                 <i class="bi bi-person"></i> <span class="badge rounded-pill bg-primary me-1">{{ user.get_full_name|default:user.username }}</span>
                             </div>
                          {% empty %}
                             <div class="list-group-item text-muted">No users assigned</div>
-                         {% endfor %}
+                        {% endfor %}
                     </td>
                     <td>{{ job_card.maintenance_type }}</td>
                     <td>
@@ -118,7 +122,7 @@
                         </div>
                     </td>
                      {% else %}
-                    <td>
+                       <td>
                         <div class="btn-group">
                             
                             {% if job_card.maintenance_type == "Preventive" and job_card.preventive_maintenance_id %}
