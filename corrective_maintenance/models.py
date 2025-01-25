@@ -34,9 +34,9 @@ class CorrectiveMaintenance(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     corrective_action = models.TextField()
-    preventive_action = models.TextField()
-    root_cause = models.TextField()
-    remarks = models.TextField()
+    preventive_action = models.TextField(blank=True, null=True)
+    root_cause = models.TextField(blank=True, null=True)
+    remarks = models.TextField(blank=True, null=True)
     completed_by = models.ManyToManyField(User, related_name='correctie_maintenance_completed_by')
     photo = models.ImageField(upload_to='uploads/corrective_photos/', blank=True, null=True)
 

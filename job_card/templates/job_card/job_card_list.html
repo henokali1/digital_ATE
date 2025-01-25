@@ -1,12 +1,29 @@
 {% extends 'base.html' %}
+{% load form_tags %}
 {% block content %}
 <br><br>
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="bi bi-clipboard-check"></i> Job Cards</h2>
-        <a href="{% url 'job_card_create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create New Job Card
-        </a>
+       <div>
+            <form method="get" class="d-flex align-items-center">
+               <select name="filter" class="form-select me-2" onchange="this.form.submit()">
+                    <option value="all" {% if filter == 'all' %}selected{% endif %}>All Job Cards</option>
+                    <option value="assigned" {% if filter == 'assigned' %}selected{% endif %}>My Job Cards</option>
+                </select>
+                 <select name="per_page" class="form-select me-2" onchange="this.form.submit()">
+                    <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
+                      <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
+                    <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
+                     <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
+                 </select>
+                 {% if user.is_superuser %}
+                    <a href="{% url 'job_card_create' %}" class="btn btn-primary">
+                       <i class="bi bi-plus-circle"></i> Create New Job Card
+                    </a>
+                {% endif %}
+            </form>
+       </div>
     </div>
 
     <div class="table-responsive">
@@ -19,8 +36,12 @@
                     <th>Priority</th>
                     <th>Assigned To</th>
                     <th>Maintenance Type</th>
-                    <th>Acknowledgement</th>
-                    <th>Actions</th>
+                     <th>Acknowledgement</th>
+                     {% if user.is_superuser %}
+                      <th>Actions</th>
+                     {% else %}
+                         <th>Actions</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -48,9 +69,8 @@
                             {{ job_card.priority_level }}
                         </span>
                     </td>
-                     <td>
-                        
-                         {% for user in job_card.assigned_users.all %}
+                   <td>
+                       {% for user in job_card.assigned_users.all %}
                             <div class="list-group-item">
                                 <i class="bi bi-person"></i> <span class="badge rounded-pill bg-primary me-1">{{ user.get_full_name|default:user.username }}</span>
                             </div>
@@ -58,7 +78,7 @@
                             <div class="list-group-item text-muted">No users assigned</div>
                          {% endfor %}
                     </td>
-                     <td>{{ job_card.maintenance_type }}</td>
+                    <td>{{ job_card.maintenance_type }}</td>
                     <td>
                         {% if job_card.acknowledged %}
                             <span class="badge bg-success"><i class="bi bi-check-circle"></i> Acknowledged</span>
@@ -66,6 +86,7 @@
                             <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Not Acknowledged</span>
                         {% endif %}
                     </td>
+                     {% if user.is_superuser %}
                     <td>
                         <div class="btn-group">
                             <a href="{% url 'job_card_update' job_card.pk %}" class="btn btn-sm btn-outline-primary">
@@ -74,7 +95,17 @@
                             <a href="{% url 'job_card_delete' job_card.pk %}" class="btn btn-sm btn-outline-danger">
                                 <i class="bi bi-trash"></i>
                             </a>
-                           {% if job_card.maintenance_type == "Preventive" and job_card.preventive_maintenance_id == None %}
+                            {% if job_card.maintenance_type == "Preventive" and job_card.preventive_maintenance_id %}
+                                <a href="/preventive_maintenance/{{job_card.preventive_maintenance_id.pk}}" class="btn btn-sm btn-outline-info">
+                                     <i class="bi bi-eye"></i> PM
+                                </a>
+                            {% endif %}
+                            {% if job_card.maintenance_type == "Corrective" and job_card.corrective_maintenance_id %}
+                                  <a href="/corrective_maintenance/detail/{{job_card.corrective_maintenance_id.pk}}" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-eye"></i> CM
+                                </a>
+                            {% endif %}
+                            {% if job_card.maintenance_type == "Preventive" and job_card.preventive_maintenance_id == None %}
                                 <a href="/preventive_maintenance/create/?jc={{ job_card.pk }}" class="btn btn-sm btn-outline-success">
                                     <i class="bi bi-plus-circle"></i> PM
                                 </a>
@@ -86,10 +117,91 @@
                             {% endif %}
                         </div>
                     </td>
+                     {% else %}
+                    <td>
+                        <div class="btn-group">
+                            
+                            {% if job_card.maintenance_type == "Preventive" and job_card.preventive_maintenance_id %}
+                                <a href="/preventive_maintenance/{{job_card.preventive_maintenance_id.pk}}" class="btn btn-sm btn-outline-info">
+                                     <i class="bi bi-eye"></i> PM
+                                </a>
+                            {% endif %}
+                            {% if job_card.maintenance_type == "Corrective" and job_card.corrective_maintenance_id %}
+                                  <a href="/corrective_maintenance/detail/{{job_card.corrective_maintenance_id.pk}}" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-eye"></i> CM
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+         {% if job_cards.paginator.num_pages > 1 %}
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                 <div class="pagination-info">
+                    <small class="text-muted">
+                    Showing items {{ job_cards.start_index }} to {{ job_cards.end_index }} of {{ job_cards.paginator.count }}
+                    </small>
+                  </div>
+                   <nav aria-label="Job Card list navigation">
+                       <ul class="pagination mb-0">
+                            {% if job_cards.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}" aria-label="First">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ job_cards.previous_page_number }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}" aria-label="Previous">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                            </li>
+                            {% endif %}
+            
+                            {% for num in job_cards.paginator.page_range %}
+                                {% if job_cards.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > job_cards.number|add:'-3' and num < job_cards.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+            
+                            {% if job_cards.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ job_cards.next_page_number }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}" aria-label="Next">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ job_cards.paginator.num_pages }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}" aria-label="Last">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                   </nav>
+                 </div>
+           {% endif %}
     </div>
 </div>
 {% endblock %}

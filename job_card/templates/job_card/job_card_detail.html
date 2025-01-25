@@ -8,14 +8,16 @@
                 <i class="bi bi-clipboard-data"></i> {{ job_card.job_card_number }}
             </h3>
             <div class="btn-group">
-                 {% if job_card.acknowledged == False and user in job_card.assigned_users.all %}
+                {% if job_card.acknowledged == False and user in job_card.assigned_users.all %}
                 <a href="{% url 'job_card_acknowledge' job_card.pk %}" class="btn btn-light btn-sm">
                    <i class="bi bi-check-circle"></i> Acknowledge
                 </a>
                 {% endif %}
+                 {% if user.is_superuser %}
                 <a href="{% url 'job_card_update' job_card.pk %}" class="btn btn-light btn-sm">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
+                {% endif %}
                 <a href="{% url 'job_card_list' %}" class="btn btn-light btn-sm">
                     <i class="bi bi-arrow-left"></i> Back
                 </a>
@@ -140,7 +142,7 @@
                  </div>
               </div>
              {% endif %}
-                 {% if job_card.status == 'Completed' %}
+              {% if job_card.status == 'Completed' %}
                     <div class="row mt-3">
                         <div class="col-md-12">
                             <div class="card bg-light">
