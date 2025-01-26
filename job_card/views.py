@@ -10,6 +10,51 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django import forms
 from logbook.models import LogEntry
+from .models import JobCard, JobCardMessage, JobCardImage
+from .forms import JobCardMessageForm
+from django.http import JsonResponse
+
+
+
+@login_required
+def job_card_chat(request, pk):
+    job_card = get_object_or_404(JobCard, pk=pk)
+    messages = job_card.messages.all().prefetch_related('images')
+    
+    if request.method == 'POST':
+        print("Files in request:", request.FILES)
+        form = JobCardMessageForm(request.POST, request.FILES)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.job_card = job_card
+            message.user = request.user
+            message.save()
+            
+            # Handle multiple image uploads
+            images = request.FILES.getlist('images[]')
+            for image in images:
+                JobCardImage.objects.create(message=message, image=image)
+            
+            print(f"Saved {len(images)} images for message {message.id}")
+                
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'success',
+                    'message': message.message,
+                    'user': message.user.get_full_name() or message.user.username,
+                    'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                    'images': [{'url': img.image.url} for img in message.images.all()]
+                })
+            return redirect('job_card_detail', pk=pk)
+    else:
+        form = JobCardMessageForm()
+    
+    return render(request, 'job_card/job_card_chat.html', {
+        'job_card': job_card,
+        'messages': messages,
+        'form': form
+    })
+
 
 @login_required
 def job_card_list(request):

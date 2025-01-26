@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:pk>/acknowledge/', views.job_card_acknowledge, name='job_card_acknowledge'),
     path('<int:pk>/update-status/', views.job_card_update_status, name='job_card_update_status'),
     path('<int:pk>/add-remark-to-logbook/', views.job_card_add_remark_to_logbook, name='job_card_add_remark_to_logbook'),
+    path('<int:pk>/chat/', views.job_card_chat, name='job_card_chat'),
 ]

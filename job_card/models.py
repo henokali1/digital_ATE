@@ -56,3 +56,17 @@ class JobCard(models.Model):
 
     def __str__(self):
         return f"{self.job_card_number} - {self.task_description}"
+
+class JobCardMessage(models.Model):
+    job_card = models.ForeignKey('JobCard', on_delete=models.CASCADE, related_name='messages')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['created_at']
+
+class JobCardImage(models.Model):
+    message = models.ForeignKey(JobCardMessage, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='job_card_chat/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)

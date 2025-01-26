@@ -1,0 +1,218 @@
+{# job_card/templates/job_card/job_card_chat.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">
+                <i class="bi bi-chat-dots"></i> Chat - {{ job_card.job_card_number }}
+            </h3>
+            <a href="{% url 'job_card_detail' job_card.pk %}" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left"></i> Back to Job Card
+            </a>
+        </div>
+        
+        <div class="card-body">
+            <div class="chat-messages mb-4" id="chatMessages" style="height: 400px; overflow-y: auto;">
+                {% for message in messages %}
+                <div class="message {% if message.user == request.user %}message-right{% else %}message-left{% endif %} mb-3">
+                    <div class="message-content">
+                        <div class="message-header">
+                            <strong>{{ message.user.get_full_name|default:message.user.username }}</strong>
+                            <small class="text-muted">{{ message.created_at|date:"F j, Y, g:i a" }}</small>
+                        </div>
+                        <div class="message-body">
+                            <p>{{ message.message }}</p>
+                            {% if message.images.all %}
+                            <div class="message-images">
+                                {% for image in message.images.all %}
+                                <img src="{{ image.image.url }}" alt="Uploaded image" class="img-thumbnail message-image" 
+                                     style="max-width: 200px; cursor: pointer" onclick="showImageModal(this.src)">
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <form id="chatForm" method="POST" enctype="multipart/form-data" class="chat-form">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    {{ form.message }}
+                </div>
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" name="images[]" id="imageInput" multiple accept="image/*">
+                    <button type="button" class="btn btn-secondary" onclick="toggleCamera()">
+                        <i class="bi bi-camera"></i>
+                    </button>
+                </div>
+                <div id="imagePreview" class="mb-3 d-flex flex-wrap gap-2"></div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send"></i> Send
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <img src="" id="modalImage" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .message {
+        margin-bottom: 1rem;
+    }
+    
+    .message-content {
+        max-width: 80%;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        background-color: #f8f9fa;
+    }
+    
+    .message-right {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .message-right .message-content {
+        background-color: #e3f2fd;
+    }
+    
+    .message-header {
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .message-body p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .message-images {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    #imagePreview img {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Scroll to bottom of chat on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
+    // Image preview handling
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        const preview = document.getElementById('imagePreview');
+        preview.innerHTML = '';
+        
+        for (const file of this.files) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-thumbnail';
+                preview.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Image modal
+    function showImageModal(src) {
+        const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+        document.getElementById('modalImage').src = src;
+        modal.show();
+    }
+
+    // Camera handling
+    function toggleCamera() {
+        const input = document.getElementById('imageInput');
+        input.click();
+    }
+
+    // Form submission
+    document.getElementById('chatForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                // Add new message to chat
+                const chatMessages = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message message-right mb-3';
+                
+                let imagesHtml = '';
+                if (result.images && result.images.length > 0) {
+                    imagesHtml = '<div class="message-images">' + 
+                        result.images.map(img => 
+                            `<img src="${img.url}" alt="Uploaded image" class="img-thumbnail message-image" 
+                                  style="max-width: 200px; cursor: pointer" onclick="showImageModal(this.src)">`
+                        ).join('') + '</div>';
+                }
+                
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-header">
+                            <strong>${result.user}</strong>
+                            <small class="text-muted">${result.created_at}</small>
+                        </div>
+                        <div class="message-body">
+                            <p>${result.message}</p>
+                            ${imagesHtml}
+                        </div>
+                    </div>
+                `;
+                
+                chatMessages.appendChild(messageDiv);
+                // Clear form
+                this.reset();
+                document.getElementById('imagePreview').innerHTML = '';
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+</script>
+{% endblock %}

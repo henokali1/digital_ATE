@@ -22,6 +22,18 @@
                 <a href="{% url 'job_card_list' %}" class="btn btn-light btn-sm">
                     <i class="bi bi-arrow-left"></i> Back
                 </a>
+                <div class="btn-group">
+                    {% if user in job_card.assigned_users.all or user.is_superuser %}
+                    <a href="{% url 'job_card_chat' job_card.pk %}" class="btn btn-light btn-sm">
+                        <i class="bi bi-chat-dots"></i> Chat
+                        {% with message_count=job_card.messages.count %}
+                        {% if message_count %}
+                        <span class="badge bg-primary">{{ message_count }}</span>
+                        {% endif %}
+                        {% endwith %}
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         

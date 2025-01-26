@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import JobCard
+from .models import JobCardMessage, JobCardImage
 
 class JobCardForm(forms.ModelForm):
     assigned_users = forms.ModelMultipleChoiceField(
@@ -33,3 +34,13 @@ class JobCardForm(forms.ModelForm):
              if maintenance_type == 'Corrective' and not corrective_maintenance:
                   raise forms.ValidationError("A corrective maintenance record must be created before marking the job card as completed.")
          return cleaned_data
+
+
+class JobCardMessageForm(forms.ModelForm):
+    class Meta:
+        model = JobCardMessage
+        fields = ['message']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['message'].widget.attrs.update({'class': 'form-control', 'rows': '3'})
