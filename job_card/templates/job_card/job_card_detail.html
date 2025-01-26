@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load job_card_duration %}
 {% block content %}
 <br><br>
 <div class="container mt-4">
@@ -101,7 +102,7 @@
                             <span class="badge bg-success fs-6">Acknowledged</span>
                             <p class="mt-1">Acknowledged At: {{ job_card.acknowledged_at }}</p>
                                 {% if job_card.time_to_acknowledge %}
-                                    <p class="mt-1">Time to Acknowledge: {{ job_card.time_to_acknowledge }}</p>
+                                    <p class="mt-1">Time to Acknowledge: {{ job_card.time_to_acknowledge|jobcard_duration }}</p>
                                 {% endif %}
                              {% else %}
                              <span class="badge bg-danger fs-6">Not Acknowledged</span>
@@ -150,7 +151,7 @@
                                 <h6 class="card-title text-muted">Completion time</h6>
                                  
                                   {% if job_card.time_to_complete %}
-                                        <p>Time to complete : {{ job_card.time_to_complete }}</p>
+                                        <p>Time to complete : {{ job_card.time_to_complete|jobcard_duration }}</p>
                                    {% endif %}
                                 
                                 </div>
@@ -161,21 +162,29 @@
 
             <div class="mt-4">
                 <h5 class="text-muted"><i class="bi bi-clock-history"></i> Timeline</h5>
-                <div class="list-group">
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between">
-                            <span><i class="bi bi-calendar-plus"></i> Created</span>
-                            <small class="text-muted">{{ job_card.created_at|date:"F j, Y, g:i a" }}</small>
+                    <div class="list-group">
+                        <div class="list-group-item">
+                           <div class="d-flex justify-content-between">
+                              <div>
+                                  <span><i class="bi bi-calendar-plus"></i> Created: </span>
+                                  <small class="text-muted">{{ job_card.created_at|date:"F j, Y, g:i a" }}</small>
+                               </div>
+                                <div class="text-end">
+                                      <small class="text-muted">by {{ job_card.created_by.get_full_name|default:job_card.created_by.username }}</small>
+                                </div>
+                            </div>
+                          
                         </div>
-                        <small class="text-muted">by {{ job_card.created_by.get_full_name|default:job_card.created_by.username }}</small>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between">
-                            <span><i class="bi bi-calendar-check"></i> Last Updated</span>
-                            <small class="text-muted">{{ job_card.updated_at|date:"F j, Y, g:i a" }}</small>
+                        <div class="list-group-item">
+                         <div class="d-flex justify-content-between align-items-center">
+                              <div>
+                                  <span><i class="bi bi-calendar-check"></i> Last Updated:</span>
+                                   <small class="text-muted">{{ job_card.updated_at|date:"F j, Y, g:i a" }}</small>
+                              </div>
+                           </div>
                         </div>
                     </div>
-                </div>
+
             </div>
         </div>
     </div>

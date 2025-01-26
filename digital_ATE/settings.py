@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'job_card.templatetags',
     'widget_tweaks',
     'accounts',
     'pages',

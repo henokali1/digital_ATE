@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load form_tags %}
+{% load form_filters %}
 {% block content %}
 <br><br>
 <div class="container mt-4">
@@ -17,6 +17,39 @@
                     <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
                      <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
                  </select>
+                  
+                  <select name="status" class="form-select me-2" onchange="this.form.submit()">
+                      <option value="">All Statuses</option>
+                       {% for choice in job_card.STATUS_CHOICES %}
+                            <option value="{{ choice.0 }}" {% if request.GET.status == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                       {% endfor %}
+                  </select>
+                    
+                    
+                   <select name="priority" class="form-select me-2" onchange="this.form.submit()">
+                      <option value="">All Priorities</option>
+                       {% for choice in job_card.PRIORITY_CHOICES %}
+                            <option value="{{ choice.0 }}" {% if request.GET.priority == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                       {% endfor %}
+                  </select>
+                   <select name="maintenance_type" class="form-select me-2" onchange="this.form.submit()">
+                      <option value="">All Types</option>
+                       {% for choice in job_card.MAINTENANCE_TYPE %}
+                            <option value="{{ choice.0 }}" {% if request.GET.maintenance_type == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                       {% endfor %}
+                   </select>
+                   
+                     <select name="acknowledged" class="form-select me-2" onchange="this.form.submit()">
+                            <option value="">All Acknowledgements</option>
+                            <option value="True" {% if request.GET.acknowledged == 'True' %}selected{% endif %}>Acknowledged</option>
+                            <option value="False" {% if request.GET.acknowledged == 'False' %}selected{% endif %}>Not Acknowledged</option>
+                       </select>
+                     <select name="assigned_to" class="form-select me-2" onchange="this.form.submit()">
+                            <option value="">All Assigned Users</option>
+                            {% for user in users %}
+                              <option value="{{ user.pk }}" {% if request.GET.assigned_to == user.pk|stringformat:'s' %}selected{% endif %}>{{ user.username }}</option>
+                             {% endfor %}
+                     </select>
             </form>
               
           {% if user.is_superuser %}
@@ -153,12 +186,12 @@
                        <ul class="pagination mb-0">
                             {% if job_cards.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}" aria-label="First">
+                                <a class="page-link" href="?page=1{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{request.GET.priority}}{% endif %}{% if request.GET.maintenance_type %}&maintenance_type={{request.GET.maintenance_type}}{% endif %}{% if request.GET.acknowledged %}&acknowledged={{request.GET.acknowledged}}{% endif %}{% if request.GET.assigned_to %}&assigned_to={{request.GET.assigned_to}}{% endif %}" aria-label="First">
                                     <i class="bi bi-chevron-double-left"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ job_cards.previous_page_number }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}" aria-label="Previous">
+                                <a class="page-link" href="?page={{ job_cards.previous_page_number }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{request.GET.priority}}{% endif %}{% if request.GET.maintenance_type %}&maintenance_type={{request.GET.maintenance_type}}{% endif %}{% if request.GET.acknowledged %}&acknowledged={{request.GET.acknowledged}}{% endif %}{% if request.GET.assigned_to %}&assigned_to={{request.GET.assigned_to}}{% endif %}" aria-label="Previous">
                                     <i class="bi bi-chevron-left"></i>
                                 </a>
                             </li>
@@ -178,19 +211,19 @@
                                     </li>
                                 {% elif num > job_cards.number|add:'-3' and num < job_cards.number|add:'3' %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}">{{ num }}</a>
+                                        <a class="page-link" href="?page={{ num }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{request.GET.priority}}{% endif %}{% if request.GET.maintenance_type %}&maintenance_type={{request.GET.maintenance_type}}{% endif %}{% if request.GET.acknowledged %}&acknowledged={{request.GET.acknowledged}}{% endif %}{% if request.GET.assigned_to %}&assigned_to={{request.GET.assigned_to}}{% endif %}">{{ num }}</a>
                                     </li>
                                 {% endif %}
                             {% endfor %}
             
                             {% if job_cards.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ job_cards.next_page_number }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}" aria-label="Next">
+                                <a class="page-link" href="?page={{ job_cards.next_page_number }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{request.GET.priority}}{% endif %}{% if request.GET.maintenance_type %}&maintenance_type={{request.GET.maintenance_type}}{% endif %}{% if request.GET.acknowledged %}&acknowledged={{request.GET.acknowledged}}{% endif %}{% if request.GET.assigned_to %}&assigned_to={{request.GET.assigned_to}}{% endif %}" aria-label="Next">
                                     <i class="bi bi-chevron-right"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ job_cards.paginator.num_pages }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}" aria-label="Last">
+                                <a class="page-link" href="?page={{ job_cards.paginator.num_pages }}{% if filter %}&filter={{filter}}{% endif %}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{request.GET.priority}}{% endif %}{% if request.GET.maintenance_type %}&maintenance_type={{request.GET.maintenance_type}}{% endif %}{% if request.GET.acknowledged %}&acknowledged={{request.GET.acknowledged}}{% endif %}{% if request.GET.assigned_to %}&assigned_to={{request.GET.assigned_to}}{% endif %}" aria-label="Last">
                                     <i class="bi bi-chevron-double-right"></i>
                                 </a>
                             </li>

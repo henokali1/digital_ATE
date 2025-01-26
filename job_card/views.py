@@ -6,16 +6,44 @@ from django.utils import timezone
 from django.http import HttpResponseForbidden, HttpResponse
 from datetime import timedelta
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+from django.contrib.auth.models import User
 
 
 @login_required
 def job_card_list(request):
     filter = request.GET.get('filter', 'all')
-    per_page = int(request.GET.get('per_page', 10)) # Get the per_page value or set to default 10
+    per_page = int(request.GET.get('per_page', 10))  # Get the per_page value or set to default 10
+
+    # Get filter values from query parameters
+    status_filter = request.GET.get('status')
+    priority_filter = request.GET.get('priority')
+    maintenance_type_filter = request.GET.get('maintenance_type')
+    acknowledged_filter = request.GET.get('acknowledged')
+    assigned_to_filter = request.GET.get('assigned_to')
+    
     if filter == 'assigned':
-       job_cards_list = JobCard.objects.filter(assigned_users=request.user).order_by('-created_at') # Order by newest first
+        job_cards_list = JobCard.objects.filter(assigned_users=request.user)
     else:
-        job_cards_list = JobCard.objects.all().order_by('-created_at') # Order by newest first
+        job_cards_list = JobCard.objects.all()
+
+    # Apply filters to the queryset
+    if status_filter:
+        job_cards_list = job_cards_list.filter(status=status_filter)
+    if priority_filter:
+        job_cards_list = job_cards_list.filter(priority_level=priority_filter)
+    if maintenance_type_filter:
+        job_cards_list = job_cards_list.filter(maintenance_type=maintenance_type_filter)
+    if acknowledged_filter:
+            if acknowledged_filter == 'True':
+                job_cards_list = job_cards_list.filter(acknowledged=True)
+            elif acknowledged_filter == 'False':
+                job_cards_list = job_cards_list.filter(acknowledged=False)
+    if assigned_to_filter:
+          job_cards_list = job_cards_list.filter(assigned_users__id=assigned_to_filter)
+    
+   
+    job_cards_list = job_cards_list.order_by('-created_at') # Order by newest first
 
      # Pagination
     paginator = Paginator(job_cards_list, per_page)
@@ -26,7 +54,9 @@ def job_card_list(request):
         job_cards = paginator.page(1)
     except EmptyPage:
         job_cards = paginator.page(paginator.num_pages)
-    return render(request, 'job_card/job_card_list.html', {'job_cards': job_cards, 'filter': filter, 'per_page': per_page})
+
+    users = User.objects.all() #Get all users
+    return render(request, 'job_card/job_card_list.html', {'job_cards': job_cards, 'filter': filter, 'per_page': per_page, 'users':users, 'job_card': JobCard})
 
 @login_required
 def job_card_create(request):
@@ -97,15 +127,16 @@ def job_card_update_status(request, pk):
        return HttpResponseForbidden("You are not authorized to change the status of this job card.")
 
     if request.method == 'POST':
-         new_status = request.POST.get('status')
-         job_card.remarks = request.POST.get('remarks')
+        new_status = request.POST.get('status')
+        job_card.remarks = request.POST.get('remarks')
 
-         if new_status == 'Completed': #Check if the status is completed
+        if new_status == 'Completed': #Check if the status is completed
              job_card.completed_at = timezone.now() # Set completed_at
              job_card.time_to_complete = job_card.completed_at - job_card.created_at # calculate duration
-             job_card.save(update_fields=['status', 'remarks','completed_at','time_to_complete'])
-         else:
-            job_card.save(update_fields=['status', 'remarks']) #save when status is not completed
-         return redirect('job_card_detail', pk=pk)
+        
+        job_card.status = new_status #Assign the new status
+        job_card.save() # save the status and the related fields
+        
+        return redirect('job_card_detail', pk=pk)
     
     return redirect('job_card_detail', pk=pk)

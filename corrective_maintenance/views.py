@@ -4,6 +4,7 @@ from .models import CorrectiveMaintenance
 from .forms import CorrectiveMaintenanceForm
 from job_card.models import JobCard
 
+
 # List View
 @login_required
 def maintenance_list(request):
