@@ -46,7 +46,7 @@
                         <th><i class="bi bi-calendar-event me-2"></i>End</th>
                         <th><i class="bi bi-clock me-2"></i>Duration</th>
                         <th><i class="bi bi-tag me-2"></i>Type</th>
-                        <th><i class="bi bi-tools me-2"></i>Actions</th>
+                        <!-- <th><i class="bi bi-tools me-2"></i>Actions</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -62,14 +62,14 @@
                                 {{ record.type }}
                             </span>
                         </td>
-                        <td>
+                        <!-- <td>
                             <a href="{% url 'maintenance_update' record.id %}" class="btn btn-sm btn-warning me-2" onclick="event.stopPropagation();">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <a href="{% url 'maintenance_delete' record.id %}" class="btn btn-sm btn-danger" onclick="event.stopPropagation();">
                                 <i class="bi bi-trash"></i>
                             </a>
-                        </td>
+                        </td> -->
                     </tr>
                     {% endfor %}
                 </tbody>

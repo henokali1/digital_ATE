@@ -43,25 +43,25 @@
                         <th><i class="bi bi-calendar-event me-2"></i>Start</th>
                         <th><i class="bi bi-calendar-event me-2"></i>End</th>
                         <th><i class="bi bi-clock me-2"></i>Duration</th>
-                        <th><i class="bi bi-tools me-2"></i>Actions</th>
+                        <!-- <th><i class="bi bi-tools me-2"></i>Actions</th> -->
                     </tr>
                 </thead>
                 <tbody>
                     {% for record in records %}
-                    <tr class="cursor-pointer" onclick="window.location=`{% url 'maintenance_detail' record.id %}`" style="cursor: pointer;">
+                    <tr class="cursor-pointer" onclick="window.location=`/preventive_maintenance/{{record.id}}/`" style="cursor: pointer;">
                         <td>{{ record.asset }}</td>
                         <td>{{ record.location }}</td>
                         <td>{{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</td>
                         <td>{{ record.end_date|date:"M d, Y" }} {{ record.end_time|time:"H:i" }}</td>
                         <td>{{ record.duration }} hrs</td>
-                        <td>
+                        <!-- <td>
                             <a href="{% url 'maintenance_update' record.id %}" class="btn btn-sm btn-warning me-2" onclick="event.stopPropagation();">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <a href="{% url 'maintenance_delete' record.id %}" class="btn btn-sm btn-danger" onclick="event.stopPropagation();">
                                 <i class="bi bi-trash"></i>
                             </a>
-                        </td>
+                        </td> -->
                     </tr>
                     {% endfor %}
                 </tbody>
