@@ -1,87 +1,136 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Preventive Maintenance Records{% endblock %}
+{% block heading_h1 %}Preventive Maintenance{% endblock %}
+{% block heading_h2 %}Maintenance Records{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <!-- Header Section with Title and Create Button -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">
-            <i class="bi bi-tools"></i> Preventive Maintenance Records
-        </h2>
-        <a href="/preventive_maintenance/create/" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create New Record
+<div class="row mb-4">
+    <div class="col d-flex justify-content-between align-items-center">
+        <a href="{% url 'maintenance_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Add New Record
         </a>
-    </div>
-
-    <!-- Table Card -->
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th><i class="bi bi-hash"></i> ID</th>
-                            <th><i class="bi bi-gear"></i> Asset</th>
-                            <th><i class="bi bi-geo-alt"></i> Location</th>
-                            <th><i class="bi bi-building"></i> Section</th>
-                            <th><i class="bi bi-clock"></i> Duration</th>
-                            <th><i class="bi bi-calendar"></i> Start Date</th>
-                            <th><i class="bi bi-person"></i> Logged By</th>
-                            <th><i class="bi bi-image"></i> Photo</th>
-                            <th><i class="bi bi-three-dots"></i> Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in records %}
-                        <tr class="cursor-pointer" onclick="window.location='/preventive_maintenance/{{record.pk}}';" style="cursor: pointer;">
-                            <td>{{ record.pk }}</td>
-                            <td>{{ record.asset }}</td>
-                            <td>{{ record.location }}</td>
-                            <td>{{ record.section }}</td>
-                            <td>{{ record.duration }} hrs</td>
-                            <td>{{ record.start_date }}</td>
-                            <td>{{ record.logged_by.get_full_name|default:record.logged_by.username }}</td>
-                            <td>
-                                {% if record.photo %}
-                                    <img src="{{ record.photo.url }}" alt="Maintenance Photo" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
-                                {% else %}
-                                    <span class="text-muted"><i class="bi bi-image"></i></span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="btn-group" onclick="event.stopPropagation();">
-                                    <a href="{% url 'maintenance_update' record.pk %}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a href="{% url 'maintenance_delete' record.pk %}" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="9" class="text-center py-4">
-                                <div class="text-muted">
-                                    <i class="bi bi-inbox fs-4 d-block mb-2"></i>
-                                    No maintenance records found
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+         <form method="get" class="d-flex align-items-center">
+               <select name="per_page" class="form-select me-2" onchange="this.form.submit()">
+                    <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
+                      <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
+                    <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
+                     <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
+                 </select>
+              <div class="d-flex align-items-center">
+                     <label for="start_date" class="form-label me-1" style="margin-bottom: 0;">Start Date</label>
+                      <input type="date" name="start_date" class="form-control me-2" value="{{ request.GET.start_date }}" onchange="this.form.submit()" placeholder="Start Date">
+                      <label for="end_date" class="form-label mx-1" style="margin-bottom: 0;">End Date</label>
+                     <input type="date" name="end_date" class="form-control me-2" value="{{ request.GET.end_date }}" onchange="this.form.submit()" placeholder="End Date">
+                     {% if request.GET.start_date or request.GET.end_date %}
+                        <a href="{% url 'maintenance_list' %}" class="btn btn-outline-secondary ms-1" title="Clear date filter">
+                        <i class="bi bi-x-lg"></i>
+                        </a>
+                    {% endif %}
+                </div>
+           </form>
     </div>
 </div>
 
-<!-- Optional: Add some custom styles -->
-<style>
-    .cursor-pointer:hover {
-        background-color: rgba(0,0,0,.03);
-    }
-    .table td {
-        vertical-align: middle;
-    }
-</style>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th><i class="bi bi-gear me-2"></i>Asset</th>
+                        <th><i class="bi bi-building me-2"></i>Location</th>
+                        <th><i class="bi bi-calendar-event me-2"></i>Start</th>
+                        <th><i class="bi bi-calendar-event me-2"></i>End</th>
+                        <th><i class="bi bi-clock me-2"></i>Duration</th>
+                        <th><i class="bi bi-tools me-2"></i>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr class="cursor-pointer" onclick="window.location=`{% url 'maintenance_detail' record.id %}`" style="cursor: pointer;">
+                        <td>{{ record.asset }}</td>
+                        <td>{{ record.location }}</td>
+                        <td>{{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</td>
+                        <td>{{ record.end_date|date:"M d, Y" }} {{ record.end_time|time:"H:i" }}</td>
+                        <td>{{ record.duration }} hrs</td>
+                        <td>
+                            <a href="{% url 'maintenance_update' record.id %}" class="btn btn-sm btn-warning me-2" onclick="event.stopPropagation();">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'maintenance_delete' record.id %}" class="btn btn-sm btn-danger" onclick="event.stopPropagation();">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+         {% if records.paginator.num_pages > 1 %}
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                 <div class="pagination-info">
+                    <small class="text-muted">
+                    Showing items {{ records.start_index }} to {{ records.end_index }} of {{ records.paginator.count }}
+                    </small>
+                  </div>
+                   <nav aria-label="Preventive maintenance list navigation">
+                       <ul class="pagination mb-0">
+                            {% if records.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="First">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ records.previous_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Previous">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                            </li>
+                            {% endif %}
+            
+                            {% for num in records.paginator.page_range %}
+                                {% if records.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > records.number|add:'-3' and num < records.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+            
+                            {% if records.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ records.next_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Next">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ records.paginator.num_pages }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Last">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                   </nav>
+                 </div>
+           {% endif %}
+    </div>
+</div>
 {% endblock %}

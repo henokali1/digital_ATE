@@ -3,13 +3,51 @@ from django.contrib.auth.decorators import login_required
 from .models import CorrectiveMaintenance
 from .forms import CorrectiveMaintenanceForm
 from job_card.models import JobCard
+from datetime import datetime
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 # List View
 @login_required
 def maintenance_list(request):
     records = CorrectiveMaintenance.objects.all()
-    return render(request, 'corrective_maintenance/list.html', {'records': records})
+
+    start_date_filter = request.GET.get('start_date')
+    end_date_filter = request.GET.get('end_date')  # Get date filters from query parameters
+
+    #Filtering logic
+    if start_date_filter and end_date_filter:
+         try:
+             start_date = datetime.strptime(start_date_filter, '%Y-%m-%d').date()
+             end_date = datetime.strptime(end_date_filter, '%Y-%m-%d').date()
+             records = records.filter(start_date__range=[start_date,end_date])
+         except (ValueError, TypeError):
+               pass #Ignore if a bad date value is supplied
+    elif start_date_filter:
+         try:
+             start_date = datetime.strptime(start_date_filter, '%Y-%m-%d').date()
+             records = records.filter(start_date__gte=start_date)
+         except (ValueError, TypeError):
+               pass
+    elif end_date_filter:
+         try:
+             end_date = datetime.strptime(end_date_filter, '%Y-%m-%d').date()
+             records = records.filter(start_date__lte=end_date)
+         except (ValueError, TypeError):
+               pass
+    
+    per_page = int(request.GET.get('per_page', 10)) # Get the per_page value or set to default 10
+      # Pagination
+    paginator = Paginator(records, per_page)
+    page = request.GET.get('page', 1)
+    try:
+        maintenances = paginator.page(page)
+    except PageNotAnInteger:
+        maintenances = paginator.page(1)
+    except EmptyPage:
+        maintenances = paginator.page(paginator.num_pages)
+
+    return render(request, 'corrective_maintenance/list.html', {'records': maintenances, 'per_page': per_page})
 
 # Create View
 @login_required

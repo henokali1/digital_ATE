@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'corrective_maintenance',
     'job_card',
     'daily_inspection',
+    'django_select2',
 ]
 
 MIDDLEWARE = [

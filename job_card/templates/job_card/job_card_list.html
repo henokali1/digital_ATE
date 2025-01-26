@@ -87,6 +87,9 @@
                     <td>
                         <a href="{% url 'job_card_detail' job_card.pk %}" class="text-decoration-none">
                             {{ job_card.job_card_number }}
+                         {% if job_card.status == 'Completed' %}
+                               <span class="text-success ms-2"><i class="bi bi-check-circle-fill"></i></span>
+                             {% endif %}
                         </a>
                     </td>
                     <td>{{ job_card.task_description }}</td>
@@ -241,4 +244,10 @@
            {% endif %}
     </div>
 </div>
+
+<style>
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.03);
+    }
+</style>
 {% endblock %}

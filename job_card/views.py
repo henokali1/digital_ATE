@@ -8,7 +8,7 @@ from datetime import timedelta
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.contrib.auth.models import User
-
+from django import forms
 
 @login_required
 def job_card_list(request):
@@ -70,10 +70,12 @@ def job_card_create(request):
             job_card.save()
             form.save_m2m()
             return redirect('job_card_list')
+        else:
+            return render(request, 'job_card/job_card_form.html', {'form': form})
     else:
         form = JobCardForm()
     return render(request, 'job_card/job_card_form.html', {'form': form})
-
+    
 @login_required
 def job_card_update(request, pk):
     job_card = get_object_or_404(JobCard, pk=pk)
@@ -84,6 +86,8 @@ def job_card_update(request, pk):
         if form.is_valid():
             form.save()
             return redirect('job_card_list')
+        else:
+            return render(request, 'job_card/job_card_form.html', {'form': form})
     else:
         form = JobCardForm(instance=job_card)
     return render(request, 'job_card/job_card_form.html', {'form': form})
@@ -124,19 +128,26 @@ def job_card_update_status(request, pk):
     job_card = get_object_or_404(JobCard, pk=pk)
 
     if request.user not in job_card.assigned_users.all():
-       return HttpResponseForbidden("You are not authorized to change the status of this job card.")
+        return HttpResponseForbidden("You are not authorized to change the status of this job card.")
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
         job_card.remarks = request.POST.get('remarks')
 
-        if new_status == 'Completed': #Check if the status is completed
+        if new_status == 'Completed':
+            if job_card.maintenance_type == 'Preventive' and not job_card.preventive_maintenance_id:
+                return render(request, 'job_card/job_card_detail.html', {'job_card': job_card, 'error': 'A preventive maintenance record must be created before marking the job card as completed.'})
+
+            if job_card.maintenance_type == 'Corrective' and not job_card.corrective_maintenance_id:
+                return render(request, 'job_card/job_card_detail.html', {'job_card': job_card, 'error': 'A corrective maintenance record must be created before marking the job card as completed.'})
+        
+        # Setting the status
+        job_card.status = new_status
+        if new_status == 'Completed':
              job_card.completed_at = timezone.now() # Set completed_at
              job_card.time_to_complete = job_card.completed_at - job_card.created_at # calculate duration
         
-        job_card.status = new_status #Assign the new status
-        job_card.save() # save the status and the related fields
-        
+        job_card.save() 
         return redirect('job_card_detail', pk=pk)
     
     return redirect('job_card_detail', pk=pk)

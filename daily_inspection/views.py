@@ -11,6 +11,8 @@ from .models import InspectionIdent, DailyInspection
 from logbook.models import LogEntry
 from django.utils.timezone import localtime
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from datetime import datetime
 
 @login_required
 @require_POST
@@ -53,7 +55,41 @@ def save_to_logbook(request):
 
 @login_required
 def inspection_list(request):
-    inspections = InspectionIdent.objects.all().order_by('-initiated_at')
+    inspections_list = InspectionIdent.objects.all().order_by('-initiated_at')
+    per_page = int(request.GET.get('per_page', 10)) # Get the per_page value or set to default 10
+
+    start_date_filter = request.GET.get('start_date')
+    end_date_filter = request.GET.get('end_date') # Get date filters from query parameters
+
+    #Filtering logic
+    if start_date_filter and end_date_filter:
+         try:
+             start_date = datetime.strptime(start_date_filter, '%Y-%m-%d').date()
+             end_date = datetime.strptime(end_date_filter, '%Y-%m-%d').date()
+             inspections_list = inspections_list.filter(initiated_at__date__range=[start_date,end_date])
+         except (ValueError, TypeError):
+               pass #Ignore if a bad date value is supplied
+    elif start_date_filter:
+         try:
+             start_date = datetime.strptime(start_date_filter, '%Y-%m-%d').date()
+             inspections_list = inspections_list.filter(initiated_at__date__gte=start_date)
+         except (ValueError, TypeError):
+               pass
+    elif end_date_filter:
+         try:
+             end_date = datetime.strptime(end_date_filter, '%Y-%m-%d').date()
+             inspections_list = inspections_list.filter(initiated_at__date__lte=end_date)
+         except (ValueError, TypeError):
+               pass
+    # Pagination
+    paginator = Paginator(inspections_list, per_page)
+    page = request.GET.get('page', 1)
+    try:
+        inspections = paginator.page(page)
+    except PageNotAnInteger:
+        inspections = paginator.page(1)
+    except EmptyPage:
+        inspections = paginator.page(paginator.num_pages)
     
     # Add progress information to each inspection
     for inspection in inspections:
@@ -84,8 +120,8 @@ def inspection_list(request):
 
     return render(request, 'daily_inspection/inspection_list.html', {
         'inspections': inspections,
+         'per_page': per_page,
     })
-
 
 @login_required
 @require_http_methods(["GET", "POST"])

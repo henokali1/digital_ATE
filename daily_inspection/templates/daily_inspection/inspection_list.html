@@ -75,6 +75,28 @@
     <div class="col-md-10">
         <div class="card shadow">
             <div class="card-body">
+             <div class="d-flex justify-content-between align-items-center mb-4">
+                  <form method="get" class="d-flex align-items-center">
+                         <select name="per_page" class="form-select me-2" onchange="this.form.submit()">
+                            <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
+                            <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
+                            <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
+                             <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
+                         </select>
+                          <div class="d-flex align-items-center">
+                              <label for="start_date" class="form-label me-1" style="margin-bottom: 0;">Start Date</label>
+                             <input type="date" name="start_date" class="form-control me-2" value="{{ request.GET.start_date }}" onchange="this.form.submit()" placeholder="Start Date">
+                              <label for="end_date" class="form-label mx-1" style="margin-bottom: 0;">End Date</label>
+                            <input type="date" name="end_date" class="form-control me-2" value="{{ request.GET.end_date }}" onchange="this.form.submit()" placeholder="End Date">
+                                  {% if request.GET.start_date or request.GET.end_date %}
+                                <a href="{% url 'inspection_list' %}" class="btn btn-outline-secondary ms-1" title="Clear date filter">
+                                  <i class="bi bi-x-lg"></i>
+                                </a>
+                            {% endif %}
+                       </div>
+                  </form>
+             </div>
+
                 <div class="table-responsive">
                     <table class="table">
                         <thead class="table-light">
@@ -168,6 +190,70 @@
                     </table>
                 </div>
             </div>
+             {% if inspections.paginator.num_pages > 1 %}
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                 <div class="pagination-info">
+                    <small class="text-muted">
+                    Showing items {{ inspections.start_index }} to {{ inspections.end_index }} of {{ inspections.paginator.count }}
+                    </small>
+                  </div>
+                   <nav aria-label="Inspection list navigation">
+                       <ul class="pagination mb-0">
+                            {% if inspections.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="First">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ inspections.previous_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Previous">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                            </li>
+                            {% endif %}
+            
+                            {% for num in inspections.paginator.page_range %}
+                                {% if inspections.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > inspections.number|add:'-3' and num < inspections.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+            
+                            {% if inspections.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ inspections.next_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Next">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ inspections.paginator.num_pages }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Last">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                   </nav>
+                 </div>
+            {% endif %}
         </div>
     </div>
 </div>
