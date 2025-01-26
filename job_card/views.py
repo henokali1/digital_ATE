@@ -9,6 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django import forms
+from logbook.models import LogEntry
 
 @login_required
 def job_card_list(request):
@@ -150,4 +151,20 @@ def job_card_update_status(request, pk):
         job_card.save() 
         return redirect('job_card_detail', pk=pk)
     
+    return redirect('job_card_detail', pk=pk)
+
+@login_required
+def job_card_add_remark_to_logbook(request, pk):
+    job_card = get_object_or_404(JobCard, pk=pk)
+
+    if request.method == 'POST' and job_card.remarks:
+           current_time = timezone.localtime()
+           log_entry = LogEntry.objects.create(
+                date = current_time.date(),
+                time = current_time.time(),
+                location = job_card.location,
+                remarks = f"[Job Card: {job_card.job_card_number}] : {job_card.remarks}",
+                )
+           log_entry.initials.set(job_card.assigned_users.all())
+           return redirect('job_card_detail', pk=pk)
     return redirect('job_card_detail', pk=pk)

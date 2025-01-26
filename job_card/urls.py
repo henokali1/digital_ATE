@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:pk>/delete/', views.job_card_delete, name='job_card_delete'),
     path('<int:pk>/acknowledge/', views.job_card_acknowledge, name='job_card_acknowledge'),
     path('<int:pk>/update-status/', views.job_card_update_status, name='job_card_update_status'),
+    path('<int:pk>/add-remark-to-logbook/', views.job_card_add_remark_to_logbook, name='job_card_add_remark_to_logbook'),
 ]

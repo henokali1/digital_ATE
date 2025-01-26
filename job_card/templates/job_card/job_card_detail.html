@@ -157,7 +157,7 @@
                  </div>
               </div>
              {% endif %}
-              {% if job_card.status == 'Completed' %}
+             {% if job_card.status == 'Completed' %}
                     <div class="row mt-3">
                         <div class="col-md-12">
                             <div class="card bg-light">
@@ -172,7 +172,20 @@
                             </div>
                         </div>
                    </div>
-                 {% endif %}
+              {% endif %}
+
+              {% if job_card.remarks %}
+                <div class="row mt-3">
+                     <div class="col-md-12">
+                        <form method="post" action="{% url 'job_card_add_remark_to_logbook' job_card.pk %}">
+                            {% csrf_token %}
+                              <button type="submit" class="btn btn-success" >
+                                    <i class="bi bi-journal-plus"></i> Add Remark to Logbook
+                            </button>
+                         </form>
+                     </div>
+                </div>
+              {% endif %}
 
             {% if job_card.maintenance_type == "Preventive" %}
                 <h4 class="mt-4"><i class="bi bi-tools"></i> Preventive Maintenance</h4>
