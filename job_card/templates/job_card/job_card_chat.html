@@ -59,6 +59,25 @@
     </div>
 </div>
 
+<!-- Camera Modal -->
+<div class="modal fade" id="cameraModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Take Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="stopCamera()"></button>
+            </div>
+            <div class="modal-body">
+                <div id="cameraPreview" class="text-center"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="stopCamera()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="takePicture()">Take Photo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Image Preview Modal -->
 <div class="modal fade" id="imageModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -153,9 +172,57 @@
     }
 
     // Camera handling
-    function toggleCamera() {
-        const input = document.getElementById('imageInput');
-        input.click();
+    let stream = null;
+    async function toggleCamera() {
+        const preview = document.createElement('video');
+        const modal = new bootstrap.Modal(document.getElementById('cameraModal'));
+        
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            preview.srcObject = stream;
+            preview.play();
+            document.getElementById('cameraPreview').appendChild(preview);
+            modal.show();
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Unable to access camera');
+        }
+    }
+
+    function takePicture() {
+        const canvas = document.createElement('canvas');
+        const video = document.querySelector('#cameraPreview video');
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        canvas.toBlob(blob => {
+            const file = new File([blob], "camera_photo.jpg", { type: "image/jpeg" });
+            const container = new DataTransfer();
+            container.items.add(file);
+            
+            const input = document.getElementById('imageInput');
+            const existingFiles = Array.from(input.files);
+            existingFiles.forEach(file => container.items.add(file));
+            input.files = container.files;
+            
+            // Trigger change event for preview
+            const event = new Event('change');
+            input.dispatchEvent(event);
+        }, 'image/jpeg');
+        
+        stopCamera();
+        bootstrap.Modal.getInstance(document.getElementById('cameraModal')).hide();
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        const preview = document.querySelector('#cameraPreview video');
+        if (preview) preview.remove();
     }
 
     // Form submission
