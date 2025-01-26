@@ -18,3 +18,9 @@ class PreventiveMaintenanceForm(forms.ModelForm):
             'end_date': forms.DateInput(attrs={'type': 'date'}),
             'end_time': forms.TimeInput(attrs={'type': 'time'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['completed_by'].label_from_instance = self.user_full_name
+
+    def user_full_name(self, user):
+      return f'{user.first_name} {user.last_name}'
