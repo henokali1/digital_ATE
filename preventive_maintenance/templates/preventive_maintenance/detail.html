@@ -64,7 +64,7 @@
                     <table class="table table-borderless">
                         <tr>
                             <th class="w-25">Logged By:</th>
-                            <td>{{ maintenance.logged_by }}</td>
+                            <td>{{ maintenance.logged_by.get_full_name|default:maintenance.logged_by.username }}</td>
                         </tr>
                         <tr>
                             <th>Completed By:</th>

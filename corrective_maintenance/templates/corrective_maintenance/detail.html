@@ -83,18 +83,18 @@
             </div>
         </div>
 
-        <!-- Personnel Section -->
-        <div class="col-md-6">
+           <!-- Personnel Section -->
+           <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <i class="bi bi-people me-2"></i>Personnel
                 </div>
                 <div class="card-body">
-                    <p><strong><i class="bi bi-person-check me-2"></i>Logged By:</strong> {{ record.logged_by }}</p>
+                    <p><strong><i class="bi bi-person-check me-2"></i>Logged By:</strong> {{ record.logged_by.get_full_name|default:record.logged_by.username }}</p>
                     <p><strong><i class="bi bi-people-fill me-2"></i>Completed By:</strong></p>
                     <ul class="list-unstyled ms-4">
                         {% for user in record.completed_by.all %}
-                        <li><i class="bi bi-person me-2"></i>{{ user }}</li>
+                        <li><i class="bi bi-person me-2"></i>{{ user.get_full_name|default:user.username }}</li>
                         {% endfor %}
                     </ul>
                 </div>
