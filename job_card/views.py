@@ -59,7 +59,7 @@ def job_card_chat(request, pk):
 @login_required
 def job_card_list(request):
     filter = request.GET.get('filter', 'all')
-    per_page = int(request.GET.get('per_page', 10))  # Get the per_page value or set to default 10
+    per_page = int(request.GET.get('per_page', 25))  # Get the per_page value or set to default 25
 
     # Get filter values from query parameters
     status_filter = request.GET.get('status')
