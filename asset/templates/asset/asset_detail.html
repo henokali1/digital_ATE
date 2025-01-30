@@ -230,11 +230,174 @@
                     </div>
                 </div>
                 {% endif %}
+
+                <!-- Installation Date Card -->
+                    {% if asset.installation_date %}
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-calendar"></i> Installation Date
+                            </h5>
+                        </div>
+                         <div class="card-body">
+                            <p class="mb-0 fw-bold">{{ asset.installation_date }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+            </div>
+        </div>
+
+        <!-- Asset History Section -->
+       <div class="card shadow-sm mb-4">
+           <div class="card-header bg-primary text-white">
+               <h5 class="card-title mb-0"><i class="bi bi-clock-history"></i> Asset History</h5>
+           </div>
+          <div class="card-body">
+                 <div class="mb-4">
+                     <button class="btn btn-success btn-sm" type="button" data-bs-toggle="collapse"
+                             data-bs-target="#addHistoryForm" aria-expanded="false" aria-controls="addHistoryForm">
+                         <i class="bi bi-plus-lg me-2"></i> Add History
+                     </button>
+                     <div class="collapse mt-3" id="addHistoryForm">
+                         <div class="card card-body">
+                                <form method="POST" action="{% url 'add_asset_history' asset.id %}" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ history_form.remarks.id_for_label }}" class="form-label"><i class="bi bi-chat-text"></i> Remarks</label>
+                                        {{ history_form.remarks }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ history_form.photo.id_for_label }}" class="form-label">
+                                            <i class="bi bi-image"></i> Photo (Optional)
+                                        </label>
+                                        {{ history_form.photo }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ history_form.document.id_for_label }}" class="form-label">
+                                            <i class="bi bi-file-earmark"></i> Document (Optional)
+                                        </label>
+                                         {{ history_form.document }}
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                             <i class="bi bi-save"></i> Save History
+                                        </button>
+                                   </div>
+                                </form>
+                         </div>
+                     </div>
+                </div>
+                
+                {% if asset.history.all %}
+                <div class="table-responsive">
+                     <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>User</th>
+                                <th>Remarks</th>
+                                <th>Photo</th>
+                                <th>Document</th>
+                            </tr>
+                            </thead>
+                        <tbody>
+                            {% for history in asset.history.all|dictsort:"timestamp"|slice:":5" %}
+                                <tr>
+                                    <td>{{ history.timestamp }}</td>
+                                    <td>{{ history.user.get_full_name|default:history.user.username }}</td>
+                                    <td>{{ history.remarks }}</td>
+                                     <td>
+                                          {% if history.photo %}
+                                          <a href="{{ history.photo.url }}" target="_blank">
+                                           <img src="{{ history.photo.url }}" class="img-thumbnail" style="max-width: 50px; max-height:50px;"  alt="History Photo">
+                                         </a>
+                                          {% else %}
+                                            -
+                                         {% endif %}
+                                      </td>
+                                      <td>
+                                         {% if history.document %}
+                                           <a href="{{ history.document.url }}" target="_blank">
+                                               <i class="bi bi-file-earmark-arrow-down"></i> Download
+                                          </a>
+                                          {% else %}
+                                            -
+                                         {% endif %}
+                                      </td>
+                                </tr>
+                           {% endfor %}
+                           </tbody>
+                       </table>
+                 </div>
+                {% else %}
+                <p class="text-muted">No history available for this asset.</p>
+                {% endif %}
+                {% if asset.history.all|length > 5 %}
+                <div class="mt-2">
+                    <small><a href="#" data-bs-toggle="modal" data-bs-target="#fullHistoryModal">View full history <i class="bi bi-chevron-double-down"></i></a></small>
+                </div>
+                 {% endif %}
+           </div>
+       </div>
+    </div>
+</div>
+
+    <!-- Full History Modal -->
+<div class="modal fade" id="fullHistoryModal" tabindex="-1" aria-labelledby="fullHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fullHistoryModalLabel"><i class="bi bi-clock-history"></i> Full Asset History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                 {% if asset.history.all %}
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date/Time</th>
+                                 <th>User</th>
+                                <th>Remarks</th>
+                                <th>Photo</th>
+                                <th>Document</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for history in asset.history.all|dictsort:"timestamp" %}
+                                <tr>
+                                    <td>{{ history.timestamp }}</td>
+                                     <td>{{ history.user.get_full_name|default:history.user.username }}</td>
+                                    <td>{{ history.remarks }}</td>
+                                    <td>
+                                         {% if history.photo %}
+                                          <a href="{{ history.photo.url }}" target="_blank">
+                                           <img src="{{ history.photo.url }}" class="img-thumbnail" style="max-width: 50px; max-height:50px;" alt="History Photo">
+                                          </a>
+                                           {% else %}
+                                            -
+                                         {% endif %}
+                                     </td>
+                                     <td>
+                                        {% if history.document %}
+                                        <a href="{{ history.document.url }}" target="_blank">
+                                         <i class="bi bi-file-earmark-arrow-down"></i> Download
+                                       </a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">No history available for this asset.</p>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
-
 <style>
     .card {
         border: none;
@@ -305,6 +468,11 @@
         .modal-dialog {
             margin: 0.5rem;
         }
+    }
+       .img-thumbnail{
+        max-width: 75px;
+        max-height: 75px;
+        object-fit: cover;
     }
 </style>
 

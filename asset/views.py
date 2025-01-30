@@ -1,17 +1,16 @@
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Asset, PositionRack
+from .models import Asset, PositionRack, AssetHistory
 from .forms import AssetForm
 from django.contrib.auth.decorators import login_required
 import csv
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
-from .forms import AssetForm, CSVImportForm
+from .forms import AssetForm, CSVImportForm, AssetHistoryForm
 from location.models import Location
 from django.db.models import Q
 import io
-
 
 @login_required
 def home(request):
@@ -74,7 +73,9 @@ def asset_create(request):
 @login_required
 def asset_detail(request, id):
     asset = get_object_or_404(Asset, id=id)
-    return render(request, 'asset/asset_detail.html', {'asset': asset})
+    history_form = AssetHistoryForm()
+    return render(request, 'asset/asset_detail.html', {'asset': asset, 'history_form': history_form })
+
 
 # Update an existing asset
 @login_required
@@ -151,7 +152,8 @@ def import_assets(request):
                                 'preventive_maintenance_required', 'true').lower() == 'true',
                             corrective_maintenance_required=row.get(
                                 'corrective_maintenance_required', 'false').lower() == 'true',
-                            remarks=row.get('remarks', '')
+                            remarks=row.get('remarks', ''),
+                             installation_date = row.get('installation_date', None)  # Handle installation date
                         )
                         success_count += 1
                     except Exception as e:
@@ -190,7 +192,7 @@ def download_sample_csv(request):
         'position_rack', 'status', 'manufacturer', 'model_number', 
         'part_number', 'morning_shift_daily_inspection_required',
         'night_shift_daily_inspection_required', 'preventive_maintenance_required',
-        'corrective_maintenance_required', 'remarks'
+        'corrective_maintenance_required', 'remarks', 'installation_date'
     ])
     
     # Write sample data
@@ -198,7 +200,24 @@ def download_sample_csv(request):
         'Sample Asset 1', 'SN001', 'TAG-12345678', 'Surveillance', 'Tower',
         'Rack-1', 'In Use', 'Sample Manufacturer', 'Model-123',
         'Part-456', 'true', 'false', 'true', 'false',
-        'Sample remarks'
+        'Sample remarks', '2024-10-26'
     ])
 
     return response
+
+@login_required
+def add_asset_history(request, id):
+        asset = get_object_or_404(Asset, id=id)
+        if request.method == 'POST':
+            history_form = AssetHistoryForm(request.POST, request.FILES)
+            if history_form.is_valid():
+                history_entry = history_form.save(commit=False)
+                history_entry.asset = asset
+                history_entry.user = request.user
+                history_entry.save()
+                messages.success(request, 'Asset history updated.')
+                return redirect('asset_detail', id=id)
+        else:
+            history_form = AssetHistoryForm()
+
+        return render(request, 'asset/asset_detail.html', {'asset': asset, 'history_form': history_form})

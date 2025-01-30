@@ -1,8 +1,8 @@
-# asset/models.py
+ # asset/models.py
 from django.db import models
 from location.models import Location
 import uuid
-
+from django.contrib.auth.models import User
 
 class PositionRack(models.Model):
     name = models.CharField(max_length=100, unique=True, help_text="Name of the rack or position")
@@ -42,6 +42,7 @@ class Asset(models.Model):
     corrective_maintenance_required = models.BooleanField(default=False)
     remarks = models.CharField(max_length=250, blank=True, null=True)
     photo = models.ImageField(upload_to='assets_photos/', blank=True, null=True)
+    installation_date = models.DateField(blank=True, null=True)  # Add this field
 
     def save(self, *args, **kwargs):
         if not self.tag_id:  # Only generate a tag_id if it doesn't already exist
@@ -50,3 +51,14 @@ class Asset(models.Model):
 
     def __str__(self):
         return f'{self.name} - {self.position_rack}'
+
+class AssetHistory(models.Model):
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='history')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    remarks = models.TextField(blank=True)
+    photo = models.ImageField(upload_to='asset_history_photos/', blank=True, null=True)
+    document = models.FileField(upload_to='asset_history_documents/', blank=True, null=True)
+
+    def __str__(self):
+        return f"History for {self.asset.name} at {self.timestamp}"

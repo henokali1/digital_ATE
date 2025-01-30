@@ -1,5 +1,6 @@
+# asset/forms.py
 from django import forms
-from .models import Asset, PositionRack
+from .models import Asset, PositionRack, AssetHistory
 from location.models import Location
 
 class AssetForm(forms.ModelForm):
@@ -20,7 +21,7 @@ class AssetForm(forms.ModelForm):
             'preventive_maintenance_required',
             'corrective_maintenance_required',
             # Additional Information
-            'remarks', 'photo'
+            'remarks', 'photo', 'installation_date'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter asset name'}),
@@ -34,7 +35,8 @@ class AssetForm(forms.ModelForm):
             'model_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter model number'}),
             'part_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter part number'}),
             'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter any additional remarks'}),
-            'photo': forms.FileInput(attrs={'class': 'form-control'})
+            'photo': forms.FileInput(attrs={'class': 'form-control'}),
+            'installation_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
         }
         labels = {
             'morning_shift_daily_inspection_required': 'Morning Shift Inspection',
@@ -51,9 +53,9 @@ class AssetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         # Make certain fields optional
-        optional_fields = ['manufacturer', 'model_number', 'part_number', 'remarks', 'photo']
+        optional_fields = ['manufacturer', 'model_number', 'part_number', 'remarks', 'photo', 'installation_date']
         for field in optional_fields:
             self.fields[field].required = False
 
@@ -106,3 +108,13 @@ class CSVImportForm(forms.Form):
             'accept': '.csv'
         })
     )
+
+class AssetHistoryForm(forms.ModelForm):
+    class Meta:
+        model = AssetHistory
+        fields = ['remarks', 'photo', 'document']
+        widgets = {
+            'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter remarks about the asset'}),
+            'photo': forms.FileInput(attrs={'class': 'form-control'}),
+            'document': forms.FileInput(attrs={'class': 'form-control'}),
+        }
