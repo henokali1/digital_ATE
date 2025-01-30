@@ -99,19 +99,36 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label for="{{ form.corrective_action.id_for_label }}" class="form-label">Corrective Action</label>
-                        {{ form.corrective_action|addClass:"form-control" }}
-                    </div>
+                         {{ form.corrective_action|add_class:"form-control text-area-small" }}
+                     </div>
                     <div class="mb-3">
                         <label for="{{ form.preventive_action.id_for_label }}" class="form-label">Preventive Action</label>
-                        {{ form.preventive_action|addClass:"form-control" }}
+                         {{ form.preventive_action|add_class:"form-control text-area-small" }}
                     </div>
                     <div class="mb-3">
                         <label for="{{ form.root_cause.id_for_label }}" class="form-label">Root Cause</label>
-                        {{ form.root_cause|addClass:"form-control" }}
+                        {{ form.root_cause|add_class:"form-control text-area-small" }}
                     </div>
                     <div class="mb-3">
                         <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks</label>
-                        {{ form.remarks|addClass:"form-control" }}
+                         {{ form.remarks|add_class:"form-control text-area-small" }}
+                    </div>
+                    <!-- New fields -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                             <label for="{{ form.ROSI_NO.id_for_label }}" class="form-label">ROSI NO.</label>
+                              <div class="input-group">
+                                   <span class="input-group-text"><i class="bi bi-file-earmark-text"></i></span>
+                                    {{ form.ROSI_NO|addClass:"form-control" }}
+                                 </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.incident_report.id_for_label }}" class="form-label">Incident Report</label>
+                            <div class="input-group">
+                                 <span class="input-group-text"><i class="bi bi-file-earmark-arrow-up"></i></span>
+                                {{ form.incident_report|addClass:"form-control" }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -148,6 +165,11 @@
     </div>
 </div>
 
+<style>
+     .text-area-small {
+        height: 100px; /* Adjust the height as needed */
+    }
+</style>
 <script>
 // Form validation
 (function () {

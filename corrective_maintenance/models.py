@@ -39,6 +39,8 @@ class CorrectiveMaintenance(models.Model):
     remarks = models.TextField(blank=True, null=True)
     completed_by = models.ManyToManyField(User, related_name='correctie_maintenance_completed_by')
     photo = models.ImageField(upload_to='uploads/corrective_photos/', blank=True, null=True)
+    ROSI_NO = models.CharField(max_length=50, blank=True, null=True)
+    incident_report = models.FileField(upload_to='uploads/incident_reports/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Calculate duration in hours
