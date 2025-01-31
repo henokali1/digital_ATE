@@ -97,13 +97,6 @@ def job_card_list(request):
     if assigned_to_filter:
           job_cards_list = job_cards_list.filter(assigned_users__id=assigned_to_filter)
 
-    #Filter for date range if there is a start date and due date
-    if filter != 'overdue' and filter != 'upcoming': # Do this filter only when overdue and upcoming filter is not used
-        job_cards_list = job_cards_list.filter(
-            Q(start_date__isnull=True) | Q(start_date__lte=today),
-            Q(due_date__isnull=True) | Q(due_date__gte=today)
-        )
-    
     job_cards_list = job_cards_list.order_by('-created_at') # Order by newest first
 
      # Pagination
