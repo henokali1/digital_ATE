@@ -47,3 +47,13 @@ class JobCardMessageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['message'].widget.attrs.update({'class': 'form-control', 'rows': '3'})
+
+class CSVImportForm(forms.Form):
+    csv_file = forms.FileField(
+        label='Select CSV File',
+        help_text='File must be in CSV format with required headers',
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.csv'
+        })
+    )

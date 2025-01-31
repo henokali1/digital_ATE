@@ -11,4 +11,6 @@ urlpatterns = [
     path('<int:pk>/update-status/', views.job_card_update_status, name='job_card_update_status'),
     path('<int:pk>/add-remark-to-logbook/', views.job_card_add_remark_to_logbook, name='job_card_add_remark_to_logbook'),
     path('<int:pk>/chat/', views.job_card_chat, name='job_card_chat'),
+    path('import/', views.import_job_cards, name='import_job_cards'),
+    path('download-sample-csv/', views.download_sample_csv, name='download_sample_csv'),
 ]
