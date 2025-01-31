@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import JobCardForm, CSVImportForm
 from django.utils import timezone
 from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -57,6 +57,7 @@ def job_card_chat(request, pk):
     })
 
 
+
 @login_required
 def job_card_list(request):
     filter = request.GET.get('filter', 'all')
@@ -70,6 +71,7 @@ def job_card_list(request):
     assigned_to_filter = request.GET.get('assigned_to')
     
     today = date.today() #Get current date
+    current_date = datetime.now().date()
 
     if filter == 'assigned':
         job_cards_list = JobCard.objects.filter(assigned_users=request.user)
@@ -110,7 +112,7 @@ def job_card_list(request):
         job_cards = paginator.page(paginator.num_pages)
 
     users = User.objects.all() #Get all users
-    return render(request, 'job_card/job_card_list.html', {'job_cards': job_cards, 'filter': filter, 'per_page': per_page, 'users':users, 'job_card': JobCard})
+    return render(request, 'job_card/job_card_list.html', {'job_cards': job_cards, 'filter': filter, 'per_page': per_page, 'users':users, 'job_card': JobCard, 'today':current_date})
 
 @login_required
 def job_card_create(request):
