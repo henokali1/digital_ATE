@@ -11,16 +11,19 @@ class JobCardForm(forms.ModelForm):
     )
     class Meta:
         model = JobCard
-        fields = ['task_description', 'assigned_users', 'priority_level', 'maintenance_type', 'location', 'status', 'remarks']
+        fields = ['task_description', 'assigned_users', 'priority_level', 'maintenance_type', 'location', 'status', 'start_date', 'due_date','remarks']
         exclude = ['created_at', 'created_by', 'updated_at','acknowledged', 'acknowledged_at']
+        widgets ={
+             'start_date': forms.DateInput(attrs={'type': 'date', 'class':'form-control'}),
+            'due_date': forms.DateInput(attrs={'type': 'date', 'class':'form-control'}),
+        }
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['assigned_users'].label_from_instance = self.user_full_name
-
     def user_full_name(self, user):
         return f'{user.first_name} {user.last_name}'
-    
+
     def clean(self):
          cleaned_data = super().clean()
          status = cleaned_data.get('status')

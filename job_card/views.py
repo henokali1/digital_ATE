@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import JobCardForm
 from django.utils import timezone
 from django.http import HttpResponseForbidden, HttpResponse
-from datetime import timedelta
+from datetime import timedelta, date
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -13,7 +13,6 @@ from logbook.models import LogEntry
 from .models import JobCard, JobCardMessage, JobCardImage
 from .forms import JobCardMessageForm
 from django.http import JsonResponse
-
 
 
 @login_required
@@ -68,8 +67,16 @@ def job_card_list(request):
     acknowledged_filter = request.GET.get('acknowledged')
     assigned_to_filter = request.GET.get('assigned_to')
     
+    today = date.today() #Get current date
+
     if filter == 'assigned':
         job_cards_list = JobCard.objects.filter(assigned_users=request.user)
+    elif filter == 'overdue':
+       job_cards_list = JobCard.objects.filter(due_date__lt=today).exclude(status='Completed')
+    elif filter == 'upcoming':
+         job_cards_list = JobCard.objects.filter(
+              start_date__gt=today # start date should be in the future
+        )
     else:
         job_cards_list = JobCard.objects.all()
 
@@ -87,8 +94,14 @@ def job_card_list(request):
                 job_cards_list = job_cards_list.filter(acknowledged=False)
     if assigned_to_filter:
           job_cards_list = job_cards_list.filter(assigned_users__id=assigned_to_filter)
+
+    #Filter for date range if there is a start date and due date
+    if filter != 'overdue' and filter != 'upcoming': # Do this filter only when overdue and upcoming filter is not used
+        job_cards_list = job_cards_list.filter(
+            Q(start_date__isnull=True) | Q(start_date__lte=today),
+            Q(due_date__isnull=True) | Q(due_date__gte=today)
+        )
     
-   
     job_cards_list = job_cards_list.order_by('-created_at') # Order by newest first
 
      # Pagination

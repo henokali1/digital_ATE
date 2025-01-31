@@ -6,6 +6,7 @@ from corrective_maintenance.models import CorrectiveMaintenance
 from django.utils.timezone import now
 import uuid
 
+
 class JobCard(models.Model):
     PRIORITY_CHOICES = [
         ('High', 'High'),
@@ -33,7 +34,7 @@ class JobCard(models.Model):
     job_card_number = models.CharField(
         max_length=50, unique=True, editable=False
     )
-    task_description = models.CharField(max_length=255) 
+    task_description = models.CharField(max_length=255)
     assigned_users = models.ManyToManyField(User, related_name='assigned_jobs', blank=True)
     priority_level = models.CharField(max_length=10, choices=PRIORITY_CHOICES, blank=True, null=True)
     maintenance_type = models.CharField(max_length=15, choices=MAINTENANCE_TYPE, default='Not Required')
@@ -44,10 +45,12 @@ class JobCard(models.Model):
     acknowledged = models.BooleanField(default=False, editable=False)
     acknowledged_at = models.DateTimeField(null=True, blank=True, editable=False)
     remarks = models.TextField(blank=True, null=True)
-    time_to_acknowledge = models.DurationField(null=True, blank=True, editable=False) # New field for time to acknowledge
-    completed_at = models.DateTimeField(null=True, blank=True, editable=False) # New field for completed time
-    time_to_complete = models.DurationField(null=True, blank=True, editable=False) # New field for time to complete
-
+    time_to_acknowledge = models.DurationField(null=True, blank=True, editable=False)  # New field for time to acknowledge
+    completed_at = models.DateTimeField(null=True, blank=True, editable=False)  # New field for completed time
+    time_to_complete = models.DurationField(null=True, blank=True, editable=False)  # New field for time to complete
+    
+    start_date = models.DateField(null=True, blank=True)
+    due_date = models.DateField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.job_card_number:

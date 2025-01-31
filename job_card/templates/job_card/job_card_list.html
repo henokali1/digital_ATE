@@ -19,6 +19,8 @@
                         <select name="filter" class="form-select me-2" onchange="this.form.submit()">
                              <option value="all" {% if filter == 'all' %}selected{% endif %}>All Job Cards</option>
                              <option value="assigned" {% if filter == 'assigned' %}selected{% endif %}>My Job Cards</option>
+                              <option value="upcoming" {% if filter == 'upcoming' %}selected{% endif %}>Upcoming Job Cards</option>
+                             <option value="overdue" {% if filter == 'overdue' %}selected{% endif %}>Overdue Job Cards</option>
                          </select>
                           <!-- <select name="per_page" class="form-select me-2" onchange="this.form.submit()">
                              <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
@@ -93,7 +95,7 @@
                 </thead>
                 <tbody>
                     {% for job_card in job_cards %}
-                    <tr>
+                    <tr {% if job_card.due_date and job_card.due_date < today and job_card.status != 'Completed'%} style="background-color: rgba(220, 53, 69, 0.1);" title="This job card is over due"{% endif %}>
                         <td>
                             <a href="{% url 'job_card_detail' job_card.pk %}" class="text-decoration-none">
                                 {{ job_card.job_card_number }}
@@ -255,4 +257,10 @@
         </div>
     </div>
 </div>
+
+<style>
+    .table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.05)
+    }
+</style>
 {% endblock %}
