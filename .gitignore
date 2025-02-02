@@ -1,0 +1,26 @@
+# Ignore database files
+db.sqlite3
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore Django migration cache files
+**/migrations/__pycache__/
+
+# Ignore media uploads and generated files
+/media/
+
+# Ignore environment and dependency files
+venv/
+.env
+*.log
+
+# Ignore backup and temporary files
+*.swp
+*.swo
+*.bak
+.DS_Store
+Thumbs.db
