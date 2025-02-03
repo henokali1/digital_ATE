@@ -41,7 +41,7 @@ def asset_list(request):
     queryset = queryset.order_by('-id')
     
     # Pagination
-    paginator = Paginator(queryset, 100)  # Show 100 items per page
+    paginator = Paginator(queryset, 10)  # Show 10 items per page
     page = request.GET.get('page', 1)
     
     try:

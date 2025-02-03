@@ -289,13 +289,13 @@
                 <i class="bi bi-chevron-down"></i>
             </button>
                  <div class="options">
-                    <div class="theme-button" style="padding: 0 1rem;">
+                    <!-- <div class="theme-button" style="padding: 0 1rem;">
                       <input type="checkbox" id="theme-toggle" class="theme-checkbox">
                          <label for="theme-toggle" class="theme-label">
                              <i class="bi bi-brightness-high-fill light-icon"></i>
                               <i class="bi bi-moon-fill dark-icon"></i>
                          </label>
-                    </div>
+                    </div> -->
                     
                    <form method="POST" action="{% url 'logout' %}">
                      {% csrf_token %}
@@ -320,9 +320,9 @@
     </div>
     {% block extra_js %}
     {% endblock %}
-    <script src="{% static 'js/dark-mode.js' %}"></script>
-    <!-- <script>
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    <!-- <script src="{% static 'js/dark-mode.js' %}"></script> -->
+    <script>
+        // document.getElementById('currentYear').textContent = new Date().getFullYear();
           document.addEventListener('DOMContentLoaded', function() {
                 const button = document.getElementById('theme-logout-button');
                  const options = document.querySelector('.theme-logout-container .options');
@@ -343,7 +343,7 @@
                 });
           })
 
-    </script> -->
+    </script>
     
 </body>
 </html>
