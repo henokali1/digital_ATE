@@ -192,10 +192,12 @@
                                     
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <h4 class="asset-name">
-                                                <i class="bi bi-hdd-fill"></i>
-                                                {{ daily_inspection.asset.name }}
-                                            </h4>
+                                            <a href="/asset/{{ daily_inspection.asset.id }}/">
+                                                <h4 class="asset-name">
+                                                    <i class="bi bi-hdd-fill"></i>
+                                                    {{ daily_inspection.asset.name }}
+                                                </h4>
+                                            </a>
                                             <small class="text-muted">
                                                 Section: {{ daily_inspection.asset.section }}
                                                 {% if daily_inspection.asset.serial_number %}
