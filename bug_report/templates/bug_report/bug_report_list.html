@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Bug Reports{% endblock %}
+
+{% block heading_h1 %}Bug Reports{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <a href="{% url 'bug_report:bug_report_create' %}" class="btn btn-primary mb-3">Report a Bug</a>
+        <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Reported By</th>
+                    <th>Date Reported</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in bug_reports %}
+                    <tr>
+                        <td><a href="{% url 'bug_report:bug_report_detail' report.pk %}">{{ report.title }}</a></td>
+                        <td>{{ report.severity }}</td>
+                        <td>{{ report.status }}</td>
+                        <td>{{ report.reported_by.username }}</td>
+                        <td>{{ report.date_reported }}</td>
+                        <td>
+                            <a href="{% url 'bug_report:bug_report_update' report.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{% url 'bug_report:bug_report_delete' report.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+{% endblock %}

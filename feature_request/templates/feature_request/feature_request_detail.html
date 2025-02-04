@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ feature_request.title }}{% endblock %}
+
+{% block heading_h1 %}{{ feature_request.title }}{% endblock %}
+
+{% block content %}
+    <dl class="row">
+        <dt class="col-sm-3">Title:</dt>
+        <dd class="col-sm-9">{{ feature_request.title }}</dd>
+
+        <dt class="col-sm-3">Description:</dt>
+        <dd class="col-sm-9">{{ feature_request.description|default:"N/A"|linebreaks }}</dd>
+
+        {% if feature_request.attachment %}
+            <dt class="col-sm-3">Attachment:</dt>
+            <dd class="col-sm-9">
+                <a href="{{ feature_request.attachment.url }}" target="_blank"><i class="bi bi-file-earmark-arrow-down me-2"></i>Download Attachment</a>
+            </dd>
+        {% endif %}
+
+        <dt class="col-sm-3">Requested By:</dt>
+        <dd class="col-sm-9">{{ feature_request.requested_by.username }}</dd>
+
+        <dt class="col-sm-3">Date Requested:</dt>
+        <dd class="col-sm-9">{{ feature_request.date_requested }}</dd>
+
+        <dt class="col-sm-3">Status:</dt>
+        <dd class="col-sm-9">{{ feature_request.status }}</dd>
+
+        <dt class="col-sm-3">Comments:</dt>
+        <dd class="col-sm-9">{{ feature_request.comments|default:"N/A"|linebreaks }}</dd>
+    </dl>
+
+    <a href="{% url 'feature_request:feature_request_update' feature_request.pk %}" class="btn btn-warning"><i class="bi bi-pencil me-2"></i>Edit</a>
+    <a href="{% url 'feature_request:feature_request_delete' feature_request.pk %}" class="btn btn-danger"><i class="bi bi-trash me-2"></i>Delete</a>
+    <a href="{% url 'feature_request:feature_request_list' %}" class="btn btn-secondary"><i class="bi bi-arrow-left me-2"></i>Back to List</a>
+{% endblock %}

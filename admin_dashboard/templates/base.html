@@ -297,11 +297,13 @@
                          </label>
                     </div> -->
                     
+                   <a href="{% url 'accounts:change_password' %}"><i class="bi bi-key-fill me-2"></i>Change Password</a>
+                   <a href="{% url 'bug_report:bug_report_list' %}"><i class="bi bi-bug-fill me-2"></i>Bug Reports</a>
+                   <a href="{% url 'feature_request:feature_request_list' %}"><i class="bi bi-lightbulb-fill me-2"></i>Feature Requests</a>
                    <form method="POST" action="{% url 'logout' %}">
                      {% csrf_token %}
                       <button type="submit" class="create-log-btn"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
                   </form>
-                   <a href="{% url 'accounts:change_password' %}"><i class="bi bi-key-fill me-2"></i>Change Password</a>
                 </div>
             </div>
           {% endif %}

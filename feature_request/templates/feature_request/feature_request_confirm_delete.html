@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block heading_h1 %}Confirm Delete{% endblock %}
+
+{% block content %}
+    <p>Are you sure you want to delete the feature request: "{{ feature_request.title }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-2"></i>Confirm Delete</button>
+        <a href="{% url 'feature_request:feature_request_list' %}" class="btn btn-secondary"><i class="bi bi-arrow-left me-2"></i>Cancel</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bug_report.title }}{% endblock %}
+
+{% block heading_h1 %}{{ bug_report.title }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <p><strong>Description:</strong> {{ bug_report.description }}</p>
+         <p><strong>Steps to Reproduce:</strong> {{ bug_report.steps_to_reproduce }}</p>
+        <p><strong>Expected Behavior:</strong> {{ bug_report.expected_behavior }}</p>
+         <p><strong>Actual Behavior:</strong> {{ bug_report.actual_behavior }}</p>
+        <p><strong>Severity:</strong> {{ bug_report.severity }}</p>
+        {% if bug_report.screenshot %}
+            <p><strong>Screenshot:</strong> <a href="{{ bug_report.screenshot.url }}" target="_blank">View Screenshot</a></p>
+        {% endif %}
+        <p><strong>Reported By:</strong> {{ bug_report.reported_by.username }}</p>
+        <p><strong>Date Reported:</strong> {{ bug_report.date_reported }}</p>
+        <p><strong>Status:</strong> {{ bug_report.status }}</p>
+        <p><strong>Comments:</strong> {{ bug_report.comments }}</p>
+
+        <a href="{% url 'bug_report:bug_report_update' bug_report.pk %}" class="btn btn-warning">Edit</a>
+        <a href="{% url 'bug_report:bug_report_delete' bug_report.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'bug_report:bug_report_list' %}" class="btn btn-secondary">Back to List</a>
+    </div>
+{% endblock %}

@@ -18,6 +18,8 @@ urlpatterns = [
     path('job_card/', include('job_card.urls')),
     path('', include('daily_inspection.urls')),
     path('select2/', include('django_select2.urls')),
+    path('bug_report/', include('bug_report.urls')),
+    path('feature_requests/', include('feature_request.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

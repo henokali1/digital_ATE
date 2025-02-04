@@ -74,6 +74,8 @@ INSTALLED_APPS = [
     'job_card',
     'daily_inspection',
     'django_select2',
+    'bug_report',
+    'feature_request',
 ]
 
 MIDDLEWARE = [
@@ -131,7 +133,8 @@ DATABASES = {
 
 # Security settings
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
-DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
+# DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
+DEBUG = True
 #ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
 
