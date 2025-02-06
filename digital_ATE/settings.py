@@ -38,18 +38,24 @@ USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # If you're using SSL/Cloudflare, add these
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False    
 
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 
+# Add more complete CSRF settings
+CSRF_USE_SESSIONS = False
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_DOMAIN = None
 CSRF_TRUSTED_ORIGINS = [
     'http://192.168.10.10',
     'https://192.168.10.10',
     'https://ate.henokcodes.com',
     'http://ate.henokcodes.com',
+    'http://localhost',
+    'http://127.0.0.1',
 ]
 
 # Application definition
