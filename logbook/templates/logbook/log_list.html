@@ -41,7 +41,7 @@
                         <th class="fw-semibold">Location</th>
                         <th class="fw-semibold">Initials</th>
                         <th class="fw-semibold">Remarks</th>
-                        <th class="fw-semibold">Photo</th>
+                        <!-- <th class="fw-semibold">Photo</th> -->
                         {% if user.username == "cns.ce@fans.ae" %}
                         <th class="fw-semibold text-end">Actions</th>
                         {% endif %}
@@ -63,13 +63,13 @@
                         <td>
                             <div class="remarks-cell">{{ log.remarks }}</div>
                         </td>
-                        <td>
+                        <!-- <td>
                             {% if log.photos %}
                             <img src="{{ log.photos.url }}" alt="Log photo" class="thumbnail">
                             {% else %}
                             <span class="text-muted">No photo</span>
                             {% endif %}
-                        </td>
+                        </td> -->
                         {% if user.username == "cns.ce@fans.ae" %}
                         <td class="text-end">
                             <div class="btn-group">
