@@ -20,6 +20,7 @@ urlpatterns = [
     path('select2/', include('django_select2.urls')),
     path('bug_report/', include('bug_report.urls')),
     path('feature_requests/', include('feature_request.urls')),
+    path('spare_parts/', include('spare_parts.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

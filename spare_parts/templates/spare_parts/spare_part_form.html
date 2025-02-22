@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if action == 'Update' %}Edit Spare Part{% else %}Create Spare Part{% endif %}{% endblock %}
+{% block heading_h1 %}{% if action == 'Update' %}Edit Spare Part{% else %}Create Spare Part{% endif %}{% endblock %}
+{% block heading_h2 %}{% if action == 'Update' %}Edit {{ spare_part.name }}{% else %}Enter spare part details{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                Please correct the errors below.
+            </div>
+        {% endif %}
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-info-circle"></i> Spare Part Details
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label"><i class="bi bi-tag"></i> Name:</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="text-danger">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.serial_number.id_for_label }}" class="form-label"><i class="bi bi-asterisk"></i> Serial Number:</label>
+                        {{ form.serial_number }}
+                        {% if form.serial_number.errors %}
+                            <div class="text-danger">{{ form.serial_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.part_number.id_for_label }}" class="form-label"><i class="bi bi-123"></i> Part Number:</label>
+                        {{ form.part_number }}
+                        {% if form.part_number.errors %}
+                            <div class="text-danger">{{ form.part_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label"><i class="bi bi-file-text"></i> Description:</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.tag_id.id_for_label }}" class="form-label"><i class="bi bi-key"></i> Tag ID:</label>
+                        {{ form.tag_id }}
+                        {% if form.tag_id.errors %}
+                            <div class="text-danger">{{ form.tag_id.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.section.id_for_label }}" class="form-label"><i class="bi bi-diagram-3"></i> Section:</label>
+                        {{ form.section }}
+                        {% if form.section.errors %}
+                            <div class="text-danger">{{ form.section.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.location.id_for_label }}" class="form-label"><i class="bi bi-geo-alt"></i> Location:</label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                            <div class="text-danger">{{ form.location.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.quantity.id_for_label }}" class="form-label"><i class="bi bi-hash"></i> Quantity:</label>
+                        {{ form.quantity }}
+                        {% if form.quantity.errors %}
+                            <div class="text-danger">{{ form.quantity.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.status.id_for_label }}" class="form-label"><i class="bi bi-check-circle"></i> Status:</label>
+                        {{ form.status }}
+                         {% if form.status.errors %}
+                            <div class="text-danger">{{ form.status.errors }}</div>
+                        {% endif %}
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        <label for="{{ form.manufacturer.id_for_label }}" class="form-label"><i class="bi bi-building"></i> Manufacturer:</label>
+                        {{ form.manufacturer }}
+                         {% if form.manufacturer.errors %}
+                            <div class="text-danger">{{ form.manufacturer.errors }}</div>
+                        {% endif %}
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        <label for="{{ form.model_number.id_for_label }}" class="form-label"><i class="bi bi-gear"></i> Model Number:</label>
+                        {{ form.model_number }}
+                         {% if form.model_number.errors %}
+                            <div class="text-danger">{{ form.model_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <i class="bi bi-box-seam"></i> Storage Details
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.shelf_number.id_for_label }}" class="form-label"><i class="bi bi-shelf"></i> Shelf Number:</label>
+                        {{ form.shelf_number }}
+                        {% if form.shelf_number.errors %}
+                            <div class="text-danger">{{ form.shelf_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.shelf_level.id_for_label }}" class="form-label"><i class="bi bi-list-ol"></i> Shelf Level:</label>
+                        {{ form.shelf_level }}
+                        {% if form.shelf_level.errors %}
+                            <div class="text-danger">{{ form.shelf_level.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.box_number.id_for_label }}" class="form-label"><i class="bi bi-box"></i> Box Number:</label>
+                        {{ form.box_number }}
+                        {% if form.box_number.errors %}
+                            <div class="text-danger">{{ form.box_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.min_stock_level.id_for_label }}" class="form-label"><i class="bi bi-exclamation-triangle"></i> Min Stock Level:</label>
+                        {{ form.min_stock_level }}
+                        {% if form.min_stock_level.errors %}
+                            <div class="text-danger">{{ form.min_stock_level.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.pr_number.id_for_label }}" class="form-label"><i class="bi bi-receipt"></i> PR Number:</label>
+                        {{ form.pr_number }}
+                        {% if form.pr_number.errors %}
+                            <div class="text-danger">{{ form.pr_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-images"></i> Spare Part Photos
+            </div>
+            <div class="card-body">
+                {{ photo_formset.management_form }}
+                {% for form in photo_formset %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="{{ form.photo.id_for_label }}" class="form-label"><i class="bi bi-image"></i> Photo</label>
+                                {{ form.photo }}
+                                {% if form.photo.errors %}
+                                    <div class="text-danger">{{ form.photo.errors }}</div>
+                                {% endif %}
+                            </div>
+                            {{ form.DELETE.label_tag }} {{ form.DELETE }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">{% if action == 'Update' %}Update{% else %}Create{% endif %} Spare Part</button>
+        <a href="{% url 'spare_parts:spare_part_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

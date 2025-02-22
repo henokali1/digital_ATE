@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Maintenance History{% endblock %}
+{% block heading_h1 %}Delete Maintenance History{% endblock %}
+{% block heading_h2 %}Confirm deletion of maintenance history on {{ maintenance_history.date }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <p>Are you sure you want to delete the maintenance history on {{ maintenance_history.date }}?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+        <a href="{% url 'spare_parts:spare_part_detail' maintenance_history.spare_part.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

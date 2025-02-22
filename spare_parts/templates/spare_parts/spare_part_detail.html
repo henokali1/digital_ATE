@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Spare Part Details{% endblock %}
+{% block heading_h1 %}Spare Part Details{% endblock %}
+{% block heading_h2 %}{{ spare_part.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Style for image zoom */
+    .img-zoom-container {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .img-zoom-container img {
+        transition: transform 0.3s ease;
+    }
+
+    .img-zoom-container:hover img {
+        transform: scale(1.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'spare_parts:spare_part_list' %}"><i class="bi bi-arrow-left"></i> Back to List</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ spare_part.name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Spare Part Details Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="bi bi-info-circle"></i> Spare Part Details
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong><i class="bi bi-tag"></i> Name:</strong> {{ spare_part.name }}</p>
+                    <p><strong><i class="bi bi-asterisk"></i> Serial Number:</strong> {{ spare_part.serial_number }}</p>
+                    <p><strong><i class="bi bi-123"></i> Part Number:</strong> {{ spare_part.part_number }}</p>
+                    <p><strong><i class="bi bi-file-text"></i> Description:</strong> {{ spare_part.description }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong><i class="bi bi-key"></i> Tag ID:</strong> {{ spare_part.tag_id }}</p>
+                    <p><strong><i class="bi bi-diagram-3"></i> Section:</strong> {{ spare_part.section }}</p>
+                    <p><strong><i class="bi bi-geo-alt"></i> Location:</strong> {{ spare_part.location }}</p>
+                    <p><strong><i class="bi bi-hash"></i> Quantity:</strong> {{ spare_part.quantity }}</p>
+                    <p><strong><i class="bi bi-check-circle{% if spare_part.status == 'Operational' %}-fill text-success{% elif spare_part.status == 'Unserviceable' %}-fill text-danger{% else %}-fill text-warning{% endif %}"></i> Status:</strong> {{ spare_part.status }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Storage Details Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <i class="bi bi-box-seam"></i> Storage Details
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong><i class="bi bi-shelf"></i> Shelf Number:</strong> {{ spare_part.shelf_number }}</p>
+                    <p><strong><i class="bi bi-list-ol"></i> Shelf Level:</strong> {{ spare_part.shelf_level }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong><i class="bi bi-box"></i> Box Number:</strong> {{ spare_part.box_number }}</p>
+                    <p><strong><i class="bi bi-exclamation-triangle"></i> Min Stock Level:</strong> {{ spare_part.min_stock_level }}</p>
+                    <p><strong><i class="bi bi-receipt"></i> PR Number:</strong> {{ spare_part.pr_number }}</p>
+                </div>
+                <div class="col-md-6">
+                      <p><strong><i class="bi bi-building"></i> Manufacturer:</strong> {{ spare_part.manufacturer }}</p>
+                    <p><strong><i class="bi bi-gear"></i> Model Number:</strong> {{ spare_part.model_number }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spare Part Photos Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <i class="bi bi-images"></i> Spare Part Photos
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for photo in spare_part.photos.all %}
+                    <div class="col-md-3 mb-3 img-zoom-container">
+                        <img src="{{ photo.photo.url }}" alt="Spare Part Photo" class="img-fluid img-thumbnail">
+                    </div>
+                {% empty %}
+                    <div class="col-md-12">
+                        <p>No photos uploaded for this spare part.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Calibration Histories Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <i class="bi bi-tools"></i> Calibration Histories
+        </div>
+        <div class="card-body">
+            {% if spare_part.calibration_history.all %}
+                <ul class="list-group list-group-flush">
+                    {% for history in spare_part.calibration_history.all %}
+                        <li class="list-group-item">
+                            <strong><i class="bi bi-calendar"></i> Date:</strong> {{ history.date }}<br>
+                            <strong><i class="bi bi-chat-square-text"></i> Remarks:</strong> {{ history.remarks }}
+                            {% if history.calibration_certificate %}
+                                <br><a href="{{ history.calibration_certificate.url }}" target="_blank"><i class="bi bi-file-earmark-pdf"></i> Calibration Certificate</a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No calibration history found for this spare part.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Maintenance Histories Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <i class="bi bi-wrench"></i> Maintenance Histories
+            <a href="{% url 'spare_parts:maintenance_history_create' spare_part.pk %}" class="btn btn-sm btn-light float-end"><i class="bi bi-plus"></i> Add Maintenance History</a>
+        </div>
+        <div class="card-body">
+            {% if spare_part.maintenance_history.all %}
+                {% for maintenance in spare_part.maintenance_history.all %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-calendar"></i> Date: {{ maintenance.date }}</h5>
+                            <p class="card-text"><i class="bi bi-chat-square-text"></i> Remarks: {{ maintenance.remarks }}</p>
+                            <div class="row">
+                                {% for photo in maintenance.photos.all %}
+                                    <div class="col-md-3 mb-3 img-zoom-container">
+                                        <img src="{{ photo.photo.url }}" alt="Maintenance Photo" class="img-fluid img-thumbnail">
+                                    </div>
+                                {% empty %}
+                                    <div class="col-md-12">
+                                        <p>No maintenance photos uploaded for this entry.</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <a href="{% url 'spare_parts:maintenance_history_update' maintenance.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i> Edit</a>
+                            <a href="{% url 'spare_parts:maintenance_history_delete' maintenance.pk %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Delete</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No maintenance history found for this spare part.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <a href="{% url 'spare_parts:spare_part_update' spare_part.pk %}" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit Spare Part</a>
+            <a href="{% url 'spare_parts:spare_part_delete' spare_part.pk %}" class="btn btn-danger"><i class="bi bi-trash"></i> Delete Spare Part</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

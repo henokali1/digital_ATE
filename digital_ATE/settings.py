@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'django_select2',
     'bug_report',
     'feature_request',
+    'spare_parts',
 ]
 
 MIDDLEWARE = [

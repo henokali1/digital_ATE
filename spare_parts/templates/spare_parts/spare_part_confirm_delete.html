@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Spare Part{% endblock %}
+{% block heading_h1 %}Delete Spare Part{% endblock %}
+{% block heading_h2 %}Confirm deletion of {{ spare_part.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <p>Are you sure you want to delete the spare part "{{ spare_part.name }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+        <a href="{% url 'spare_parts:spare_part_detail' spare_part.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

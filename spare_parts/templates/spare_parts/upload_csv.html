@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Upload Spare Parts CSV{% endblock %}
+{% block heading_h1 %}Upload Spare Parts CSV{% endblock %}
+
+{% block content %}
+<div class="container">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Upload</button>
+        <a href="{% url 'spare_parts:spare_part_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  <a href="{% url 'spare_parts:download_csv_template' %}" class="btn btn-info mt-3">Download Sample CSV Template</a>
+</div>
+{% endblock %}
