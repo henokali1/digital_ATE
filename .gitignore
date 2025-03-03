@@ -1,5 +1,6 @@
 # Ignore database files
 db.sqlite3
+*.sql
 
 # Ignore compiled Python files
 __pycache__/
@@ -24,3 +25,4 @@ venv/
 *.bak
 .DS_Store
 Thumbs.db
+
