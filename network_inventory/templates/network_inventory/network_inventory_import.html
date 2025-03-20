@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Import Network Inventory from CSV{% endblock %}
+
+{% block heading_h1 %}Import Network Inventory from CSV{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <p>Download a <a href="{% url 'network_inventory:network_inventory_download_sample_csv' %}">sample CSV file</a> to see the required format.</p>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="csv_file">CSV File:</label>
+        <input type="file" name="csv_file" class="form-control-file" id="csv_file" accept=".csv">
+      </div>
+      <button type="submit" class="btn btn-primary">Import</button>
+      <a href="{% url 'network_inventory:network_inventory_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

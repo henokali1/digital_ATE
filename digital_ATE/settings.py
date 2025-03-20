@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'bug_report',
     'feature_request',
     'spare_parts',
+    'network_inventory',
 ]
 
 MIDDLEWARE = [

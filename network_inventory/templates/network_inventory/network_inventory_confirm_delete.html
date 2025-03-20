@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block heading_h1 %}Confirm Delete{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <p>Are you sure you want to delete "{{ network_inventory_item.name }}"?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete</button>
+      <a href="{% url 'network_inventory:network_inventory_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

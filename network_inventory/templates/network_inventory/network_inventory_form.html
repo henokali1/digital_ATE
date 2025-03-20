@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}{% if form.instance.pk %}Update{% else %}Create{% endif %} Network Inventory{% endblock %}
+
+{% block heading_h1 %}{% if form.instance.pk %}Update{% else %}Create{% endif %} Network Inventory{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.name.id_for_label }}">Name:</label>
+        {% render_field form.name class="form-control" %}
+        <div class="text-danger">{{ form.name.errors }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.ip.id_for_label }}">IP Address:</label>
+        {% render_field form.ip class="form-control" %}
+        <div class="text-danger">{{ form.ip.errors }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.section.id_for_label }}">Section:</label>
+        {% render_field form.section class="form-control" %}
+        <div class="text-danger">{{ form.section.errors }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.manufacturer.id_for_label }}">Manufacturer:</label>
+        {% render_field form.manufacturer class="form-control" %}
+        <div class="text-danger">{{ form.manufacturer.errors }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.mac_address.id_for_label }}">MAC Address:</label>
+        {% render_field form.mac_address class="form-control" %}
+        <div class="text-danger">{{ form.mac_address.errors }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.remarks.id_for_label }}">Remarks:</label>
+        {% render_field form.remarks class="form-control" %}
+        <div class="text-danger">{{ form.remarks.errors }}</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{% url 'network_inventory:network_inventory_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

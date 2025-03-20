@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Network Inventory Detail{% endblock %}
+
+{% block heading_h1 %}Network Inventory Detail{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h2>{{ network_inventory_item.name }}</h2>
+    <dl class="row">
+      <dt class="col-sm-3">IP Address:</dt>
+      <dd class="col-sm-9">{{ network_inventory_item.ip }}</dd>
+
+      <dt class="col-sm-3">Section:</dt>
+      <dd class="col-sm-9">{{ network_inventory_item.section }}</dd>
+
+      <dt class="col-sm-3">Manufacturer:</dt>
+      <dd class="col-sm-9">{{ network_inventory_item.manufacturer|default:"-" }}</dd>
+
+      <dt class="col-sm-3">MAC Address:</dt>
+      <dd class="col-sm-9">{{ network_inventory_item.mac_address|default:"-" }}</dd>
+
+      <dt class="col-sm-3">Remarks:</dt>
+      <dd class="col-sm-9">{{ network_inventory_item.remarks|default:"-" }}</dd>
+    </dl>
+
+    <a href="{% url 'network_inventory:network_inventory_list' %}?page={{ page }}{% if search_term %}&search={{ search_term }}{% endif %}{% if selected_section %}§ion={{ selected_section }}{% endif %}" class="btn btn-secondary">Back to List</a>  <!-- Updated Back to List Link -->
+
+    <a href="{% url 'network_inventory:network_inventory_update' network_inventory_item.pk %}" class="btn btn-primary">Edit</a>
+  </div>
+{% endblock %}
