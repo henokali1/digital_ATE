@@ -3,13 +3,6 @@ from urllib.parse import urlencode
 
 register = template.Library()
 
-@register.filter(name='addclass')
-def addclass(field, css):
-    return field.as_widget(attrs={'class': css})
-
-
-register = template.Library()
-
 @register.filter
 def exclude_param(request_get, param_to_exclude):
     """

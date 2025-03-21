@@ -58,6 +58,7 @@ def job_card_chat(request, pk):
 
 
 
+
 @login_required
 def job_card_list(request):
     filter = request.GET.get('filter', 'all')
@@ -69,22 +70,45 @@ def job_card_list(request):
     maintenance_type_filter = request.GET.get('maintenance_type')
     acknowledged_filter = request.GET.get('acknowledged')
     assigned_to_filter = request.GET.get('assigned_to')
-    
-    today = date.today() #Get current date
+
+    # Date Range Filters
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    date_range = request.GET.get('date_range')
+
+    today = date.today()  # Get current date
     current_date = datetime.now().date()
 
     if filter == 'assigned':
         job_cards_list = JobCard.objects.filter(assigned_users=request.user)
     elif filter == 'overdue':
-       job_cards_list = JobCard.objects.filter(due_date__lt=today).exclude(status='Completed')
+        job_cards_list = JobCard.objects.filter(due_date__lt=today).exclude(status='Completed')
     elif filter == 'upcoming':
-         job_cards_list = JobCard.objects.filter(
-              start_date__gt=today # start date should be in the future
+        job_cards_list = JobCard.objects.filter(
+            start_date__gt=today  # start date should be in the future
         )
     else:
         job_cards_list = JobCard.objects.all()
 
-    # Apply filters to the queryset
+    # Apply date range filters
+    if start_date and end_date:
+        job_cards_list = job_cards_list.filter(created_at__date__range=[start_date, end_date])
+    elif date_range:
+        if date_range == 'this_week':
+            start_week = today - timedelta(days=today.weekday())
+            end_week = start_week + timedelta(days=6)
+            job_cards_list = job_cards_list.filter(created_at__date__range=[start_week, end_week])
+        elif date_range == 'this_month':
+            start_month = date(today.year, today.month, 1)
+            end_month = date(today.year, today.month, 1) + timedelta(days=32)
+            end_month = end_month.replace(day=1) - timedelta(days=1)
+            job_cards_list = job_cards_list.filter(created_at__date__range=[start_month, end_month])
+        elif date_range == 'this_year':
+            start_year = date(today.year, 1, 1)
+            end_year = date(today.year, 12, 31)
+            job_cards_list = job_cards_list.filter(created_at__date__range=[start_year, end_year])
+
+    # Apply other filters to the queryset
     if status_filter:
         job_cards_list = job_cards_list.filter(status=status_filter)
     if priority_filter:
@@ -92,16 +116,23 @@ def job_card_list(request):
     if maintenance_type_filter:
         job_cards_list = job_cards_list.filter(maintenance_type=maintenance_type_filter)
     if acknowledged_filter:
-            if acknowledged_filter == 'True':
-                job_cards_list = job_cards_list.filter(acknowledged=True)
-            elif acknowledged_filter == 'False':
-                job_cards_list = job_cards_list.filter(acknowledged=False)
+        if acknowledged_filter == 'True':
+            job_cards_list = job_cards_list.filter(acknowledged=True)
+        elif acknowledged_filter == 'False':
+            job_cards_list = job_cards_list.filter(acknowledged=False)
     if assigned_to_filter:
-          job_cards_list = job_cards_list.filter(assigned_users__id=assigned_to_filter)
+        job_cards_list = job_cards_list.filter(assigned_users__id=assigned_to_filter)
 
-    job_cards_list = job_cards_list.order_by('-created_at') # Order by newest first
+    # Calculate counts before pagination
+    total_count = job_cards_list.count()
+    completed_count = job_cards_list.filter(status='Completed').count()
+    pending_count = job_cards_list.filter(status='Pending').count()
+    in_progress_count = job_cards_list.filter(status='In Progress').count()
+    overdue_count = JobCard.objects.filter(due_date__lt=today).exclude(status='Completed').count()
 
-     # Pagination
+    job_cards_list = job_cards_list.order_by('-created_at')  # Order by newest first
+
+    # Pagination
     paginator = Paginator(job_cards_list, per_page)
     page = request.GET.get('page', 1)
     try:
@@ -111,8 +142,23 @@ def job_card_list(request):
     except EmptyPage:
         job_cards = paginator.page(paginator.num_pages)
 
-    users = User.objects.all() #Get all users
-    return render(request, 'job_card/job_card_list.html', {'job_cards': job_cards, 'filter': filter, 'per_page': per_page, 'users':users, 'job_card': JobCard, 'today':current_date})
+    users = User.objects.all()  # Get all users
+    return render(request, 'job_card/job_card_list.html', {
+        'job_cards': job_cards,
+        'filter': filter,
+        'per_page': per_page,
+        'users': users,
+        'job_card': JobCard,
+        'today': current_date,
+
+        # Dashboard counts
+        'total_count': total_count,
+        'completed_count': completed_count,
+        'pending_count': pending_count,
+        'in_progress_count': in_progress_count,
+        'overdue_count': overdue_count,
+    })
+
 
 @login_required
 def job_card_create(request):
