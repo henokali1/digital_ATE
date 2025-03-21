@@ -47,7 +47,9 @@
                            <select name="assigned_to" class="form-select me-2" onchange="this.form.submit()">
                                   <option value="">All Assigned Users</option>
                                   {% for user in users %}
-                                    <option value="{{ user.pk }}" {% if request.GET.assigned_to == user.pk|stringformat:'s' %}selected{% endif %}>{{ user.username }}</option>
+                                    {% if user.userprofile.ate_staff %}
+                                        <option value="{{ user.pk }}" {% if request.GET.assigned_to == user.pk|stringformat:'s' %}selected{% endif %}>{{ user.userprofile.initial }}</option>
+                                    {% endif %}
                                    {% endfor %}
                            </select>
                   </form>
