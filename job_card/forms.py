@@ -5,7 +5,7 @@ from .models import JobCardMessage, JobCardImage
 
 class JobCardForm(forms.ModelForm):
     assigned_users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects.filter(userprofile__ate_staff=True),
         widget=forms.CheckboxSelectMultiple,
         label="Assigned To"
     )

@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 class LogEntryForm(forms.ModelForm):
     initials = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects.filter(userprofile__ate_staff=True),
         widget=forms.CheckboxSelectMultiple,
         label="Select Users"
     )
@@ -29,4 +29,3 @@ class LogEntryForm(forms.ModelForm):
 
     def user_full_name(self, user):
         return f'{user.first_name} {user.last_name}'
-    # location = forms.ModelChoiceField(queryset=Location.objects.all(), empty_label="Select a Location")

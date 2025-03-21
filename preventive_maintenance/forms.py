@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class PreventiveMaintenanceForm(forms.ModelForm):
     completed_by = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects.filter(userprofile__ate_staff=True),
         widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
         label="Maintenance Completed By"
     )

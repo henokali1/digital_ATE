@@ -56,7 +56,22 @@
                         <td>
                             <p class="mb-3">
                                 {% for user in log.initials.all %}
-                                <span class="badge rounded-pill bg-primary me-1">{{ user.username }}</span>
+                                    <div class="list-group-item">
+                                        <span class="d-inline-flex align-items-center">
+                                            {% if user.userprofile.profile_picture %}
+                                                <img src="{{ user.userprofile.profile_picture.url }}" alt="{{ user.username }}'s Profile Picture" class="rounded-circle me-1" style="width: 24px; height: 24px; object-fit: cover;">
+                                            {% else %}
+                                                <i class="bi bi-person me-1"></i>  {# Add me-1 for spacing #}
+                                            {% endif %}
+                                            <span class="badge rounded-pill bg-primary">
+                                              {% if user.userprofile.initial %}
+                                                 {{ user.userprofile.initial }}
+                                              {% else %}
+                                                 {{ user.username }}
+                                              {% endif %}
+                                            </span>
+                                        </span>
+                                    </div>
                                 {% endfor %}
                             </p>
                         </td>
