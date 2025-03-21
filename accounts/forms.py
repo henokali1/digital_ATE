@@ -13,12 +13,17 @@ class ChangePasswordForm(PasswordChangeForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['staff_id_no', 'initial', 'position', 'profile_picture', 'ate_staff']  # Include the fields you want to edit
+        fields = ['profile_picture']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        #Make all fields disabled except profile_picture
         for field_name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'form-control'}) #add bootstrap class to fields
+            if field_name != 'profile_picture':
+                field.widget.attrs['disabled'] = True
+                field.widget.attrs['readonly'] = True  # for some widget types
+        self.fields['profile_picture'].widget.attrs.update({'class': 'form-control'})
+
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -28,4 +33,6 @@ class UserForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'form-control'}) #add bootstrap class to fields
+            field.widget.attrs.update({'class': 'form-control'})
+            # field.widget.attrs['disabled'] = True #Make all fields disabled
+            # field.widget.attrs['readonly'] = True #Make all fields readonly

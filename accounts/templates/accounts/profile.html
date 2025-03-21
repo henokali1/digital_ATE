@@ -3,6 +3,11 @@
 {% block content %}
     <div class="container">
         <h1>Edit Profile</h1>
+        <div class="mb-3">
+            <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-primary">
+                <i class="bi bi-key-fill me-2"></i>Change Password
+            </a>
+        </div>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
              {% if messages %}
@@ -15,9 +20,10 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            {{ user_form.as_p }}
+            
             {{ profile_form.as_p }}
-            <button type="submit">Update Profile</button>
+            <button type="submit" class="btn btn-primary">Update Profile Picture</button>
         </form>
     </div>
+
 {% endblock %}
