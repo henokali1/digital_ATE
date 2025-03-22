@@ -45,14 +45,14 @@ class JobCard(models.Model):
     acknowledged = models.BooleanField(default=False, editable=False)
     acknowledged_at = models.DateTimeField(null=True, blank=True, editable=False)
     remarks = models.TextField(blank=True, null=True)
-    time_to_acknowledge = models.DurationField(null=True, blank=True, editable=False)  # New field for time to acknowledge
-    completed_at = models.DateTimeField(null=True, blank=True, editable=False)  # New field for completed time
-    time_to_complete = models.DurationField(null=True, blank=True, editable=False)  # New field for time to complete
+    time_to_acknowledge = models.DurationField(null=True, blank=True, editable=False)
+    completed_at = models.DateTimeField(null=True, blank=True, editable=False)
+    time_to_complete = models.DurationField(null=True, blank=True, editable=False)
     
     start_date = models.DateField(null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
 
-    requires_oem_support = models.BooleanField(default=False) # Add this line
+    requires_oem_support = models.BooleanField(default=False) 
 
     def save(self, *args, **kwargs):
         if not self.job_card_number:

@@ -88,7 +88,8 @@ def job_card_list(request):
             start_date__gt=today  # start date should be in the future
         )
     else:
-        job_cards_list = JobCard.objects.all()
+        # exclude the job cards whose start date is greater than today
+        job_cards_list = JobCard.objects.exclude(start_date__gt=today)
 
     # Apply date range filters
     if start_date and end_date:
