@@ -20,12 +20,13 @@ def change_password(request):
 @login_required
 def profile(request):
     if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
+        # user_form = UserForm(request.POST, instance=request.user) # Remove this line
         profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.userprofile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
+        # if user_form.is_valid() and profile_form.is_valid():# Remove user_form from this line.
+        if profile_form.is_valid():
+            # user_form.save()# Remove this line
             profile_form.save()
-            messages.success(request, 'Profile updated successfully')
+            messages.success(request, 'Profile picture updated successfully')
             return redirect('accounts:profile')  # Redirect to the profile page
         else:
              messages.error(request, 'Please correct the errors below.')

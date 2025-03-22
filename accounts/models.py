@@ -15,8 +15,8 @@ class UserProfile(models.Model):
     initial = models.CharField(max_length=10, blank=True, null=True)
     position = models.ForeignKey(Position, on_delete=models.SET_NULL, blank=True, null=True)
     ate_staff = models.BooleanField(default=True)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
