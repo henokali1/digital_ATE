@@ -157,7 +157,6 @@ def job_card_list(request):
         'completed_count': completed_count,
         'pending_count': pending_count,
         'in_progress_count': in_progress_count,
-        'overdue_count': overdue_count,
     })
 
 
@@ -166,7 +165,7 @@ def job_card_create(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden("You are not authorized to create job cards.")
     if request.method == 'POST':
-        form = JobCardForm(request.POST)
+        form = JobCardForm(request.POST, request.FILES)
         if form.is_valid():
             job_card = form.save(commit=False)
             job_card.created_by = request.user
@@ -185,7 +184,7 @@ def job_card_update(request, pk):
     if not request.user.is_superuser:
         return HttpResponseForbidden("You are not authorized to edit job cards.")
     if request.method == 'POST':
-        form = JobCardForm(request.POST, instance=job_card)
+        form = JobCardForm(request.POST, request.FILES, instance=job_card)
         if form.is_valid():
             form.save()
             return redirect('job_card_list')
@@ -236,13 +235,15 @@ def job_card_update_status(request, pk):
     if request.method == 'POST':
         new_status = request.POST.get('status')
         job_card.remarks = request.POST.get('remarks')
+        # Handle the image upload
+        if 'status_update_image' in request.FILES:
+            job_card.status_update_image = request.FILES['status_update_image']
+            if new_status == 'Completed':
+                if job_card.maintenance_type == 'Preventive' and not job_card.preventive_maintenance_id:
+                    return render(request, 'job_card/job_card_detail.html', {'job_card': job_card, 'error': 'A preventive maintenance record must be created before marking the job card as completed.'})
 
-        if new_status == 'Completed':
-            if job_card.maintenance_type == 'Preventive' and not job_card.preventive_maintenance_id:
-                return render(request, 'job_card/job_card_detail.html', {'job_card': job_card, 'error': 'A preventive maintenance record must be created before marking the job card as completed.'})
-
-            if job_card.maintenance_type == 'Corrective' and not job_card.corrective_maintenance_id:
-                return render(request, 'job_card/job_card_detail.html', {'job_card': job_card, 'error': 'A corrective maintenance record must be created before marking the job card as completed.'})
+                if job_card.maintenance_type == 'Corrective' and not job_card.corrective_maintenance_id:
+                    return render(request, 'job_card/job_card_detail.html', {'job_card': job_card, 'error': 'A corrective maintenance record must be created before marking the job card as completed.'})
         
         # Setting the status
         job_card.status = new_status

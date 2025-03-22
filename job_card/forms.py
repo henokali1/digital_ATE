@@ -11,7 +11,7 @@ class JobCardForm(forms.ModelForm):
     )
     class Meta:
         model = JobCard
-        fields = ['task_description', 'assigned_users', 'priority_level', 'maintenance_type', 'location', 'status', 'start_date', 'due_date','remarks', 'requires_oem_support'] # Add 'requires_oem_support'
+        fields = ['image', 'task_description', 'assigned_users', 'priority_level', 'maintenance_type', 'location', 'status', 'start_date', 'due_date','remarks', 'requires_oem_support'] # Add 'requires_oem_support'
         exclude = ['created_at', 'created_by', 'updated_at','acknowledged', 'acknowledged_at']
         widgets ={
              'start_date': forms.DateInput(attrs={'type': 'date', 'class':'form-control'}),

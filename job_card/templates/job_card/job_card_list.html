@@ -3,20 +3,18 @@
 
 {% block content %}
 <br><br>
-<div class="container mt-4">
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'info' %}alert-info{% elif message.tags == 'warning' %}alert-warning{% elif message.tags == 'error' %}alert-danger{% else %}alert-secondary{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 
-    {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'info' %}alert-info{% elif message.tags == 'warning' %}alert-warning{% elif message.tags == 'error' %}alert-danger{% else %}alert-secondary{% endif %} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <div class="card shadow-sm mb-4">
+<div class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex justify-content-around align-items-center flex-wrap">
                 <div class="dashboard-item text-center mb-3" style="cursor: pointer;" onclick="location.href='?status=Completed{% if request.GET|exclude_param:'status' %}&{{ request.GET|exclude_param:'status'|urlencode }}{% endif %}'">
@@ -42,13 +40,6 @@
                     <div class="dashboard-count">{{ overdue_count }}</div>
                     <div class="dashboard-label">Overdue</div>
                 </div>
-
-                <!-- <div class="dashboard-item text-center mb-3">
-                    <i class="bi bi-list-task text-secondary dashboard-icon"></i>
-                    <div class="dashboard-count">{{ total_count }}</div>
-                    <div class="dashboard-label">Total</div>
-                </div> -->
-
             </div>
         </div>
     </div>
@@ -372,7 +363,6 @@
                 {% endif %}
             </div>
         </div>
-    </div>
 </div>
 
 <style>

@@ -52,8 +52,9 @@ class JobCard(models.Model):
     start_date = models.DateField(null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
 
-    requires_oem_support = models.BooleanField(default=False) 
-
+    requires_oem_support = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='job_card_images/', blank=True, null=True)  # Add image field
+    status_update_image = models.ImageField(upload_to='job_card_status_images/', blank=True, null=True) # image for status update
     def save(self, *args, **kwargs):
         if not self.job_card_number:
             self.job_card_number = f"JC-{uuid.uuid4().hex[:8]}-{now().strftime('%d-%m-%Y')}"
