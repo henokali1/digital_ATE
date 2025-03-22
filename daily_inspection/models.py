@@ -21,6 +21,7 @@ class DailyInspection(models.Model):
         ('OK', 'Ok'),
         ('WARNING', 'Warning'),
         ('ALARM', 'Alarm'),
+        ('DEGRADED', 'Degraded'),  # Added "Degraded"
         ('DONE', 'Done'),
         ('OFF', 'Off'),
         ('UNSERVICEABLE', 'Unserviceable'),

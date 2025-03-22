@@ -140,6 +140,7 @@
                                                          <p><i class="bi bi-check-circle text-success"></i>OK: {{ inspection.status_counts.OK|default:0 }}</p>
                                                          <p><i class="bi bi-exclamation-triangle text-warning"></i>WARNING: {{ inspection.status_counts.WARNING|default:0 }}</p>
                                                          <p><i class="bi bi-exclamation-octagon text-danger"></i>ALARM: {{ inspection.status_counts.ALARM|default:0 }}</p>
+                                                         <p><i class="bi bi-exclamation-triangle text-warning"></i>DEGRADED: {{ inspection.status_counts.DEGRADED|default:0 }}</p>
                                                          <p><i class="bi bi-check-square text-primary"></i>DONE: {{ inspection.status_counts.DONE|default:0 }}</p>
                                                          <p><i class="bi bi-power text-secondary"></i>OFF: {{ inspection.status_counts.OFF|default:0 }}</p>
                                                          <p><i class="bi bi-slash-circle text-muted"></i>UNSERVICEABLE: {{ inspection.status_counts.UNSERVICEABLE|default:0 }}</p>
