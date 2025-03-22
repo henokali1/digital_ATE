@@ -307,6 +307,25 @@ def import_job_cards(request):
                                     errors.append(f"User '{username.strip()}' does not exist.")
                                     continue
                          # Create job card
+                        start_date_str = row.get('start_date')
+                        due_date_str = row.get('due_date')
+                        
+                        start_date = None
+                        due_date = None
+
+                        if start_date_str:
+                            try:
+                                start_date = datetime.strptime(start_date_str, '%m/%d/%Y').date()
+                            except ValueError:
+                                errors.append(f"Invalid start date format: {start_date_str}. Use MM/DD/YYYY.")
+                                start_date = None  # Ensure start_date is None if parsing fails
+
+                        if due_date_str:
+                            try:
+                                due_date = datetime.strptime(due_date_str, '%m/%d/%Y').date()
+                            except ValueError:
+                                errors.append(f"Invalid due date format: {due_date_str}. Use MM/DD/YYYY.")
+                                due_date = None  # Ensure due_date is None if parsing fails
                        
                         requires_oem_support = row.get('requires_oem_support', 'False').lower() == 'true'
                         job_card = JobCard.objects.create(
@@ -316,8 +335,8 @@ def import_job_cards(request):
                             location=location,
                             status=row['status'],
                             created_by=request.user,
-                            start_date=row.get('start_date', None),
-                            due_date=row.get('due_date', None),
+                            start_date=start_date,
+                            due_date=due_date,
                             remarks=row.get('remarks',''),
                             requires_oem_support=requires_oem_support,
                            )
@@ -335,6 +354,7 @@ def import_job_cards(request):
 
             except Exception as e:
                 messages.error(request, f'Error processing CSV file: {str(e)}')
+                messages.add_message(request, messages.INFO, "Custom message", extra_tags="my_custom_tag")
                 return redirect('import_job_cards')
 
             return redirect('job_card_list')
@@ -358,14 +378,14 @@ def download_sample_csv(request):
         'status', 'assigned_users','start_date', 'due_date','remarks', 'requires_oem_support'
     ])
     
-    # Write sample data
+    # Write sample data (MM/DD/YYYY format)
     writer.writerow([
-        'Sample Task Description 1', 'Medium', 'Corrective', 'Tower',
-        'Pending', 'cns.ce,user1', '2024-02-10', '2024-03-10', 'Sample remarks', 'True'
+        'Sample Task Description 1', 'Medium', 'Corrective', 'VCR',
+        'Pending', 'cns.ce@fans.ae,cns.104@fans.ae', '02/10/2025', '03/10/2025', 'Sample remarks', 'True'
     ])
     writer.writerow([
-        'Sample Task Description 2', 'High', 'Preventive', 'Ground',
-        'In Progress', 'cns.ce,user2', '2024-03-10', '2024-04-10','Another Sample remarks', 'False'
+        'Sample Task Description 2', 'High', 'Preventive', 'ACR',
+        'In Progress', 'cns.ce@fans.ae,cns.104@fans.ae', '03/10/2025', '04/10/2025','Another Sample remarks', 'False'
     ])
 
     return response
