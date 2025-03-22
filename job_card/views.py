@@ -306,7 +306,8 @@ def import_job_cards(request):
                                     errors.append(f"User '{username.strip()}' does not exist.")
                                     continue
                          # Create job card
-                     
+                       
+                        requires_oem_support = row.get('requires_oem_support', 'False').lower() == 'true'
                         job_card = JobCard.objects.create(
                             task_description=row['task_description'],
                             priority_level=row.get('priority_level', ''),
@@ -317,6 +318,7 @@ def import_job_cards(request):
                             start_date=row.get('start_date', None),
                             due_date=row.get('due_date', None),
                             remarks=row.get('remarks',''),
+                            requires_oem_support=requires_oem_support,
                            )
                         job_card.assigned_users.set(assigned_users)
                         success_count += 1
@@ -339,6 +341,7 @@ def import_job_cards(request):
         form = CSVImportForm()
     return render(request, 'job_card/import_job_cards.html', {'form': form})
 
+
 @login_required
 def download_sample_csv(request):
     # Create the HttpResponse object with CSV header
@@ -351,17 +354,17 @@ def download_sample_csv(request):
     # Write headers
     writer.writerow([
         'task_description', 'priority_level', 'maintenance_type', 'location', 
-        'status', 'assigned_users','start_date', 'due_date','remarks'
+        'status', 'assigned_users','start_date', 'due_date','remarks', 'requires_oem_support'
     ])
     
     # Write sample data
     writer.writerow([
         'Sample Task Description 1', 'Medium', 'Corrective', 'Tower',
-        'Pending', 'cns.ce,user1', '2024-02-10', '2024-03-10', 'Sample remarks'
+        'Pending', 'cns.ce,user1', '2024-02-10', '2024-03-10', 'Sample remarks', 'True'
     ])
     writer.writerow([
         'Sample Task Description 2', 'High', 'Preventive', 'Ground',
-        'In Progress', 'cns.ce,user2', '2024-03-10', '2024-04-10','Another Sample remarks'
+        'In Progress', 'cns.ce,user2', '2024-03-10', '2024-04-10','Another Sample remarks', 'False'
     ])
 
     return response

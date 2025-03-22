@@ -52,6 +52,8 @@ class JobCard(models.Model):
     start_date = models.DateField(null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
 
+    requires_oem_support = models.BooleanField(default=False) # Add this line
+
     def save(self, *args, **kwargs):
         if not self.job_card_number:
             self.job_card_number = f"JC-{uuid.uuid4().hex[:8]}-{now().strftime('%d-%m-%Y')}"

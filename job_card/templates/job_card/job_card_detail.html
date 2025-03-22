@@ -152,6 +152,24 @@
                     </div>
                 </div>
             
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">
+                                <i class="bi bi-gear"></i> Requires OEM Support?
+                            </h6>
+                            <p class="mb-0">
+                                {% if job_card.requires_oem_support %}
+                                    Yes
+                                {% else %}
+                                    No
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
              {% if user in job_card.assigned_users.all %}
              <div class="row mt-4">
                  <div class="col-12">

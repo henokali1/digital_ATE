@@ -168,6 +168,7 @@
                             <th>Priority</th>
                             <th>Assigned To</th>
                             <th>Maintenance Type</th>
+                            <th>OEM Support</th>
                             <th>Acknowledgement</th>
                             {% if user.is_superuser %}
                                 <th>Actions</th>
@@ -229,6 +230,13 @@
                                     {% endfor %}
                                 </td>
                                 <td>{{ job_card.maintenance_type }}</td>
+                                <td>
+                                    {% if job_card.requires_oem_support %}
+                                        <span class="badge bg-info"><i class="bi bi-tools"></i> Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary"><i class="bi bi-x"></i> No</span>
+                                    {% endif %}
+                                </td>
                                 <td>
                                     {% if job_card.acknowledged %}
                                         <span class="badge bg-success"><i class="bi bi-check-circle"></i> Acknowledged</span>
