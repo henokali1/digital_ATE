@@ -27,19 +27,19 @@
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="detail-group">
-                                <h6 class="text-muted mb-1">Date</h6>
+                                <h6 class="text-muted mb-1"><i class="bi bi-calendar me-1"></i>Date</h6>
                                 <p class="mb-3">{{ log.date }}</p>
                             </div>
                             <div class="detail-group">
-                                <h6 class="text-muted mb-1">Time</h6>
+                                <h6 class="text-muted mb-1"><i class="bi bi-clock me-1"></i>Time</h6>
                                 <p class="mb-3">{{ log.time }}</p>
                             </div>
                             <div class="detail-group">
-                                <h6 class="text-muted mb-1">Location</h6>
+                                <h6 class="text-muted mb-1"><i class="bi bi-geo-alt me-1"></i>Location</h6>
                                 <p class="mb-3">{{ log.location }}</p>
                             </div>
                             <div class="detail-group">
-                                <h6 class="text-muted mb-1">Initials</h6>
+                                <h6 class="text-muted mb-1"><i class="bi bi-person-check me-1"></i>Initials</h6>
                                 <p class="mb-3">
                                     {% for user in log.initials.all %}
                                     <div class="list-group-item">
@@ -69,12 +69,14 @@
                                 <p class="mb-3">{{ log.logged_at }}</p>
                             </div> -->
                             <div class="detail-group">
-                                <h6 class="text-muted mb-1">Remarks</h6>
-                                <p class="mb-3">{{ log.remarks }}</p>
+                                <h6 class="text-muted mb-1"><i class="bi bi-chat-square-text me-1"></i>Remarks</h6>
+                                <div class="remarks-box">
+                                    <p class="mb-3">{{ log.remarks }}</p>
+                                </div>
                             </div>
                             {% if log.photos %}
                             <div class="detail-group">
-                                <h6 class="text-muted mb-1">Photo</h6>
+                                <h6 class="text-muted mb-1"><i class="bi bi-image me-1"></i>Photo</h6>
                                 <a href="{{ log.photos.url }}" target="_blank" class="d-inline-block">
                                     <img src="{{ log.photos.url }}" alt="Log photo" class="img-fluid rounded" style="max-height: 200px;">
                                 </a>
@@ -97,6 +99,7 @@
     .detail-group h6 {
         font-size: 0.875rem;
         font-weight: 600;
+        color: var(--primary-color);  /* Consistent color scheme */
     }
 
     .detail-group p {
@@ -112,6 +115,28 @@
             display: flex;
             gap: 0.5rem;
         }
+    }
+
+    /* Add some spacing between list items in initials */
+    .list-group-item {
+        margin-bottom: 0.5rem;
+        border: 1px solid #e9ecef; /* Light border for definition */
+        border-radius: 0.3rem;
+        padding: 0.5rem;
+    }
+
+    /* Make the Remarks stand out */
+    .remarks-box {
+        background-color: #f8f9fa; /* Light background */
+        border: 1px solid #dee2e6; /* Light border */
+        border-radius: 0.3rem;
+        padding: 0.75rem;
+        font-style: italic;        /* Italicize the text */
+        color: #495057;             /* Darken the text slightly */
+    }
+
+    .remarks-box p {
+        margin-bottom: 0;       /* Remove extra paragraph margin */
     }
 </style>
 {% endblock %}
