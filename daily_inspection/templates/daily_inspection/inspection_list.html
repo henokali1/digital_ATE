@@ -137,13 +137,27 @@
                                                  </div>
                                                  <div class="modal-body">
                                                      {% if inspection.status_counts %}
-                                                         <p><i class="bi bi-check-circle text-success"></i>OK: {{ inspection.status_counts.OK|default:0 }}</p>
-                                                         <p><i class="bi bi-exclamation-triangle text-warning"></i>WARNING: {{ inspection.status_counts.WARNING|default:0 }}</p>
-                                                         <p><i class="bi bi-exclamation-octagon text-danger"></i>ALARM: {{ inspection.status_counts.ALARM|default:0 }}</p>
-                                                         <p><i class="bi bi-exclamation-triangle text-warning"></i>DEGRADED: {{ inspection.status_counts.DEGRADED|default:0 }}</p>
-                                                         <p><i class="bi bi-check-square text-primary"></i>DONE: {{ inspection.status_counts.DONE|default:0 }}</p>
-                                                         <p><i class="bi bi-power text-secondary"></i>OFF: {{ inspection.status_counts.OFF|default:0 }}</p>
-                                                         <p><i class="bi bi-slash-circle text-muted"></i>UNSERVICEABLE: {{ inspection.status_counts.UNSERVICEABLE|default:0 }}</p>
+                                                       <p>
+                                                           <a href="{% url 'filtered_assets' inspection_id=inspection.inspection_ident status='OK' %}"><i class="bi bi-check-circle text-success"></i>OK: {{ inspection.status_counts.OK|default:0 }}</a>
+                                                       </p>
+                                                       <p>
+                                                           <a href="{% url 'filtered_assets' inspection_id=inspection.inspection_ident status='WARNING' %}"><i class="bi bi-exclamation-triangle text-warning"></i>WARNING: {{ inspection.status_counts.WARNING|default:0 }}</a>
+                                                       </p>
+                                                       <p>
+                                                           <a href="{% url 'filtered_assets' inspection_id=inspection.inspection_ident status='ALARM' %}"><i class="bi bi-exclamation-octagon text-danger"></i>ALARM: {{ inspection.status_counts.ALARM|default:0 }}</a>
+                                                       </p>
+                                                       <p>
+                                                           <a href="{% url 'filtered_assets' inspection_id=inspection.inspection_ident status='DEGRADED' %}"><i class="bi bi-exclamation-triangle text-warning"></i>DEGRADED: {{ inspection.status_counts.DEGRADED|default:0 }}</a>
+                                                       </p>
+                                                       <p>
+                                                           <a href="{% url 'filtered_assets' inspection_id=inspection.inspection_ident status='DONE' %}"><i class="bi bi-check-square text-primary"></i>DONE: {{ inspection.status_counts.DONE|default:0 }}</a>
+                                                       </p>
+                                                       <p>
+                                                           <a href="{% url 'filtered_assets' inspection_id=inspection.inspection_ident status='OFF' %}"><i class="bi bi-power text-secondary"></i>OFF: {{ inspection.status_counts.OFF|default:0 }}</a>
+                                                       </p>
+                                                       <p>
+                                                           <a href="{% url 'filtered_assets' inspection_id=inspection.inspection_ident status='UNSERVICEABLE' %}"><i class="bi bi-slash-circle text-muted"></i>UNSERVICEABLE: {{ inspection.status_counts.UNSERVICEABLE|default:0 }}</a>
+                                                       </p>
                                                      {% endif %}
                                                      <p><i class="bi bi-hourglass-split text-info"></i>Pending: {{ inspection.pending_count|default:0 }}</p>
                                                  </div>

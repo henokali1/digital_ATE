@@ -182,3 +182,15 @@ def inspection_detail(request, inspection_id):
     }
     
     return render(request, 'daily_inspection/inspection_detail.html', context)
+
+@login_required
+def filtered_assets(request, inspection_id, status):
+    inspection = get_object_or_404(InspectionIdent, inspection_ident=inspection_id)
+    filtered_inspections = inspection.daily_inspections.filter(status=status).order_by('asset__position_rack', 'asset__name')
+
+    context = {
+        'inspection': inspection,
+        'filtered_inspections': filtered_inspections,
+        'status': status,
+    }
+    return render(request, 'daily_inspection/filtered_assets.html', context)

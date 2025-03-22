@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Filtered Assets{% endblock %}
+
+{% block heading_h1 %}Filtered Assets{% endblock %}
+
+{% block heading_h2 %}Inspection: {{ inspection.initiated_at|date:"d M Y" }} - {{ inspection.shift }} Shift - Status: {{ status }}{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-body">
+                    {% if filtered_inspections %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Asset Name</th>
+                                    <th>Location</th>
+                                    <th>Remarks</th>
+                                    <th>Inspected At</th>
+                                    <th>Inspected By</th>
+                                    <th>Photo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inspection in filtered_inspections %}
+                                    <tr>
+                                        <td><a href="/asset/{{ inspection.asset.id }}/">{{ inspection.asset.name }}</a></td>
+                                        <td>{{ inspection.asset.location }}</td>
+                                        <td>{{ inspection.remarks|default:"-" }}</td>
+                                        <td>{{ inspection.inspected_at|date:"d M Y H:i"|default:"-" }}</td>
+                                        <td>
+                                          {% for user in inspection.inspected_by.all %}
+                                             {{ user.get_full_name|default:user.username }}{% if not forloop.last %}, {% endif %}
+                                          {% empty %}
+                                             -
+                                          {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% if inspection.photo %}
+                                                <a href="{{ inspection.photo.url }}" target="_blank">View Photo</a>
+                                            {% else %}
+                                                No Photo
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No assets found with status: {{ status }}</p>
+                    {% endif %}
+                    <a href="{% url 'inspection_detail' inspection.inspection_ident %}" class="btn btn-secondary">Back to Inspection</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
