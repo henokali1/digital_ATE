@@ -67,12 +67,22 @@
           color: #4a9ed8; /* A slightly darker shade of the primary color, on hover */
           text-decoration: none;
       }
-      .inspected-by-chip { /* Style for the inspected by chip */
+    .inspected-by-chip { /* Style for the inspected by chip */
         background-color: #d4edda; /* Light green background */
         color: #155724; /* Dark green text */
         padding: 0.25rem 0.5rem;
         border-radius: 1rem; /* Rounded corners */
         font-size: 0.8rem;
+        text-decoration: none; /* Remove underline from links */
+        cursor: pointer; /* Change cursor to indicate it's clickable */
+        display: inline-block; /* Make it a block element for padding to work */
+    }
+
+    .inspected-by-chip:hover {
+        opacity: 0.8; /* Slight visual feedback on hover */
+    }
+    .inspected-by-chip i {
+        margin-right: 0.3rem; /* Space between the icon and text */
     }
 </style>
 {% endblock %}
@@ -132,16 +142,22 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if inspection.inspected_count > 0 and inspection.daily_inspections.first.inspected_by.exists %}
-                                       {% with first_inspector=inspection.daily_inspections.first.inspected_by.all.0 %}
-                                             <span class="inspected-by-chip">
-                                             {{ first_inspector.userprofile.initial|default:first_inspector.username }}
-                                            </span>
-                                       {% endwith %}
-                                        {% else %}
+                                     {% if inspection.inspected_count > 0 and inspection.daily_inspections.first.inspected_by.exists %}
+                                      {% with first_inspector=inspection.daily_inspections.first.inspected_by.all.0 %}
+                                          {% if first_inspector.userprofile.phone_number %}
+                                               <a href="tel:{{ first_inspector.userprofile.phone_number }}" class="inspected-by-chip">
+                                                <i class="bi bi-telephone-fill"></i>   {{ first_inspector.userprofile.initial|default:first_inspector.username }}
+                                               </a>
+                                           {% else %}
+                                                <span class="inspected-by-chip">
+                                                {{ first_inspector.userprofile.initial|default:first_inspector.username }}
+                                                 </span>
+                                         {% endif %}
+                                      {% endwith %}
+                                       {% else %}
                                         -
                                      {% endif %}
-                                </td>
+                                 </td>
                                 <td>
                                      <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#statusModal{{ forloop.counter }}">
                                         Summary
