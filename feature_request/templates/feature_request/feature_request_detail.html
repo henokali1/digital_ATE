@@ -5,34 +5,83 @@
 {% block heading_h1 %}{{ feature_request.title }}{% endblock %}
 
 {% block content %}
-    <dl class="row">
-        <dt class="col-sm-3">Title:</dt>
-        <dd class="col-sm-9">{{ feature_request.title }}</dd>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h4 mb-0">
+                            <i class="bi bi-lightbulb me-2"></i>
+                            Feature Request Details
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-3">Title:</dt>
+                            <dd class="col-sm-9">{{ feature_request.title }}</dd>
 
-        <dt class="col-sm-3">Description:</dt>
-        <dd class="col-sm-9">{{ feature_request.description|default:"N/A"|linebreaks }}</dd>
+                            <dt class="col-sm-3">Description:</dt>
+                            <dd class="col-sm-9">{{ feature_request.description|default:"N/A"|linebreaks }}</dd>
 
-        {% if feature_request.attachment %}
-            <dt class="col-sm-3">Attachment:</dt>
-            <dd class="col-sm-9">
-                <a href="{{ feature_request.attachment.url }}" target="_blank"><i class="bi bi-file-earmark-arrow-down me-2"></i>Download Attachment</a>
-            </dd>
-        {% endif %}
+                            {% if feature_request.attachment %}
+                                <dt class="col-sm-3">Attachment:</dt>
+                                <dd class="col-sm-9">
+                                    <a href="{{ feature_request.attachment.url }}" target="_blank"><i class="bi bi-file-earmark-arrow-down me-2"></i>Download Attachment</a>
+                                </dd>
+                            {% endif %}
 
-        <dt class="col-sm-3">Requested By:</dt>
-        <dd class="col-sm-9">{{ feature_request.requested_by.username }}</dd>
+                            <dt class="col-sm-3">Requested By:</dt>
+                            <dd class="col-sm-9">{{ feature_request.requested_by.username }}</dd>
 
-        <dt class="col-sm-3">Date Requested:</dt>
-        <dd class="col-sm-9">{{ feature_request.date_requested }}</dd>
+                            <dt class="col-sm-3">Date Requested:</dt>
+                            <dd class="col-sm-9">{{ feature_request.date_requested }}</dd>
 
-        <dt class="col-sm-3">Status:</dt>
-        <dd class="col-sm-9">{{ feature_request.status }}</dd>
+                            <dt class="col-sm-3">Status:</dt>
+                            <dd class="col-sm-9">
+                                 {% if feature_request.status == 'Pending Review' %}
+                                     <span class="badge bg-secondary"><i class="bi bi-hourglass-split"></i> Pending</span>
+                                 {% elif feature_request.status == 'Approved' %}
+                                     <span class="badge bg-primary"><i class="bi bi-check"></i> Approved</span>
+                                 {% elif feature_request.status == 'In Progress' %}
+                                     <span class="badge bg-info"><i class="bi bi-gear"></i> In Progress</span>
+                                 {% elif feature_request.status == 'Implemented' %}
+                                     <span class="badge bg-success"><i class="bi bi-check-circle"></i> Implemented</span>
+                                 {% elif feature_request.status == 'Rejected' %}
+                                     <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Rejected</span>
+                                 {% else %}
+                                     {{ feature_request.status }}
+                                 {% endif %}
+                             </dd>
 
-        <dt class="col-sm-3">Comments:</dt>
-        <dd class="col-sm-9">{{ feature_request.comments|default:"N/A"|linebreaks }}</dd>
-    </dl>
-
-    <a href="{% url 'feature_request:feature_request_update' feature_request.pk %}" class="btn btn-warning"><i class="bi bi-pencil me-2"></i>Edit</a>
-    <a href="{% url 'feature_request:feature_request_delete' feature_request.pk %}" class="btn btn-danger"><i class="bi bi-trash me-2"></i>Delete</a>
-    <a href="{% url 'feature_request:feature_request_list' %}" class="btn btn-secondary"><i class="bi bi-arrow-left me-2"></i>Back to List</a>
+                            <dt class="col-sm-3">Comments:</dt>
+                             <dd class="col-sm-9">{{ feature_request.comments|default:"N/A"|linebreaks }}</dd>
+                        </dl>
+                        {% if user.is_superuser %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Change Status:</label>
+                                    <select class="form-control" id="status" name="status">
+                                        {% for choice in feature_request.STATUS_CHOICES %}
+                                            <option value="{{ choice.0 }}" {% if feature_request.status == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="comments" class="form-label">Comments:</label>
+                                    <textarea class="form-control" id="comments" name="comments">{{ feature_request.comments|default:"" }}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-repeat me-2"></i>Update Status</button>
+                                <br>
+                                <br>
+                            </form>
+                        {% endif %}
+                        <a href="{% url 'feature_request:feature_request_update' feature_request.pk %}" class="btn btn-warning"><i class="bi bi-pencil me-2"></i>Edit</a>
+                        <a href="{% url 'feature_request:feature_request_delete' feature_request.pk %}" class="btn btn-danger"><i class="bi bi-trash me-2"></i>Delete</a>
+                        <a href="{% url 'feature_request:feature_request_list' %}" class="btn btn-secondary"><i class="bi bi-arrow-left me-2"></i>Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

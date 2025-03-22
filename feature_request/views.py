@@ -3,10 +3,16 @@ from django.contrib.auth.decorators import login_required
 from .models import FeatureRequest
 from .forms import FeatureRequestForm
 
+
 @login_required
 def feature_request_list(request):
-    feature_requests = FeatureRequest.objects.all()
-    return render(request, 'feature_request/feature_request_list.html', {'feature_requests': feature_requests})
+    status_filter = request.GET.get('status', 'all')
+    if status_filter == 'all':
+        feature_requests = FeatureRequest.objects.all()
+    else:
+        feature_requests = FeatureRequest.objects.filter(status=status_filter)
+
+    return render(request, 'feature_request/feature_request_list.html', {'feature_requests': feature_requests, 'FeatureRequest':FeatureRequest})
 
 @login_required
 def feature_request_create(request):
@@ -44,4 +50,13 @@ def feature_request_delete(request, pk):
 @login_required
 def feature_request_detail(request, pk):
     feature_request = get_object_or_404(FeatureRequest, pk=pk)
+
+    if request.method == 'POST' and request.user.is_superuser:
+        new_status = request.POST.get('status')
+        comments = request.POST.get('comments')
+        feature_request.status = new_status
+        feature_request.comments = comments
+        feature_request.save()
+        return redirect('feature_request:feature_request_detail', pk=pk)  # Refresh the page
+
     return render(request, 'feature_request/feature_request_detail.html', {'feature_request': feature_request})
