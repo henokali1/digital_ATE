@@ -19,25 +19,25 @@
     .status-DONE { background-color: #0dcaf0; color: black; }
     .status-OFF { background-color: #6c757d; color: white; }
     .status-UNSERVICEABLE { background-color: #343a40; color: white; }
-    
+
     .inspection-form {
         background-color: #f8f9fa;
         border-radius: 8px;
         padding: 20px;
         margin-bottom: 15px;
     }
-    
+
     .asset-name {
         font-weight: bold;
         color: #0d6efd;
     }
-    
+
     .photo-preview {
         max-width: 200px;
         border-radius: 4px;
         margin-top: 10px;
     }
-    
+
     .location-card {
         margin-bottom: 2rem;
     }
@@ -134,11 +134,11 @@
                     </div>
                 </div>
                 <div class="progress" style="height: 10px;">
-                    <div class="progress-bar {% if progress_percentage == 100 %}bg-success{% elif progress_percentage > 50 %}bg-info{% else %}bg-warning{% endif %}" 
-                         role="progressbar" 
+                    <div class="progress-bar {% if progress_percentage == 100 %}bg-success{% elif progress_percentage > 50 %}bg-info{% else %}bg-warning{% endif %}"
+                         role="progressbar"
                          style="width: {{ progress_percentage }}%"
-                         aria-valuenow="{{ progress_percentage }}" 
-                         aria-valuemin="0" 
+                         aria-valuenow="{{ progress_percentage }}"
+                         aria-valuemin="0"
                          aria-valuemax="100">
                     </div>
                 </div>
@@ -151,7 +151,7 @@
 <div class="row justify-content-center">
     <div class="col-md-10">
         {% regroup daily_inspections by asset.location as location_list %}
-        
+
         {% for location in location_list %}
         <div class="card location-card shadow">
             <div class="card-header location-header" data-bs-toggle="collapse" data-bs-target="#location-{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
@@ -165,11 +165,11 @@
                     </span>
                 </div>
             </div>
-            
-            <div id="location-{{ forloop.counter }}" class="collapse {% if forloop.first %}show{% endif %}">
+
+            <div id="location-{{ forloop.counter }}" class="collapse {% if forloop.first %}show{% endif %}" data-parent=".row"> <!-- Add data-parent here -->
                 <div class="card-body py-3">
                     {% regroup location.list by asset.position_rack as rack_list %}
-                    
+
                     {% for rack in rack_list %}
                     <div class="card rack-card">
                         <div class="card-header rack-header" data-bs-toggle="collapse" data-bs-target="#rack-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
@@ -183,14 +183,14 @@
                                 </span>
                             </div>
                         </div>
-                        
-                        <div id="rack-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="collapse {% if forloop.first %}show{% endif %}">
+
+                        <div id="rack-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="collapse" data-parent="#location-{{ forloop.parentloop.counter }}">
                             <div class="card-body">
                                 {% for daily_inspection in rack.list %}
                                 <form class="inspection-form" id="form-{{ daily_inspection.id }}" method="POST" action="{% url 'inspection_detail' inspection.inspection_ident %}" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <input type="hidden" name="inspection_id" value="{{ daily_inspection.id }}">
-                                    
+
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <a href="/asset/{{ daily_inspection.asset.id }}/">
@@ -224,7 +224,7 @@
                                                 <label for="remarks-{{ daily_inspection.id }}" class="form-label">
                                                     <i class="bi bi-pencil-square"></i> Remarks (Optional)
                                                 </label>
-                                                <textarea 
+                                                <textarea
                                                     class="form-control"
                                                     id="remarks-{{ daily_inspection.id }}"
                                                     name="remarks"
@@ -232,7 +232,7 @@
                                                     data-form-id="{{ daily_inspection.id }}"
                                                 >{{ daily_inspection.remarks|default:'' }}</textarea>
                                                 <div class="mt-2 text-end" id="log-button-container-{{ daily_inspection.id }}">
-                                                    <button type="button" 
+                                                    <button type="button"
                                                             class="btn btn-outline-primary btn-sm save-to-logbook"
                                                             data-inspection-id="{{ daily_inspection.id }}"
                                                             data-asset-name="{{ daily_inspection.asset.name }}"
@@ -252,11 +252,11 @@
                                                 <label for="photo-{{ daily_inspection.id }}" class="form-label">
                                                     <i class="bi bi-camera"></i> Photo (Optional)
                                                 </label>
-                                                <input 
-                                                    type="file" 
-                                                    class="form-control" 
-                                                    id="photo-{{ daily_inspection.id }}" 
-                                                    name="photo" 
+                                                <input
+                                                    type="file"
+                                                    class="form-control"
+                                                    id="photo-{{ daily_inspection.id }}"
+                                                    name="photo"
                                                     accept="image/*"
                                                     data-form-id="{{ daily_inspection.id }}"
                                                 >
@@ -276,7 +276,7 @@
                                                 {% if daily_inspection.status %}
                                                 <p class="text-muted mb-0">
                                                     <small>
-                                                        <i class="bi bi-person"></i> Inspected by: 
+                                                        <i class="bi bi-person"></i> Inspected by:
                                                         {% for user in daily_inspection.inspected_by.all %}
                                                             {{ user.get_full_name|default:user.username }}{% if not forloop.last %}, {% endif %}
                                                         {% empty %}
@@ -304,229 +304,274 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const updateIndicator = document.getElementById('updateIndicator');
-    const updateStatus = document.getElementById('updateStatus');
-    let updateTimeout;
-
-    function showUpdateStatus(message, type) {
-        updateIndicator.className = 'update-indicator ' + type;
-        updateStatus.textContent = message;
-        
-        if (type === 'saved') {
-            setTimeout(() => {
-                updateIndicator.style.opacity = '0';
+    document.addEventListener('DOMContentLoaded', function() {
+        const updateIndicator = document.getElementById('updateIndicator');
+        const updateStatus = document.getElementById('updateStatus');
+        let updateTimeout;
+    
+        function showUpdateStatus(message, type) {
+            updateIndicator.className = 'update-indicator ' + type;
+            updateStatus.textContent = message;
+    
+            if (type === 'saved') {
                 setTimeout(() => {
-                    updateIndicator.style.display = 'none';
-                    updateIndicator.style.opacity = '1';
-                }, 300);
-            }, 2000);
-        }
-    }
-
-    function updateBadgeCounts() {
-        // Update location badges
-        document.querySelectorAll('.location-card').forEach(locationCard => {
-            const locationForms = locationCard.querySelectorAll('form');
-            const totalAssets = locationForms.length;
-            const inspectedAssets = Array.from(locationForms).filter(form => {
-                const statusSelect = form.querySelector('select[name="status"]');
-                return statusSelect && statusSelect.value !== '';
-            }).length;
-            
-            const locationBadge = locationCard.querySelector('.location-badge');
-            if (locationBadge) {
-                locationBadge.textContent = `${inspectedAssets}/${totalAssets} Asset${totalAssets !== 1 ? 's' : ''}`;
+                    updateIndicator.style.opacity = '0';
+                    setTimeout(() => {
+                        updateIndicator.style.display = 'none';
+                        updateIndicator.style.opacity = '1';
+                    }, 300);
+                }, 2000);
             }
-        });
-
-        // Update rack badges
-        document.querySelectorAll('.rack-card').forEach(rackCard => {
-            const rackForms = rackCard.querySelectorAll('form');
-            const totalItems = rackForms.length;
-            const inspectedItems = Array.from(rackForms).filter(form => {
-                const statusSelect = form.querySelector('select[name="status"]');
-                return statusSelect && statusSelect.value !== '';
-            }).length;
-            
-            const rackBadge = rackCard.querySelector('.rack-badge');
-            if (rackBadge) {
-                rackBadge.textContent = `${inspectedItems}/${totalItems} Item${totalItems !== 1 ? 's' : ''}`;
-            }
-        });
-    }
-
-    function debounce(func, wait) {
-        let timeout;
-        return function(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
-    }
-
-    async function submitForm(formId, saveToLogbook = false) {
-        const form = document.getElementById('form-' + formId);
-        const formData = new FormData(form);
-
-        if (!saveToLogbook){
-           showUpdateStatus('Saving changes...', 'saving');
         }
-
-        try {
-            const response = await fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+    
+        function updateBadgeCounts() {
+            // Update location badges
+            document.querySelectorAll('.location-card').forEach(locationCard => {
+                const locationForms = locationCard.querySelectorAll('form');
+                const totalAssets = locationForms.length;
+                const inspectedAssets = Array.from(locationForms).filter(form => {
+                    const statusSelect = form.querySelector('select[name="status"]');
+                    return statusSelect && statusSelect.value !== '';
+                }).length;
+    
+                const locationBadge = locationCard.querySelector('.location-badge');
+                if (locationBadge) {
+                    locationBadge.textContent = `${inspectedAssets}/${totalAssets} Asset${totalAssets !== 1 ? 's' : ''}`;
                 }
             });
-
-            if (response.ok) {
-                const responseData = await response.json();
-                
-                if (!saveToLogbook){
-                    showUpdateStatus('Changes saved!', 'saved');
+    
+            // Update rack badges
+            document.querySelectorAll('.rack-card').forEach(rackCard => {
+                const rackForms = rackCard.querySelectorAll('form');
+                const totalItems = rackForms.length;
+                const inspectedItems = Array.from(rackForms).filter(form => {
+                    const statusSelect = form.querySelector('select[name="status"]');
+                    return statusSelect && statusSelect.value !== '';
+                }).length;
+    
+                const rackBadge = rackCard.querySelector('.rack-badge');
+                if (rackBadge) {
+                    rackBadge.textContent = `${inspectedItems}/${totalItems} Item${totalItems !== 1 ? 's' : ''}`;
                 }
-                
-                // Update timestamp
-                const timeElement = form.querySelector('.text-muted');
-                if (timeElement) {
-                    timeElement.textContent = responseData.timestamp;
-                }
-
-                // Update progress indicators
-                if (responseData.progress) {
-                    const progressBadge = document.querySelector('.badge.bg-primary');
-                    const percentageBadge = document.querySelector('.badge:not(.bg-primary)');
-                    const progressBar = document.querySelector('.progress-bar');
-
-                    if (progressBadge) {
-                        progressBadge.textContent = `${responseData.progress.inspected} / ${responseData.progress.total} Assets Inspected`;
-                    }
-
-                    if (percentageBadge && progressBar) {
-                        const percentage = responseData.progress.percentage;
-                        let badgeClass = 'bg-warning';
-                        if (percentage === 100) {
-                            badgeClass = 'bg-success';
-                        } else if (percentage > 50) {
-                            badgeClass = 'bg-info';
-                        }
-
-                        // Update percentage badge
-                        percentageBadge.textContent = `${percentage.toFixed(1)}% Complete`;
-                        percentageBadge.className = `badge ${badgeClass}`;
-
-                        // Update progress bar
-                        progressBar.style.width = `${percentage}%`;
-                        progressBar.setAttribute('aria-valuenow', percentage);
-                        progressBar.className = `progress-bar ${badgeClass}`;
-                    }
-                }
-
-                // Update location and rack badges
-                updateBadgeCounts();
-            } else {
-                throw new Error('Network response was not ok');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            if (!saveToLogbook){
-                showUpdateStatus('Error saving changes', 'error');
-            }
+            });
         }
-    }
-
-    const debouncedSubmit = debounce(submitForm, 1000);
-
-    // Handle status changes
-    document.querySelectorAll('select[name="status"]').forEach(select => {
-        select.addEventListener('change', function() {
-            this.className = 'form-select status-badge status-' + this.value;
-            debouncedSubmit(this.dataset.formId);
-        });
-    });
-
-    // Handle remarks changes
-    document.querySelectorAll('textarea[name="remarks"]').forEach(textarea => {
-        textarea.addEventListener('input', function() {
-             debouncedSubmit(this.dataset.formId);
-             toggleSaveButton(this);
-        });
-    });
-
-    // Handle photo upload
-    document.querySelectorAll('input[type="file"]').forEach(input => {
-        input.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                submitForm(this.dataset.formId);
+    
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+    
+        async function submitForm(formId, saveToLogbook = false) {
+            const form = document.getElementById('form-' + formId);
+            const formData = new FormData(form);
+    
+            if (!saveToLogbook){
+               showUpdateStatus('Saving changes...', 'saving');
             }
-        });
-    });
-
-    // Handle saving to logbook
-    document.querySelectorAll('.save-to-logbook').forEach(button => {
-        button.addEventListener('click', async function() {
-            const btn = this;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
-            btn.disabled = true;
-
+    
             try {
-                const form = this.closest('form');
-                const formData = new FormData();
-                formData.append('asset_name', btn.dataset.assetName);
-                formData.append('location_id', btn.dataset.locationId);
-                formData.append('remarks', form.querySelector('textarea[name="remarks"]').value);
-                formData.append('inspection_id', btn.dataset.inspectionId);
-
-                const response = await fetch('/save-to-logbook/', {
+                const response = await fetch(form.action, {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
-
+    
                 if (response.ok) {
-                    showUpdateStatus('Saved to logbook!', 'saved');
-                    btn.innerHTML = '<i class="bi bi-check-circle"></i> Saved to Logbook';
-                    btn.classList.remove('btn-outline-primary');
-                    btn.classList.add('btn-success');
-                    setTimeout(() => {
-                        btn.disabled = true;
-                    }, 2000);
+                    const responseData = await response.json();
+    
+                    if (!saveToLogbook){
+                        showUpdateStatus('Changes saved!', 'saved');
+                    }
+    
+                    // Update timestamp
+                    const timeElement = form.querySelector('.text-muted');
+                    if (timeElement) {
+                        timeElement.textContent = responseData.timestamp;
+                    }
+    
+                    // Update progress indicators
+                    if (responseData.progress) {
+                        const progressBadge = document.querySelector('.badge.bg-primary');
+                        const percentageBadge = document.querySelector('.badge:not(.bg-primary)');
+                        const progressBar = document.querySelector('.progress-bar');
+    
+                        if (progressBadge) {
+                            progressBadge.textContent = `${responseData.progress.inspected} / ${responseData.progress.total} Assets Inspected`;
+                        }
+    
+                        if (percentageBadge && progressBar) {
+                            const percentage = responseData.progress.percentage;
+                            let badgeClass = 'bg-warning';
+                            if (percentage === 100) {
+                                badgeClass = 'bg-success';
+                            } else if (percentage > 50) {
+                                badgeClass = 'bg-info';
+                            }
+    
+                            // Update percentage badge
+                            percentageBadge.textContent = `${percentage.toFixed(1)}% Complete`;
+                            percentageBadge.className = `badge ${badgeClass}`;
+    
+                            // Update progress bar
+                            progressBar.style.width = `${percentage}%`;
+                            progressBar.setAttribute('aria-valuenow', percentage);
+                            progressBar.className = `progress-bar ${badgeClass}`;
+                        }
+                    }
+    
+                    // Update location and rack badges
+                    updateBadgeCounts();
                 } else {
                     throw new Error('Network response was not ok');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                showUpdateStatus('Error saving to logbook', 'error');
+                if (!saveToLogbook){
+                    showUpdateStatus('Error saving changes', 'error');
+                }
             }
+        }
+    
+        const debouncedSubmit = debounce(submitForm, 1000);
+    
+        // Handle status changes
+        document.querySelectorAll('select[name="status"]').forEach(select => {
+            select.addEventListener('change', function() {
+                this.className = 'form-select status-badge status-' + this.value;
+                debouncedSubmit(this.dataset.formId);
+            });
+        });
+    
+        // Handle remarks changes
+        document.querySelectorAll('textarea[name="remarks"]').forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                 debouncedSubmit(this.dataset.formId);
+                 toggleSaveButton(this);
+            });
+        });
+    
+        // Handle photo upload
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    submitForm(this.dataset.formId);
+                }
+            });
+        });
+    
+        // Handle saving to logbook
+        document.querySelectorAll('.save-to-logbook').forEach(button => {
+            button.addEventListener('click', async function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+                btn.disabled = true;
+    
+                try {
+                    const form = this.closest('form');
+                    const formData = new FormData();
+                    formData.append('asset_name', btn.dataset.assetName);
+                    formData.append('location_id', btn.dataset.locationId);
+                    formData.append('remarks', form.querySelector('textarea[name="remarks"]').value);
+                    formData.append('inspection_id', btn.dataset.inspectionId);
+    
+                    const response = await fetch('/save-to-logbook/', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    });
+    
+                    if (response.ok) {
+                        showUpdateStatus('Saved to logbook!', 'saved');
+                        btn.innerHTML = '<i class="bi bi-check-circle"></i> Saved to Logbook';
+                        btn.classList.remove('btn-outline-primary');
+                        btn.classList.add('btn-success');
+                        setTimeout(() => {
+                            btn.disabled = true;
+                        }, 2000);
+                    } else {
+                        throw new Error('Network response was not ok');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showUpdateStatus('Error saving to logbook', 'error');
+                }
+            });
+        });
+    
+       // Handle showing/hiding save to logbook button based on remarks
+        function toggleSaveButton(textarea) {
+            const form = textarea.closest('form');
+            const logButtonContainer = form.querySelector(`#log-button-container-${textarea.dataset.formId}`);
+            const saveButton = logButtonContainer.querySelector('.save-to-logbook');
+    
+            if(textarea.value.trim()){
+                saveButton.style.display = 'inline-block';
+            } else {
+                 saveButton.style.display = 'none';
+            }
+    
+            }
+    
+        document.querySelectorAll('textarea[name="remarks"]').forEach(textarea => {
+            // Initial check
+             toggleSaveButton(textarea);
+        });
+    
+        // Auto Collapse Implementation
+        const locationCards = document.querySelectorAll('.location-card .location-header');
+    
+        locationCards.forEach(locationHeader => {
+            locationHeader.addEventListener('click', function() {
+                const card = this.closest('.location-card');
+                const collapseElement = card.querySelector('.collapse');
+                const isExpanded = collapseElement.classList.contains('show');
+    
+                // Find all other location cards in the same row
+                const otherLocationCards = document.querySelectorAll('.location-card');
+    
+                otherLocationCards.forEach(otherCard => {
+                    if (otherCard !== card) {
+                        const otherCollapseElement = otherCard.querySelector('.collapse');
+    
+                        if (otherCollapseElement && otherCollapseElement.classList.contains('show')) {
+                            otherCollapseElement.classList.remove('show');
+                        }
+                    }
+                });
+            });
+        });
+    
+        const rackHeaders = document.querySelectorAll('.rack-card .rack-header');
+    
+        rackHeaders.forEach(rackHeader => {
+            rackHeader.addEventListener('click', function() {
+                const currentLocation = this.closest('.location-card'); // Find the containing location
+                const allRackCardsInLocation = currentLocation.querySelectorAll('.rack-card');  //Rack cards of the current location
+    
+                const clickedCard = this.closest('.rack-card'); // Find clicked card
+                const clickedCollapse = clickedCard.querySelector('.collapse');
+    
+                allRackCardsInLocation.forEach(rackCard => {
+                     const collapseElement = rackCard.querySelector('.collapse');  // Collapse area of the current rack card in iteration
+                        if(rackCard !== clickedCard){  // If the rackcard is not the same as the one clicked, close
+                            collapseElement.classList.remove('show');
+                        }
+    
+                });
+                 clickedCollapse.classList.toggle('show')  //Expand the clicked rack card.
+             });
         });
     });
-
-   // Handle showing/hiding save to logbook button based on remarks
-    function toggleSaveButton(textarea) {
-        const form = textarea.closest('form');
-        const logButtonContainer = form.querySelector(`#log-button-container-${textarea.dataset.formId}`);
-        const saveButton = logButtonContainer.querySelector('.save-to-logbook');
-        
-        if(textarea.value.trim()){
-            saveButton.style.display = 'inline-block';
-        } else {
-             saveButton.style.display = 'none';
-        }
-
-        }
-
-    document.querySelectorAll('textarea[name="remarks"]').forEach(textarea => {
-        // Initial check
-         toggleSaveButton(textarea);
-    });
-});
-</script>
+    </script>
 {% endblock %}
