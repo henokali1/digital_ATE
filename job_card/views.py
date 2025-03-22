@@ -157,6 +157,7 @@ def job_card_list(request):
         'completed_count': completed_count,
         'pending_count': pending_count,
         'in_progress_count': in_progress_count,
+        'overdue_count': overdue_count,
     })
 
 
