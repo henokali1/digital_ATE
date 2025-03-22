@@ -67,6 +67,13 @@
           color: #4a9ed8; /* A slightly darker shade of the primary color, on hover */
           text-decoration: none;
       }
+      .inspected-by-chip { /* Style for the inspected by chip */
+        background-color: #d4edda; /* Light green background */
+        color: #155724; /* Dark green text */
+        padding: 0.25rem 0.5rem;
+        border-radius: 1rem; /* Rounded corners */
+        font-size: 0.8rem;
+    }
 </style>
 {% endblock %}
 
@@ -103,6 +110,7 @@
                             <tr>
                                 <th><i class="bi bi-calendar-date"></i> Date</th>
                                 <th><i class="bi bi-person-workspace"></i> Shift</th>
+                                <th><i class="bi bi-person-fill"></i> Inspected By</th> <!-- New column -->
                                 <th><i class="bi bi-bar-chart-line"></i> Quick Stats</th>
                                <th><i class="bi bi-eye-fill"></i> View</th>
                                 <th><i class="bi bi-graph-up"></i> Progress</th>
@@ -122,6 +130,17 @@
                                             <i class="bi bi-moon-fill"></i> Night
                                         </span>
                                     {% endif %}
+                                </td>
+                                <td>
+                                    {% if inspection.inspected_count > 0 and inspection.daily_inspections.first.inspected_by.exists %}
+                                       {% with first_inspector=inspection.daily_inspections.first.inspected_by.all.0 %}
+                                             <span class="inspected-by-chip">
+                                             {{ first_inspector.userprofile.initial|default:first_inspector.username }}
+                                            </span>
+                                       {% endwith %}
+                                        {% else %}
+                                        -
+                                     {% endif %}
                                 </td>
                                 <td>
                                      <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#statusModal{{ forloop.counter }}">
@@ -195,7 +214,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center py-4">
+                                <td colspan="6" class="text-center py-4">
                                     <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
                                     <p class="text-muted mt-2">No inspections found</p>
                                 </td>
