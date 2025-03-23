@@ -29,15 +29,15 @@
                     <i class="bi bi-info-circle me-2"></i>Basic Information
                 </div>
                 <div class="card-body">
-                    <p><strong><i class="bi bi-gear me-2"></i>Assets:</strong>
-                        {% for asset in record.asset.all %}
-                        <a href="/asset/{{ asset.pk }}/"><span class="badge bg-primary">{{ asset }}</span></a>
-                        {% empty %}
-                            <span class="text-muted">No assets selected</span>
-                        {% endfor %}
-                    </p>
+                    <p><strong><i class="bi bi-gear me-2"></i>Asset:</strong> {{ record.asset }}</p>
                     <p><strong><i class="bi bi-building me-2"></i>Location:</strong> {{ record.location }}</p>
-                    </div>
+                    <p><strong><i class="bi bi-tag me-2"></i>Type:</strong> 
+                        <span class="badge {% if record.type == 'Outage' %}bg-danger{% elif record.type == 'Warning' %}bg-warning{% elif record.type == 'Alarm' %}bg-info{% else %}bg-secondary{% endif %}">
+                            {{ record.type }}
+                        </span>
+                    </p>
+                    <p><strong><i class="bi bi-diagram-3 me-2"></i>Section:</strong> {{ record.section }}</p>
+                </div>
             </div>
         </div>
 
@@ -63,6 +63,10 @@
                     <i class="bi bi-tools me-2"></i>Maintenance Details
                 </div>
                 <div class="card-body">
+                    <div class="mb-4">
+                        <h6><i class="bi bi-card-text me-2"></i>Task Description</h6>
+                        <p class="text-muted">{{ record.task_description }}</p>
+                    </div>
                     <div class="mb-4">
                         <h6><i class="bi bi-wrench me-2"></i>Corrective Action</h6>
                         <p class="text-muted">{{ record.corrective_action }}</p>

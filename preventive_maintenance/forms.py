@@ -23,6 +23,7 @@ class PreventiveMaintenanceForm(forms.ModelForm):
             'start_time': forms.TimeInput(attrs={'type': 'time'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
             'end_time': forms.TimeInput(attrs={'type': 'time'}),
+            'task_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

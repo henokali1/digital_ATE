@@ -37,6 +37,7 @@ class CorrectiveMaintenance(models.Model):
     preventive_action = models.TextField(blank=True, null=True)
     root_cause = models.TextField(blank=True, null=True)
     remarks = models.TextField(blank=True, null=True)
+    task_description = models.TextField(blank=True, null=True) 
     completed_by = models.ManyToManyField(User, related_name='correctie_maintenance_completed_by')
     photo = models.ImageField(upload_to='uploads/corrective_photos/', blank=True, null=True)
     ROSI_NO = models.CharField(max_length=50, blank=True, null=True)
