@@ -5,7 +5,7 @@ from asset.models import Asset
 from django.contrib.auth.models import User
 
 class PreventiveMaintenanceForm(forms.ModelForm):
-    asset = forms.ModelMultipleChoiceField(  # Changed to ModelMultipleChoiceField
+    asset = forms.ModelMultipleChoiceField( 
         queryset=Asset.objects.all(),
         widget=forms.SelectMultiple(attrs={'class': 'form-control asset-select'}),
         label="Assets"

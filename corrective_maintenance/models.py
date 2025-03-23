@@ -32,7 +32,7 @@ class CorrectiveMaintenance(models.Model):
     type = models.CharField(max_length=50, choices=TYPE_CHOICES)
     section = models.CharField(max_length=50, choices=SECTION_CHOICES)
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    asset = models.ManyToManyField(Asset, related_name='corrective_maintenances') 
     corrective_action = models.TextField()
     preventive_action = models.TextField(blank=True, null=True)
     root_cause = models.TextField(blank=True, null=True)

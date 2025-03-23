@@ -53,7 +53,13 @@
                     <tbody>
                         {% for record in records %}
                         <tr class="cursor-pointer" onclick="window.location=`{% url 'maintenance_detail' record.id %}`" style="cursor: pointer;">
-                            <td>{{ record.asset }}</td>
+                            <td>
+                                {% for asset in record.asset.all %}
+                                 <span class="badge bg-secondary">{{ asset.name }}</span>
+                                  {% empty %}
+                                    <span class="text-muted">No assets selected</span>
+                                 {% endfor %}
+                            </td>
                             <td>{{ record.location }}</td>
                             <td>{{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</td>
                             <td>{{ record.end_date|date:"M d, Y" }} {{ record.end_time|time:"H:i" }}</td>

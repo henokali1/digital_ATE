@@ -1,3 +1,4 @@
+# corrective_maintenance/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import CorrectiveMaintenance
@@ -10,7 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # List View
 @login_required
 def maintenance_list(request):
-    records = CorrectiveMaintenance.objects.all()
+    records = CorrectiveMaintenance.objects.all().order_by('-start_date')
 
     start_date_filter = request.GET.get('start_date')
     end_date_filter = request.GET.get('end_date')  # Get date filters from query parameters
@@ -67,9 +68,9 @@ def maintenance_create(request):
         if form.is_valid():
             maintenance = form.save(commit=False)
             maintenance.logged_by = request.user
-            maintenance.save()
+            maintenance.save()  # Save the main instance first
+            form.save_m2m()  # Then, save the many-to-many data
             # Now save the many-to-many data
-            form.save_m2m()
 
             # Link the CorrectiveMaintenance to the JobCard
             if job_card:
@@ -88,7 +89,8 @@ def maintenance_update(request, pk):
     if request.method == 'POST':
         form = CorrectiveMaintenanceForm(request.POST, request.FILES, instance=maintenance)
         if form.is_valid():
-            form.save()
+            maintenance = form.save()
+            form.save_m2m()
             return redirect('maintenance_list')
     else:
         form = CorrectiveMaintenanceForm(instance=maintenance)
