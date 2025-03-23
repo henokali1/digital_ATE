@@ -23,9 +23,9 @@ class PreventiveMaintenance(models.Model):
     duration = models.FloatField(editable=False, default=0)  # Auto-calculated in hours
     section = models.CharField(max_length=50, choices=SECTION_CHOICES)
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    asset = models.ManyToManyField(Asset, related_name='preventive_maintenances') # Changed to ManyToMany
     PPM_Form = models.FileField(upload_to='uploads/forms/')
-    photo = models.ImageField(upload_to='uploads/photos/', blank=True, null=True) 
+    photo = models.ImageField(upload_to='uploads/photos/', blank=True, null=True)
     remarks = models.TextField()
     completed_by = models.ManyToManyField(User, related_name='preventive_maintenance_completed_by')
 

@@ -38,7 +38,7 @@
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th><i class="bi bi-gear me-2"></i>Asset</th>
+                        <th><i class="bi bi-gear me-2"></i>Assets</th>
                         <th><i class="bi bi-building me-2"></i>Location</th>
                         <th><i class="bi bi-calendar-event me-2"></i>Start</th>
                         <th><i class="bi bi-calendar-event me-2"></i>End</th>
@@ -49,7 +49,11 @@
                 <tbody>
                     {% for record in records %}
                     <tr class="cursor-pointer" onclick="window.location=`/preventive_maintenance/{{record.id}}/`" style="cursor: pointer;">
-                        <td>{{ record.asset }}</td>
+                        <td>
+                            {% for asset in record.asset.all %}
+                                <span class="badge bg-secondary me-1">{{ asset }}</span>
+                            {% endfor %}
+                        </td>
                         <td>{{ record.location }}</td>
                         <td>{{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</td>
                         <td>{{ record.end_date|date:"M d, Y" }} {{ record.end_time|time:"H:i" }}</td>

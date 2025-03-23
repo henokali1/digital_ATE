@@ -32,9 +32,10 @@ def create_log_entry(sender, instance, created, **kwargs):
         # Store reference to log entry for m2m signal
         instance._log_entry = log_entry
 
+
 @receiver(m2m_changed, sender=PreventiveMaintenance.completed_by.through)
 def update_log_entry_initials(sender, instance, action, reverse, model, pk_set, **kwargs):
-    """
+    """    
     Signal handler to update the LogEntry initials when the completed_by field is updated
     """
     if hasattr(instance, '_log_entry') and action == "post_add":

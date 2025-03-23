@@ -32,8 +32,12 @@
                             <td>{{ maintenance.location }}</td>
                         </tr>
                         <tr>
-                            <th><i class="bi bi-gear"></i> Asset:</th>
-                            <td>{{ maintenance.asset }}</td>
+                            <th><i class="bi bi-gear"></i> Assets:</th>
+                            <td>
+                                {% for asset in maintenance.asset.all %}
+                                <a href="/asset/{{ asset.pk }}/"><span class="badge bg-primary">{{ asset }}</span></a>
+                                {% endfor %}
+                            </td>
                         </tr>
                     </table>
                 </div>

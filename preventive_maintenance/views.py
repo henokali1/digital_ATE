@@ -13,7 +13,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # List View
 @login_required
 def maintenance_list(request):
-    records = PreventiveMaintenance.objects.all()
+    records = PreventiveMaintenance.objects.all().order_by('-start_date')
 
     start_date_filter = request.GET.get('start_date')
     end_date_filter = request.GET.get('end_date')  # Get date filters from query parameters
@@ -53,7 +53,7 @@ def maintenance_list(request):
 
 
 # Create View
-# @login_required
+@login_required
 def maintenance_create(request):
     try:
         jc_id = request.GET.get('jc')
@@ -72,17 +72,25 @@ def maintenance_create(request):
             maintenance = form.save(commit=False)
             maintenance.logged_by = request.user
             maintenance.save()
-            # Now save the many-to-many data
             form.save_m2m()
-
+            
             # Link the PreventiveMaintenance to the JobCard
             if job_card:
                 job_card.preventive_maintenance_id = maintenance
                 job_card.save()
                 return redirect('/job_card/')
 
-            records = PreventiveMaintenance.objects.all()
-            return render(request, 'preventive_maintenance/list.html', {'records': records})
+            records = PreventiveMaintenance.objects.all().order_by('-logged_at')
+            per_page = int(request.GET.get('per_page', 10))
+            paginator = Paginator(records, per_page)
+            page = request.GET.get('page', 1)
+            try:
+                maintenances = paginator.page(page)
+            except PageNotAnInteger:
+                maintenances = paginator.page(1)
+            except EmptyPage:
+                maintenances = paginator.page(paginator.num_pages)
+            return render(request, 'preventive_maintenance/list.html', {'records': maintenances, 'per_page': per_page})
     else:
         form = PreventiveMaintenanceForm()
     return render(request, 'preventive_maintenance/form.html', {'form': form})

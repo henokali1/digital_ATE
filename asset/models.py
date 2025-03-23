@@ -50,7 +50,7 @@ class Asset(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.name} - {self.position_rack}'
+        return f'{self.name} - {self.position_rack} | {self.serial_number}'
 
 class AssetHistory(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='history')
