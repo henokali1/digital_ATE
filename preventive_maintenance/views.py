@@ -63,7 +63,10 @@ def maintenance_create(request):
         job_card = None
     
     if jc_id:
-        job_card = get_object_or_404(JobCard, id=jc_id)  # Fetch the JobCard instance
+        try:
+            job_card = get_object_or_404(JobCard, id=jc_id)  # Fetch the JobCard instance
+        except:
+            job_card = None
 
 
     if request.method == 'POST':
@@ -92,7 +95,10 @@ def maintenance_create(request):
                 maintenances = paginator.page(paginator.num_pages)
             return render(request, 'preventive_maintenance/list.html', {'records': maintenances, 'per_page': per_page})
     else:
-        form = PreventiveMaintenanceForm()
+        if job_card:
+             form = PreventiveMaintenanceForm(initial={'task_description': job_card.task_description})
+        else:
+            form = PreventiveMaintenanceForm()
     return render(request, 'preventive_maintenance/form.html', {'form': form})
 
 
