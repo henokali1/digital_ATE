@@ -53,15 +53,13 @@ def maintenance_list(request):
 # Create View
 @login_required
 def maintenance_create(request):
-    try:
-        jc_id = request.GET.get('jc')
-        job_card = None
-    except:
-        jc_id = None
-        job_card = None
-    
+    jc_id = request.GET.get('jc')
+    job_card = None
+    initial_data = {}  # Initialize an empty dictionary for initial data
+
     if jc_id:
         job_card = get_object_or_404(JobCard, id=jc_id)  # Fetch the JobCard instance
+        initial_data['task_description'] = job_card.task_description  # Populate the initial data
 
     if request.method == 'POST':
         form = CorrectiveMaintenanceForm(request.POST, request.FILES)
@@ -79,7 +77,7 @@ def maintenance_create(request):
                 return redirect('/job_card/')
             return redirect('maintenance_list')
     else:
-        form = CorrectiveMaintenanceForm()
+        form = CorrectiveMaintenanceForm(initial=initial_data)  # Pass the initial data to the form
     return render(request, 'corrective_maintenance/form.html', {'form': form})
 
 # Update View

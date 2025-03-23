@@ -261,7 +261,7 @@
                                             {% endif %}
                                             {% if job_card.maintenance_type == "Corrective" and job_card.corrective_maintenance_id %}
                                                 <a href="/corrective_maintenance/detail/{{job_card.corrective_maintenance_id.pk}}" class="btn btn-sm btn-outline-info">
-                                                    <i class="bi bi-eye"></i> PM
+                                                    <i class="bi bi-eye"></i> CM
                                                 </a>
                                             {% endif %}
                                             {% if job_card.maintenance_type == "Preventive" and job_card.preventive_maintenance_id == None %}
