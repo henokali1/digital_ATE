@@ -1,3 +1,4 @@
+{# logbook/log_list.html #}
 {% extends 'base.html' %}
 {% block title %}Log List{% endblock %}
 {% block heading_h1 %}Log List{% endblock %}
@@ -36,22 +37,29 @@
             <table class="table table-hover border">
                 <thead class="table-light">
                     <tr>
-                        <th class="fw-semibold">Date</th>
-                        <th class="fw-semibold">Time</th>
+                        <th class="fw-semibold">Date/Time</th>
                         <th class="fw-semibold">Location</th>
                         <th class="fw-semibold">Initials</th>
                         <th class="fw-semibold">Remarks</th>
                         <!-- <th class="fw-semibold">Photo</th> -->
-                        {% if user.username == "cns.ce@fans.ae" %}
+                        <!-- {% if user.username == "cns.ce@fans.ae" %}
                         <th class="fw-semibold text-end">Actions</th>
-                        {% endif %}
+                        {% endif %} -->
                     </tr>
                 </thead>
                 <tbody>
                     {% for log in logs %}
                     <tr class="clickable-row" data-href="{% url 'logbook:log_detail' log.id %}">
-                        <td>{{ log.date }}</td>
-                        <td>{{ log.time }}</td>
+                        <td>
+                           <span class="badge bg-secondary">
+                                {% if log.date %}
+                                    {{ log.date|date:"M d" }}
+                                {% endif %}
+                                {% if log.time %}
+                                    {{ log.time|time:"H:i" }}
+                                {% endif %}
+                            </span>
+                        </td>
                         <td>{{ log.location }}</td>
                         <td>
                             <p class="mb-3">
@@ -85,7 +93,7 @@
                             <span class="text-muted">No photo</span>
                             {% endif %}
                         </td> -->
-                        {% if user.username == "cns.ce@fans.ae" %}
+                        <!-- {% if user.username == "cns.ce@fans.ae" %}
                         <td class="text-end">
                             <div class="btn-group">
                                 <a href="{% url 'logbook:update_log_entry' log.id %}"
@@ -94,7 +102,7 @@
                                     class="btn btn-sm btn-outline-danger action-btn">Delete</a>
                             </div>
                         </td>
-                        {% endif %}
+                        {% endif %} -->
                     </tr>
                     {% endfor %}
                 </tbody>
