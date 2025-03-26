@@ -44,90 +44,129 @@
         </div>
     </div>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" class="mb-3">
-                <div class="row align-items-center">
-                    <div class="col-md-4 mb-2">
-                        <label for="start_date" class="form-label">Start Date:</label>
-                        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ request.GET.start_date }}">
-                    </div>
-                    <div class="col-md-4 mb-2">
-                        <label for="end_date" class="form-label">End Date:</label>
-                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request.GET.end_date }}">
-                    </div>
-                    <div class="col-md-4 mb-2">
-                        <button type="submit" class="btn btn-primary mt-4">Apply Date Range</button>
-                        <a href="{% url 'job_card_list' %}" class="btn btn-secondary mt-4 ms-2">Reset</a>
-                    </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-12">
-                    <div class="btn-group" role="group" aria-label="Date Range Shortcuts">
-                      <a href="?date_range=this_week{% if request.GET|exclude_param:'date_range' %}&{{ request.GET|exclude_param:'date_range'|urlencode }}{% endif %}" class="btn btn-sm btn-outline-secondary">This Week</a>
-                      <a href="?date_range=this_month{% if request.GET|exclude_param:'date_range' %}&{{ request.GET|exclude_param:'date_range'|urlencode }}{% endif %}" class="btn btn-sm btn-outline-secondary">This Month</a>
-                      <a href="?date_range=this_year{% if request.GET|exclude_param:'date_range' %}&{{ request.GET|exclude_param:'date_range'|urlencode }}{% endif %}" class="btn btn-sm btn-outline-secondary">This Year</a>
-                      <a href="?date_range=all_time{% if request.GET|exclude_param:'date_range' %}&{{ request.GET|exclude_param:'date_range'|urlencode }}{% endif %}" class="btn btn-sm btn-outline-secondary">All Time</a>
-                    </div>
-                  </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <div class="card shadow-sm">
         <div class="card-body">
-            <div class="d-flex justify-content-center mb-4">
-                <h2><i class="bi bi-clipboard-check"></i> Job Cards</h2>
-            </div>
 
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
 
-                <form method="get" class="d-flex align-items-center me-2 mb-2 mb-lg-0">
-                    <select name="filter" class="form-select me-2" onchange="this.form.submit()">
-                        <option value="all" {% if filter == 'all' %}selected{% endif %}>All Job Cards</option>
-                        <option value="assigned" {% if filter == 'assigned' %}selected{% endif %}>My Job Cards</option>
-                        <option value="upcoming" {% if filter == 'upcoming' %}selected{% endif %}>Upcoming Job Cards</option>
-                        <option value="overdue" {% if filter == 'overdue' %}selected{% endif %}>Overdue Job Cards</option>
-                    </select>
+                <form method="get" class="mb-3">
+                    <div class="card shadow-sm mb-4">
+                      <div class="card-header">
+                        <i class="bi bi-filter"></i> Filter Job Cards
+                      </div>
+                      <div class="card-body">
+                        <div class="row align-items-center">
+                          <div class="col-12 col-md-4 mb-2">
+                            <label for="search" class="form-label">Search:</label>
+                            <div class="input-group">
+                              <input type="text" class="form-control" name="search" id="search" placeholder="Search..." value="{{ search_term }}">
+                              <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                            </div>
+                          </div>
+                  
+                          <div class="col-6 col-md-2 mb-2">
+                            <label for="filter" class="form-label">View:</label>
+                            <select name="filter" id="filter" class="form-select" onchange="this.form.submit()">
+                              <option value="all" {% if filter == 'all' %}selected{% endif %}>All</option>
+                              <option value="assigned" {% if filter == 'assigned' %}selected{% endif %}>My Job Cards</option>
+                              <option value="upcoming" {% if filter == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                              <option value="overdue" {% if filter == 'overdue' %}selected{% endif %}>Overdue</option>
+                            </select>
+                          </div>
+                  
+                          <div class="col-6 col-md-2 mb-2">
+                            <label for="status" class="form-label">Status:</label>
+                            <select name="status" id="status" class="form-select" onchange="this.form.submit()">
+                              <option value="">All</option>
+                              {% for choice in job_card.STATUS_CHOICES %}
+                              <option value="{{ choice.0 }}" {% if request.GET.status == choice.0 %}selected{% endif %}>
+                                {{ choice.1 }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                  
+                          <div class="col-6 col-md-2 mb-2">
+                            <label for="priority" class="form-label">Priority:</label>
+                            <select name="priority" id="priority" class="form-select" onchange="this.form.submit()">
+                              <option value="">All</option>
+                              {% for choice in job_card.PRIORITY_CHOICES %}
+                              <option value="{{ choice.0 }}" {% if request.GET.priority == choice.0 %}selected{% endif %}>
+                                {{ choice.1 }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                  
+                          <div class="col-6 col-md-2 mb-2">
+                            <label for="maintenance_type" class="form-label">Maintenance:</label>
+                            <select name="maintenance_type" id="maintenance_type" class="form-select" onchange="this.form.submit()">
+                              <option value="">All</option>
+                              {% for choice in job_card.MAINTENANCE_TYPE %}
+                              <option value="{{ choice.0 }}" {% if request.GET.maintenance_type == choice.0 %}selected{% endif %}>
+                                {{ choice.1 }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                  
+                          <div class="col-6 col-md-2 mb-2">
+                            <label for="acknowledged" class="form-label">Acknowledged:</label>
+                            <select name="acknowledged" id="acknowledged" class="form-select" onchange="this.form.submit()">
+                              <option value="">All</option>
+                              <option value="True" {% if request.GET.acknowledged == 'True' %}selected{% endif %}>Yes</option>
+                              <option value="False" {% if request.GET.acknowledged == 'False' %}selected{% endif %}>No</option>
+                            </select>
+                          </div>
+                  
+                          <div class="col-6 col-md-2 mb-2">
+                            <label for="assigned_to" class="form-label">Assigned To:</label>
+                            <select name="assigned_to" id="assigned_to" class="form-select" onchange="this.form.submit()">
+                              <option value="">All</option>
+                              {% for user in users %}
+                              {% if user.userprofile.ate_staff %}
+                              <option value="{{ user.pk }}" {% if request.GET.assigned_to == user.pk|stringformat:'s' %}selected{% endif %}>
+                                {{ user.userprofile.initial }}</option>
+                              {% endif %}
+                              {% endfor %}
+                            </select>
+                          </div>
 
-                    <select name="status" class="form-select me-2" onchange="this.form.submit()">
-                        <option value="">All Statuses</option>
-                        {% for choice in job_card.STATUS_CHOICES %}
-                            <option value="{{ choice.0 }}" {% if request.GET.status == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                        {% endfor %}
-                    </select>
+                          <form method="get" class="mb-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-4 mb-2">
+                                    <label for="start_date" class="form-label">Start Date:</label>
+                                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ request.GET.start_date }}">
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label for="end_date" class="form-label">End Date:</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request.GET.end_date }}">
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <button type="submit" class="btn btn-primary mt-4">Apply Date Range</button>
+                                    <a href="{% url 'job_card_list' %}" class="btn btn-secondary mt-4 ms-2">Reset</a>
+                                </div>
+                            </div>
+            
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="btn-group" role="group" aria-label="Date Range Shortcuts">
+                                  <a href="?date_range=this_week{% if request.GET|exclude_param:'date_range' %}&{{ request.GET|exclude_param:'date_range'|urlencode }}{% endif %}" class="btn btn-sm btn-outline-secondary">This Week</a>
+                                  <a href="?date_range=this_month{% if request.GET|exclude_param:'date_range' %}&{{ request.GET|exclude_param:'date_range'|urlencode }}{% endif %}" class="btn btn-sm btn-outline-secondary">This Month</a>
+                                  <a href="?date_range=this_year{% if request.GET|exclude_param:'date_range' %}&{{ request.GET|exclude_param:'date_range'|urlencode }}{% endif %}" class="btn btn-sm btn-outline-secondary">This Year</a>
+                                  <a href="?date_range=all_time{% if request.GET|exclude_param:'date_range' %}&{{ request.GET|exclude_param:'date_range'|urlencode }}{% endif %}" class="btn btn-sm btn-outline-secondary">All Time</a>
+                                </div>
+                              </div>
+                            </div>
+                        </form>
 
-                    <select name="priority" class="form-select me-2" onchange="this.form.submit()">
-                        <option value="">All Priorities</option>
-                        {% for choice in job_card.PRIORITY_CHOICES %}
-                            <option value="{{ choice.0 }}" {% if request.GET.priority == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                        {% endfor %}
-                    </select>
-                    <select name="maintenance_type" class="form-select me-2" onchange="this.form.submit()">
-                        <option value="">All Types</option>
-                        {% for choice in job_card.MAINTENANCE_TYPE %}
-                            <option value="{{ choice.0 }}" {% if request.GET.maintenance_type == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <select name="acknowledged" class="form-select me-2" onchange="this.form.submit()">
-                        <option value="">All Acknowledgements</option>
-                        <option value="True" {% if request.GET.acknowledged == 'True' %}selected{% endif %}>Acknowledged</option>
-                        <option value="False" {% if request.GET.acknowledged == 'False' %}selected{% endif %}>Not Acknowledged</option>
-                    </select>
-                    <select name="assigned_to" class="form-select me-2" onchange="this.form.submit()">
-                        <option value="">All Assigned Users</option>
-                        {% for user in users %}
-                            {% if user.userprofile.ate_staff %}
-                                <option value="{{ user.pk }}" {% if request.GET.assigned_to == user.pk|stringformat:'s' %}selected{% endif %}>{{ user.userprofile.initial }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </form>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
             </div>
 
+            <div class="d-flex justify-content-center mb-4">
+                <h2><i class="bi bi-clipboard-check"></i> Job Cards</h2>
+            </div>
+            
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
                 <div class="d-flex align-items-center">
                     {% if user.is_superuser %}

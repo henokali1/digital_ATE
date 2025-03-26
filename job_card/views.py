@@ -63,6 +63,7 @@ def job_card_chat(request, pk):
 def job_card_list(request):
     filter = request.GET.get('filter', 'all')
     per_page = int(request.GET.get('per_page', 25))  # Get the per_page value or set to default 25
+    search_term = request.GET.get('search', '')  # Get the search term from the request
 
     # Get filter values from query parameters
     status_filter = request.GET.get('status')
@@ -124,6 +125,15 @@ def job_card_list(request):
     if assigned_to_filter:
         job_cards_list = job_cards_list.filter(assigned_users__id=assigned_to_filter)
 
+    # Apply the search filter
+    if search_term:
+        job_cards_list = job_cards_list.filter(
+            Q(job_card_number__icontains=search_term) |
+            Q(task_description__icontains=search_term) |
+            Q(location__name__icontains=search_term) |  # Assuming location has a 'name' field
+            Q(remarks__icontains=search_term)
+        )
+
     # Calculate counts before pagination
     total_count = job_cards_list.count()
     completed_count = job_cards_list.filter(status='Completed').count()
@@ -151,6 +161,7 @@ def job_card_list(request):
         'users': users,
         'job_card': JobCard,
         'today': current_date,
+        'search_term': search_term,  # Pass the search term to the template
 
         # Dashboard counts
         'total_count': total_count,
