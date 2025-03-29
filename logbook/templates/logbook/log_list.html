@@ -110,7 +110,12 @@
                         {% endfor %}
                         </td>
                         <td>
-                            <div class="remarks-cell">{{ log.remarks|truncatewords:15 }}</div> {# Truncate remarks for list view #}
+                            <div class="list-group-item text-start">
+                                <span class="d-inline-flex align-items-start">
+                                    {{ log.remarks }}
+                                </span>
+                            </div>
+                            
                         </td>
                         <!-- Photo/Actions columns remain commented out as per original -->
                     </tr>
