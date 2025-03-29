@@ -1,43 +1,46 @@
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from .models import UserProfile, Position
+# accounts/admin.py ---
 
-# Define an inline admin descriptor for UserProfile model
-# which acts a bit like a singleton
+from django.contrib import admin
+from .models import UserProfile, Position
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+
+
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
-    verbose_name_plural = 'profile'
+    verbose_name_plural = 'Profile'
+    fk_name = 'user'
 
 # Define a new User admin
-class CustomUserAdmin(UserAdmin):
+class UserAdmin(BaseUserAdmin):
     inlines = (UserProfileInline,)
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_staff_id_no', 'get_position_name', 'ate_staff')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_position') # Add get_position
+    list_select_related = ('userprofile', 'userprofile__position') # Optimize query
 
-    def get_staff_id_no(self, obj):
-        return obj.userprofile.staff_id_no
-    get_staff_id_no.short_description = 'Staff ID'
-
-    def get_position_name(self, obj):
-        if obj.userprofile.position:
-            return obj.userprofile.position.name
-        return None  # Or return "No Position" or similar
-    get_position_name.short_description = 'Position'
+    def get_position(self, instance):
+        # Check if userprofile and position exist before accessing name
+        if hasattr(instance, 'userprofile') and instance.userprofile.position:
+             return instance.userprofile.position.name
+        return None
+    get_position.short_description = 'Position' # Column header
 
     def get_inline_instances(self, request, obj=None):
         if not obj:
             return list()
-        return super(CustomUserAdmin, self).get_inline_instances(request, obj)
+        return super(UserAdmin, self).get_inline_instances(request, obj)
 
-    def ate_staff(self, obj):
-        return obj.userprofile.ate_staff
-    ate_staff.boolean = True #This will display a checkmark
-    ate_staff.short_description = 'ATE Staff'
 
 # Re-register UserAdmin
 admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)
+admin.site.register(User, UserAdmin)
 
-#Register Position model
-admin.site.register(Position)
+# Register Position model
+@admin.register(Position)
+class PositionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'can_create_job_cards') # Show the new flag in the list view
+    list_editable = ('can_create_job_cards',) # Allow editing the flag directly in the list
+    search_fields = ('name',)
+
+# Optionally register UserProfile if needed separately (usually managed via User)
+admin.site.register(UserProfile)

@@ -166,16 +166,15 @@
             <div class="d-flex justify-content-center mb-4">
                 <h2><i class="bi bi-clipboard-check"></i> Job Cards</h2>
             </div>
-            
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                {% if user.userprofile.position.can_create_job_cards %}
                 <div class="d-flex align-items-center">
-                    {% if user.is_superuser %}
                         <div class="create-jobcard-container">
                             <a href="{% url 'job_card_create' %}" class="btn create-jobcard-btn" title="Create new Job Card">
                                 <i class="bi bi-plus-lg me-2"></i> Create New Job Card
                             </a>
                         </div>
-                    {% endif %}
+                    
                 </div>
 
                 <div class="d-flex align-items-center">
@@ -197,6 +196,7 @@
                         </ul>
                     </div>
                 </div>
+                {% endif %}
             </div>
             <div class="table-responsive">
                 <table class="table table-hover table-striped">

@@ -174,17 +174,38 @@ def job_card_list(request):
 
 @login_required
 def job_card_create(request):
-    if not request.user.is_superuser:
+    user_can_create = False
+    if request.user.is_superuser:
+        user_can_create = True
+    else:
+        # Check if user has a profile and a position with the permission flag set
+        try:
+            # Access profile via the related name 'userprofile' (lowercase)
+            profile = request.user.userprofile
+            if profile.position and profile.position.can_create_job_cards:
+                user_can_create = True
+        except User.userprofile.RelatedObjectDoesNotExist:
+            pass
+        except AttributeError:
+             pass
+
+
+    if not user_can_create:
         return HttpResponseForbidden("You are not authorized to create job cards.")
+
+
     if request.method == 'POST':
         form = JobCardForm(request.POST, request.FILES)
         if form.is_valid():
             job_card = form.save(commit=False)
             job_card.created_by = request.user
             job_card.save()
-            form.save_m2m()
+            form.save_m2m()  # Save many-to-many relationships (like assigned_users)
+            messages.success(request, f'Job Card {job_card.job_card_number} created successfully.') # Optional success message
             return redirect('job_card_list')
         else:
+            # Pass form with errors back to template
+            messages.error(request, 'Please correct the errors below.') # Optional error message
             return render(request, 'job_card/job_card_form.html', {'form': form})
     else:
         form = JobCardForm()
