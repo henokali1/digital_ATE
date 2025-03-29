@@ -88,25 +88,26 @@
                         </td>
                         <td>{{ log.location.name }}</td> {# Access location name directly #}
                         <td>
-                            {# Removed mb-3 paragraph, layout handled by flex/gap #}
-                             <div class="d-flex flex-wrap gap-1"> {# Use flexbox for initials layout #}
-                                {% for user in log.initials.all %}
-                                    <div class="d-inline-flex align-items-center"> {# Use d-inline-flex #}
-                                        {% if user.userprofile.profile_picture %}
-                                            <img src="{{ user.userprofile.profile_picture.url }}" alt="{{ user.username }}'s Profile Picture" class="rounded-circle me-1" style="width: 24px; height: 24px; object-fit: cover;">
+                            {% for user in log.initials.all %}
+                            <div class="list-group-item">
+                                <span class="d-inline-flex align-items-center">
+                                    {% if user.userprofile.profile_picture %}
+                                        <img src="{{ user.userprofile.profile_picture.url }}" alt="{{ user.username }}'s Profile Picture" class="rounded-circle me-1" style="width: 24px; height: 24px; object-fit: cover;">
+                                    {% else %}
+                                        <i class="bi bi-person me-1"></i>  {# Add me-1 for spacing #}
+                                    {% endif %}
+                                    <span class="badge rounded-pill bg-primary">
+                                        {% if user.userprofile.initial %}
+                                            {{ user.userprofile.initial }}
+                                        {% else %}
+                                            {{ user.username }}
                                         {% endif %}
-                                        <span class="badge rounded-pill bg-primary text-nowrap">
-                                          {% if user.userprofile.initial %}
-                                             {{ user.userprofile.initial }}
-                                          {% else %}
-                                             {{ user.first_name|first }}{{ user.last_name|first }} {# Fallback initials #}
-                                          {% endif %}
-                                        </span>
-                                    </div>
-                                {% empty %}
-                                     <span class="text-muted small">N/A</span>
-                                {% endfor %}
+                                    </span>
+                                </span>
                             </div>
+                        {% empty %}
+                            <div class="list-group-item text-muted">No users assigned</div>
+                        {% endfor %}
                         </td>
                         <td>
                             <div class="remarks-cell">{{ log.remarks|truncatewords:15 }}</div> {# Truncate remarks for list view #}
