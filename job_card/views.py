@@ -130,7 +130,7 @@ def job_card_list(request):
         job_cards_list = job_cards_list.filter(
             Q(job_card_number__icontains=search_term) |
             Q(task_description__icontains=search_term) |
-            Q(location__name__icontains=search_term) |  # Assuming location has a 'name' field
+            Q(location__name__icontains=search_term) |  
             Q(remarks__icontains=search_term)
         )
 

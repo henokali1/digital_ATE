@@ -24,21 +24,21 @@ def create_log_entry(request):
 
 @login_required
 def log_list(request):
-    logs_list = LogEntry.objects.all()
-    
-    per_page = int(request.GET.get('per_page', 10)) # Get the per_page value or set to default 10
-    start_date_filter = request.GET.get('start_date')
-    end_date_filter = request.GET.get('end_date')  # Get date filters from query parameters
-   
+    logs_list = LogEntry.objects.select_related('location').prefetch_related('initials', 'initials__userprofile').all() # Optimization
 
-    #Filtering logic
+    per_page = int(request.GET.get('per_page', 10))
+    start_date_filter = request.GET.get('start_date')
+    end_date_filter = request.GET.get('end_date')
+    query = request.GET.get('q', '') # Get search query
+
+    # Filtering logic for dates
     if start_date_filter and end_date_filter:
          try:
              start_date = datetime.strptime(start_date_filter, '%Y-%m-%d').date()
              end_date = datetime.strptime(end_date_filter, '%Y-%m-%d').date()
              logs_list = logs_list.filter(date__range=[start_date,end_date])
          except (ValueError, TypeError):
-               pass #Ignore if a bad date value is supplied
+               pass
     elif start_date_filter:
          try:
              start_date = datetime.strptime(start_date_filter, '%Y-%m-%d').date()
@@ -52,7 +52,18 @@ def log_list(request):
          except (ValueError, TypeError):
                pass
 
-    logs_list = logs_list.order_by('-logged_at')  # Reverse order
+    # Filtering logic for search query
+    if query:
+        logs_list = logs_list.filter(
+            Q(location__name__icontains=query) | # Search in Location name (adjust 'name' if field is different)
+            Q(remarks__icontains=query) |        # Search in remarks
+            Q(initials__username__icontains=query) | # Search in username of related users
+            Q(initials__first_name__icontains=query) | # Search in first name
+            Q(initials__last_name__icontains=query)   # Search in last name
+        ).distinct() # Use distinct to avoid duplicates from ManyToMany join
+
+    logs_list = logs_list.order_by('-logged_at')  # Order after filtering
+
     # Pagination
     paginator = Paginator(logs_list, per_page)
     page = request.GET.get('page', 1)
@@ -63,7 +74,14 @@ def log_list(request):
     except EmptyPage:
         logs = paginator.page(paginator.num_pages)
 
-    return render(request, 'logbook/log_list.html', {'logs': logs, 'per_page': per_page})
+    # Pass the search query back to the template
+    context = {
+        'logs': logs,
+        'per_page': per_page,
+        'query': query, # Add query to context
+    }
+    return render(request, 'logbook/log_list.html', context)
+
 
 # Edit an existing LogEntry
 @login_required
