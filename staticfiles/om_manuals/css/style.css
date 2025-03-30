@@ -1,0 +1,14 @@
+/* om_manuals/static/om_manuals/css/style.css */
+
+body {
+    font-family: sans-serif;
+  }
+  
+  .table-responsive {
+    overflow-x: auto; /* Enables horizontal scrolling on small screens */
+  }
+
+  .list-group-item a{
+    text-decoration: none;
+    color: #000;
+}
