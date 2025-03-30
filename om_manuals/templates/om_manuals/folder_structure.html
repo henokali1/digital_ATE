@@ -1,0 +1,16 @@
+{% load static %}
+
+{% for name, details in structure.items %}
+    {% if details.type == 'folder' %}
+        <li class="list-group-item">
+            <a href="?path={{ current_path }}/{{ details.name }}" style="text-decoration: none; color: inherit;">
+                <i class="bi bi-folder me-2"></i> {{ details.name }}
+            </a>
+        </li>
+    {% else %}
+        <li class="list-group-item">
+            <i class="bi bi-file-earmark me-2"></i>
+            <a href="{% get_media_prefix %}{{ current_path }}/{{ details.name }}" target="_blank">{{ details.name }}</a>
+        </li>
+    {% endif %}
+{% endfor %}

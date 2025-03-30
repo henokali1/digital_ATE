@@ -11,3 +11,4 @@ tablib==3.8.0
 python-dotenv==1.0.1
 django-debug-toolbar==5.0.1
 mysqlclient==2.2.7
+watchdog==6.0.0

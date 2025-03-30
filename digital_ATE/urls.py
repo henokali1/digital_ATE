@@ -22,6 +22,7 @@ urlpatterns = [
     path('feature_requests/', include('feature_request.urls')),
     path('spare_parts/', include('spare_parts.urls')),
     path('network_inventory/', include('network_inventory.urls')),
+    path('manuals/', include('om_manuals.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

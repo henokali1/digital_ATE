@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manuals Search{% endblock %}
+
+{% block heading_h1 %}<h1>Operations & Maintenance Manuals</h1>{% endblock %}
+{% block heading_h2 %}<h2>Search and Browse Manuals</h2>{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <form method="GET" action="{% url 'om_manuals:manual_list' %}" class="mb-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search manuals..." name="q" value="{% if query %}{{ query }}{% endif %}">
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Search</button>
+                </div>
+            </form>
+
+            {% if manuals %}
+                <p>Found {{ manuals|length }} manuals matching your search.</p>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Section</th>
+                                <th>Folder</th>
+                                <th>File Type</th>
+                                <th>File</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for manual in manuals %}
+                                <tr>
+                                    <td>{{ manual.title }}</td>
+                                    <td>{{ manual.section|default:'-' }}</td>
+                                    <td>{{ manual.folder|default:'-' }}</td>
+                                    <td>{{ manual.file_type }}</td>
+                                    <td>
+                                        <a href="{{ manual.file_path|slice:'7:' }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-file-earmark-text"></i> Open File
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% elif query %}
+                <p>No manuals found matching your search query.</p>
+            {% endif %}
+
+            <hr>  <!-- Separator line -->
+
+            <h3>Browse Manuals</h3>
+            <ul class="list-group">
+                {% include 'om_manuals/folder_structure.html' with structure=folder_structure base_path='manuals' %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

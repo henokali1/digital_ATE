@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'feature_request',
     'spare_parts',
     'network_inventory',
+    'om_manuals',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
              'builtins': ['job_card.templatetags.job_card_tags'],
         },
@@ -185,7 +187,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  
 # Add this to point to your static directory
-STATICFILES_DIRS = [Path(BASE_DIR) / "static"]
+# STATICFILES_DIRS = [Path(BASE_DIR) / "static"]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+#Manual folder Directory
+MANUALS_ROOT = os.path.join(BASE_DIR, 'manuals')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -14,9 +14,6 @@ __pycache__/
 # Ignore media uploads and generated files
 /media/
 
-# Ignore file uploads in om_manuals
-/om_manuals/
-
 # Ignore file uploads in manuals
 /manuals/
 
