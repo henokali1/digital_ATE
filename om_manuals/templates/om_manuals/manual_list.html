@@ -29,6 +29,7 @@
                                 <!-- <th style="text-align: center;">File Type</th> -->
                                 <th style="text-align: center;">File</th>
                                 <th style="text-align: center;">Download</th>
+                                <th style="text-align: left;">File Size</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,7 +48,8 @@
                                         <a href="{% get_media_prefix %}{{ manual.file_path }}" download="{{ manual.file_name }}" class="btn btn-sm btn-primary">
                                             <i class="bi bi-download"></i> Download
                                         </a>
-                                    </td>  <!-- Download link -->
+                                    </td>  
+                                    <td style="text-align: left;">{{ manual.readable_file_size }}</td>  
                                 </tr>
                             {% endfor %}
                         </tbody>
