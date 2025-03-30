@@ -1,3 +1,4 @@
+# signals.py
 import os
 import time
 import logging
@@ -48,7 +49,7 @@ def start_watching():
         observer.stop()
     observer.join()
 
-# Manual function to start the watcher - can be called from elsewhere if needed
+# Manual function to start the watcher
 def start_watcher_thread():
     index_manuals()
     remove_deleted_manuals()
