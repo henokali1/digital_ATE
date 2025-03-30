@@ -15,8 +15,15 @@ def index_manuals():
     manuals_path = os.path.join(settings.MEDIA_ROOT, 'manuals')
 
     for root, subdirs, files in os.walk(manuals_path):
-        section = os.path.basename(root) if root != manuals_path else None  # Top-level folders are the sections.
+        # Extract section from the path relative to MEDIA_ROOT/manuals
         relative_path = os.path.relpath(root, manuals_path)
+        
+        #Ensure the root path is not the manuals directory to avoid errors
+        if relative_path == '.':
+            section = None
+        else:
+            section = relative_path.split(os.sep)[0] #first directory on the root
+            
         folder_name = relative_path if relative_path != '.' else None #folder name
 
         for file in files:

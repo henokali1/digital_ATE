@@ -22,10 +22,10 @@ class ManualsDirectoryEventHandler(FileSystemEventHandler):
         remove_deleted_manuals()
 
 def start_watching():
-    manuals_path = os.path.join(settings.MEDIA_ROOT, 'manuals')
     event_handler = ManualsDirectoryEventHandler()
+    manuals_path = os.path.join(settings.MEDIA_ROOT, 'manuals') # this is needed
     observer = Observer()
-    observer.schedule(event_handler, manuals_path, recursive=True)  # Watch the 'manuals' directory within MEDIA_ROOT
+    observer.schedule(event_handler, manuals_path, recursive=True)
     observer.start()
     logger.info(f"Watching manuals directory: {manuals_path}")
 
@@ -38,12 +38,9 @@ def start_watching():
 
 @receiver(post_migrate)
 def setup_manuals_watcher(sender, **kwargs):
-    if sender.name == 'om_manuals':  # Only run for the 'om_manuals' app
-        # Initialize the index on app startup
+    if sender.name == 'om_manuals':
         index_manuals()
         remove_deleted_manuals()
-
-        # Start watching the directory in a separate thread to avoid blocking the main thread
         thread = threading.Thread(target=start_watching, daemon=True)
         thread.start()
         logger.info("Started manuals directory watcher thread.")
