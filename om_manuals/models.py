@@ -3,7 +3,7 @@ import os
 
 class Manual(models.Model):
     title = models.CharField(max_length=255)
-    file_path = models.CharField(max_length=255)  # Full path relative to media root
+    file_path = models.CharField(max_length=255)  # Full path relative to MEDIA_ROOT
     section = models.CharField(max_length=255, blank=True, null=True) # Section: Communication, Navigation, etc.
     folder = models.CharField(max_length=255, blank=True, null=True) # subfolder name
     file_type = models.CharField(max_length=50, blank=True, null=True)  # .pdf, .doc, etc.

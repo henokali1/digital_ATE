@@ -30,7 +30,8 @@ def manual_list(request):
             Q(folder__icontains=query)
         ).order_by('section', 'folder', 'title')
 
-    manuals_path = os.path.join(settings.BASE_DIR, path) #append folder name
+    #Change the default value, since we removed the manuals directory, use MEDIA_ROOT
+    manuals_path = os.path.join(settings.MEDIA_ROOT, path) #append folder name
 
     folder_structure = get_folder_structure(manuals_path)
 

@@ -22,11 +22,12 @@ class ManualsDirectoryEventHandler(FileSystemEventHandler):
         remove_deleted_manuals()
 
 def start_watching():
+    manuals_path = os.path.join(settings.MEDIA_ROOT, 'manuals')
     event_handler = ManualsDirectoryEventHandler()
     observer = Observer()
-    observer.schedule(event_handler, settings.BASE_DIR + '/manuals', recursive=True)  # Watch the 'manuals' directory
+    observer.schedule(event_handler, manuals_path, recursive=True)  # Watch the 'manuals' directory within MEDIA_ROOT
     observer.start()
-    logger.info(f"Watching manuals directory: {settings.BASE_DIR + '/manuals'}")
+    logger.info(f"Watching manuals directory: {manuals_path}")
 
     try:
         while True:
