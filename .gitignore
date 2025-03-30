@@ -17,6 +17,9 @@ __pycache__/
 # Ignore file uploads in om_manuals
 /om_manuals/
 
+# Ignore file uploads in manuals
+/manuals/
+
 # Ignore environment and dependency files
 venv/
 .env
