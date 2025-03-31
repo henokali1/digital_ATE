@@ -30,7 +30,9 @@
                                 <th>Requested By</th>
                                 <th>Status</th>
                                 <th>Date Requested</th>
+                                {% if user.is_superuser %}
                                 <th>Actions</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
@@ -56,10 +58,12 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ request.date_requested }}</td>
+                                    {% if user.is_superuser %}
                                     <td>
                                         <a href="{% url 'feature_request:feature_request_update' request.pk %}" class="btn btn-sm btn-warning" title="Edit"><i class="bi bi-pencil"></i></a>
                                         <a href="{% url 'feature_request:feature_request_delete' request.pk %}" class="btn btn-sm btn-danger" title="Delete"><i class="bi bi-trash"></i></a>
                                     </td>
+                                    {% endif %}
                                 </tr>
                             {% empty %}
                                 <tr>
