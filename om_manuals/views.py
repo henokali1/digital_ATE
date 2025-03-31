@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.conf import settings
 from django.db.models import Q
 from om_manuals.models import Manual
+from django.contrib.auth.decorators import login_required
 
 def get_folder_structure(base_dir):
     """
@@ -18,6 +19,7 @@ def get_folder_structure(base_dir):
             structure[item] = {'type': 'file', 'name': item}  # Mark as file
     return structure
 
+@login_required
 def manual_list(request):
     query = request.GET.get('q')
     path = request.GET.get('path', 'manuals')  # Get the path from the query parameters. Default to 'manuals'
