@@ -127,10 +127,10 @@
         <!-- Card Footer with Actions -->
         <div class="card-footer bg-light">
             <div class="d-flex justify-content-end gap-2">
-                <a href="{% url 'maintenance_update' maintenance.pk %}" class="btn btn-primary">
+                <a href="/preventive_maintenance/{{maintenance.pk}}/update/" class="btn btn-primary">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
-                <a href="{% url 'maintenance_delete' maintenance.pk %}" class="btn btn-danger">
+                <a href="/preventive_maintenance/{{maintenance.pk}}/delete/" class="btn btn-danger">
                     <i class="bi bi-trash"></i> Delete
                 </a>
             </div>
