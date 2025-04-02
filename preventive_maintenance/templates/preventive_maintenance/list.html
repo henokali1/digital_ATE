@@ -7,28 +7,93 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col d-flex justify-content-between align-items-center">
-        <a href="/preventive_maintenance/create/" class="btn btn-primary">
+        <a href="{% url 'maintenance_create' %}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>Add New Record
         </a>
-         <form method="get" class="d-flex align-items-center">
-               <select name="per_page" class="form-select me-2" onchange="this.form.submit()">
-                    <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
-                      <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
-                    <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
-                     <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
-                 </select>
-              <div class="d-flex align-items-center">
-                     <label for="start_date" class="form-label me-1" style="margin-bottom: 0;">Start Date</label>
-                      <input type="date" name="start_date" class="form-control me-2" value="{{ request.GET.start_date }}" onchange="this.form.submit()" placeholder="Start Date">
-                      <label for="end_date" class="form-label mx-1" style="margin-bottom: 0;">End Date</label>
-                     <input type="date" name="end_date" class="form-control me-2" value="{{ request.GET.end_date }}" onchange="this.form.submit()" placeholder="End Date">
-                     {% if request.GET.start_date or request.GET.end_date %}
-                        <a href="{% url 'maintenance_list' %}" class="btn btn-outline-secondary ms-1" title="Clear date filter">
-                        <i class="bi bi-x-lg"></i>
-                        </a>
-                    {% endif %}
+        <form method="get" class="d-flex align-items-center">
+            <select name="per_page" class="form-select me-2" onchange="this.form.submit()">
+                <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
+                <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
+                <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
+                <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
+            </select>
+            <div class="d-flex align-items-center">
+                <label for="start_date" class="form-label me-1" style="margin-bottom: 0;">Start Date</label>
+                <input type="date" name="start_date" class="form-control me-2" value="{{ start_date_filter }}"
+                       onchange="this.form.submit()" placeholder="Start Date">
+                <label for="end_date" class="form-label mx-1" style="margin-bottom: 0;">End Date</label>
+                <input type="date" name="end_date" class="form-control me-2" value="{{ end_date_filter }}"
+                       onchange="this.form.submit()" placeholder="End Date">
+            </div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" id="filterForm">
+            <div class="row gy-3">
+                <div class="col-md-3 col-sm-6">
+                    <label for="section_filter" class="form-label"><i class="bi bi-list-ul me-1"></i>Section</label>
+                    <select class="form-select" id="section_filter" name="section" onchange="this.form.submit()">
+                        <option value="">All Sections</option>
+                        {% for section_value, section_label in sections %}
+                            <option value="{{ section_value }}" {% if section_filter == section_value %}selected{% endif %}>
+                                {{ section_label }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
-           </form>
+
+                <div class="col-md-3 col-sm-6">
+                    <label for="location_filter" class="form-label"><i class="bi bi-geo-alt me-1"></i>Location</label>
+                    <select class="form-select" id="location_filter" name="location" onchange="this.form.submit()">
+                        <option value="">All Locations</option>
+                        {% for location in locations %}
+                            <option value="{{ location.id }}" {% if location_filter == location.id|stringformat:'s' %}selected{% endif %}>
+                                {{ location.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <label for="asset_filter" class="form-label"><i class="bi bi-boxes me-1"></i>Asset</label>
+                    <select class="form-select" id="asset_filter" name="asset" onchange="this.form.submit()">
+                        <option value="">All Assets</option>
+                        {% for asset in assets %}
+                            <option value="{{ asset.id }}" {% if asset_filter == asset.id|stringformat:'s' %}selected{% endif %}>
+                                {{ asset.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <label for="completed_by_filter" class="form-label"><i class="bi bi-person-check me-1"></i>Completed
+                        By</label>
+                    <select class="form-select" id="completed_by_filter" name="completed_by"
+                            onchange="this.form.submit()">
+                        <option value="">All Users</option>
+                        {% for user in completed_by_users %}
+                            <option value="{{ user.id }}" {% if completed_by_filter == user.id|stringformat:'s' %}selected{% endif %}>
+                                {{ user.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+                <div class = "row gy-3 mt-1">
+                     <div class="col-md-12 text-end">
+                        {% if request.GET.start_date or request.GET.end_date or section_filter or location_filter or asset_filter or completed_by_filter %}
+                             <a href="{% url 'maintenance_list' %}" class="btn btn-outline-secondary" title="Clear All Filters">
+                                <i class="bi bi-x-lg"></i> Clear Filters
+                              </a>
+                        {% endif %}
+                   </div>
+               </div>
+
+        </form>
     </div>
 </div>
 
@@ -37,18 +102,20 @@
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead class="table-light">
-                    <tr>
-                        <th><i class="bi bi-gear me-2"></i>Assets</th>
-                        <th><i class="bi bi-building me-2"></i>Location</th>
-                        <th><i class="bi bi-calendar-event me-2"></i>Start</th>
-                        <th><i class="bi bi-calendar-event me-2"></i>End</th>
-                        <th><i class="bi bi-clock me-2"></i>Duration</th>
-                        <!-- <th><i class="bi bi-tools me-2"></i>Actions</th> -->
-                    </tr>
+                <tr>
+                    <th><i class="bi bi-gear me-2"></i>Assets</th>
+                    <th><i class="bi bi-building me-2"></i>Location</th>
+                    <th><i class="bi bi-calendar-event me-2"></i>Start</th>
+                    <th><i class="bi bi-calendar-event me-2"></i>End</th>
+                    <th><i class="bi bi-clock me-2"></i>Duration</th>
+                    <!-- <th><i class="bi bi-tools me-2"></i>Actions</th> -->
+                </tr>
                 </thead>
                 <tbody>
-                    {% for record in records %}
-                    <tr class="cursor-pointer" onclick="window.location=`/preventive_maintenance/{{record.id}}/`" style="cursor: pointer;">
+                {% for record in records %}
+                    <tr class="cursor-pointer"
+                        onclick="window.location=`/preventive_maintenance/{{record.id}}`"
+                        style="cursor: pointer;">
                         <td>
                             {% for asset in record.asset.all %}
                                 <span class="badge bg-secondary me-1">{{ asset }}</span>
@@ -67,74 +134,83 @@
                             </a>
                         </td> -->
                     </tr>
-                    {% endfor %}
+                {% endfor %}
                 </tbody>
             </table>
         </div>
-         {% if records.paginator.num_pages > 1 %}
+        {% if records.paginator.num_pages > 1 %}
             <div class="d-flex justify-content-between align-items-center mt-4">
-                 <div class="pagination-info">
+                <div class="pagination-info">
                     <small class="text-muted">
-                    Showing items {{ records.start_index }} to {{ records.end_index }} of {{ records.paginator.count }}
+                        Showing items {{ records.start_index }} to {{ records.end_index }} of {{ records.paginator.count }}
                     </small>
-                  </div>
-                   <nav aria-label="Preventive maintenance list navigation">
-                       <ul class="pagination mb-0">
-                            {% if records.has_previous %}
+                </div>
+                <nav aria-label="Preventive maintenance list navigation">
+                    <ul class="pagination mb-0">
+                        {% if records.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="First">
+                                <a class="page-link"
+                                   href="?page=1{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if section_filter %}§ion={{ section_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}{% if asset_filter %}&asset={{ asset_filter }}{% endif %}{% if completed_by_filter %}&completed_by={{ completed_by_filter }}{% endif %}"
+                                   aria-label="First">
                                     <i class="bi bi-chevron-double-left"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ records.previous_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Previous">
+                                <a class="page-link"
+                                   href="?page={{ records.previous_page_number }}{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if section_filter %}§ion={{ section_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}{% if asset_filter %}&asset={{ asset_filter }}{% endif %}{% if completed_by_filter %}&completed_by={{ completed_by_filter }}{% endif %}"
+                                   aria-label="Previous">
                                     <i class="bi bi-chevron-left"></i>
                                 </a>
                             </li>
-                            {% else %}
+                        {% else %}
                             <li class="page-item disabled">
                                 <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
                             </li>
                             <li class="page-item disabled">
                                 <span class="page-link"><i class="bi bi-chevron-left"></i></span>
                             </li>
+                        {% endif %}
+
+                        {% for num in records.paginator.page_range %}
+                            {% if records.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > records.number|add:'-3' and num < records.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page={{ num }}{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if section_filter %}§ion={{ section_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}{% if asset_filter %}&asset={{ asset_filter }}{% endif %}{% if completed_by_filter %}&completed_by={{ completed_by_filter }}{% endif %}">{{ num }}</a>
+                                </li>
                             {% endif %}
-            
-                            {% for num in records.paginator.page_range %}
-                                {% if records.number == num %}
-                                    <li class="page-item active">
-                                        <span class="page-link">{{ num }}</span>
-                                    </li>
-                                {% elif num > records.number|add:'-3' and num < records.number|add:'3' %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-            
-                            {% if records.has_next %}
+                        {% endfor %}
+
+                        {% if records.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ records.next_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Next">
+                                <a class="page-link"
+                                   href="?page={{ records.next_page_number }}{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if section_filter %}§ion={{ section_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}{% if asset_filter %}&asset={{ asset_filter }}{% endif %}{% if completed_by_filter %}&completed_by={{ completed_by_filter }}{% endif %}"
+                                   aria-label="Next">
                                     <i class="bi bi-chevron-right"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ records.paginator.num_pages }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Last">
+                                <a class="page-link"
+                                   href="?page={{ records.paginator.num_pages }}{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if section_filter %}§ion={{ section_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}{% if asset_filter %}&asset={{ asset_filter }}{% endif %}{% if completed_by_filter %}&completed_by={{ completed_by_filter }}{% endif %}"
+                                   aria-label="Last">
                                     <i class="bi bi-chevron-double-right"></i>
                                 </a>
                             </li>
-                            {% else %}
+                        {% else %}
                             <li class="page-item disabled">
                                 <span class="page-link"><i class="bi bi-chevron-right"></i></span>
                             </li>
                             <li class="page-item disabled">
                                 <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
                             </li>
-                            {% endif %}
-                        </ul>
-                   </nav>
-                 </div>
-           {% endif %}
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
