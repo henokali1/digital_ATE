@@ -12,26 +12,111 @@
             <a href="{% url 'maintenance_create' %}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Add New Record
             </a>
-               <form method="get" class="d-flex align-items-center">
-                    <select name="per_page" class="form-select me-2" onchange="this.form.submit()">
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <form method="get" class="row row-cols-lg-auto g-3 align-items-center">
+                <div class="col-12">
+                    <label class="visually-hidden" for="per_page">Records per page</label>
+                    <select name="per_page" class="form-select" id="per_page" onchange="this.form.submit()">
                         <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
-                          <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
+                        <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
                         <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
-                         <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
-                     </select>
-                     
-                     <div class="d-flex align-items-center">
-                          <label for="start_date" class="form-label me-1" style="margin-bottom: 0;">Start Date</label>
-                          <input type="date" name="start_date" class="form-control me-2" value="{{ request.GET.start_date }}" onchange="this.form.submit()" placeholder="Start Date">
-                          <label for="end_date" class="form-label mx-1" style="margin-bottom: 0;">End Date</label>
-                         <input type="date" name="end_date" class="form-control me-2" value="{{ request.GET.end_date }}" onchange="this.form.submit()" placeholder="End Date">
-                         {% if request.GET.start_date or request.GET.end_date %}
-                            <a href="{% url 'maintenance_list' %}" class="btn btn-outline-secondary ms-1" title="Clear date filter">
-                            <i class="bi bi-x-lg"></i>
-                            </a>
-                        {% endif %}
+                        <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label class="visually-hidden" for="start_date">Start Date</label>
+                    <div class="input-group">
+                        <div class="input-group-text"><i class="bi bi-calendar"></i></div>
+                        <input type="date" name="start_date" class="form-control" id="start_date" value="{{ request.GET.start_date }}" onchange="this.form.submit()" placeholder="Start Date">
                     </div>
-               </form>
+                </div>
+
+                <div class="col-12">
+                    <label class="visually-hidden" for="end_date">End Date</label>
+                    <div class="input-group">
+                        <div class="input-group-text"><i class="bi bi-calendar"></i></div>
+                        <input type="date" name="end_date" class="form-control" id="end_date" value="{{ request.GET.end_date }}" onchange="this.form.submit()" placeholder="End Date">
+                    </div>
+                </div>
+
+                 <div class="col-12">
+                    <label class="visually-hidden" for="type">Type</label>
+                    <div class="input-group">
+                         <div class="input-group-text"><i class="bi bi-filter"></i></div>
+                    <select name="type" class="form-select" id="type" onchange="this.form.submit()">
+                        <option value="" {% if not request.GET.type %}selected{% endif %}>All Types</option>
+                        {% for choice in type_choices %}
+                            <option value="{{ choice.0 }}" {% if request.GET.type == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                        {% endfor %}
+                    </select>
+                   </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="visually-hidden" for="section">Section</label>
+                    <div class="input-group">
+                       <div class="input-group-text"><i class="bi bi-filter"></i></div>
+                        <select name="section" class="form-select" id="section" onchange="this.form.submit()">
+                            <option value="" {% if not request.GET.section %}selected{% endif %}>All Sections</option>
+                            {% for choice in section_choices %}
+                                <option value="{{ choice.0 }}" {% if request.GET.section == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                            {% endfor %}
+                        </select>
+                   </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="visually-hidden" for="location">Location</label>
+                    <div class="input-group">
+                       <div class="input-group-text"><i class="bi bi-geo-alt"></i></div>
+                    <select name="location" class="form-select" id="location" onchange="this.form.submit()">
+                        <option value="" {% if not request.GET.location %}selected{% endif %}>All Locations</option>
+                        {% for location in locations %}
+                            <option value="{{ location.id }}" {% if request.GET.location|stringformat:'i' == location.id|stringformat:'i' %}selected{% endif %}>{{ location.name }}</option>
+                        {% endfor %}
+                    </select>
+                   </div>
+                </div>
+
+                 <div class="col-12">
+                    <label class="visually-hidden" for="completed_by">Completed By</label>
+                    <div class="input-group">
+                         <div class="input-group-text"><i class="bi bi-person"></i></div>
+                    <select name="completed_by" class="form-select" id="completed_by" onchange="this.form.submit()">
+                        <option value="" {% if not request.GET.completed_by %}selected{% endif %}>All Staff</option>
+                        {% for user in completed_by_users %}
+                            <option value="{{ user.id }}" {% if request.GET.completed_by|stringformat:'i' == user.id|stringformat:'i' %}selected{% endif %}>{{ user.first_name }} {{user.last_name}}</option>
+                        {% endfor %}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="visually-hidden" for="asset">Asset</label>
+                    <div class="input-group">
+                        <div class="input-group-text"><i class="bi bi-gear"></i></div>
+                        <select name="asset" class="form-select" id="asset" onchange="this.form.submit()">
+                            <option value="" {% if not request.GET.asset %}selected{% endif %}>All Assets</option>
+                            {% for asset in assets %}
+                                <option value="{{ asset.id }}" {% if request.GET.asset|stringformat:'i' == asset.id|stringformat:'i' %}selected{% endif %}>{{ asset.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    {% if request.GET.start_date or request.GET.end_date or request.GET.type or request.GET.section or request.GET.location or request.GET.completed_by or request.GET.asset %}
+                        <a href="{% url 'maintenance_list' %}" class="btn btn-outline-secondary" title="Clear Filters">
+                            <i class="bi bi-x-lg"></i> Clear Filters
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
         </div>
     </div>
 
@@ -55,98 +140,98 @@
                         <tr class="cursor-pointer" onclick="window.location=`{% url 'maintenance_detail' record.id %}`" style="cursor: pointer;">
                             <td>
                                 {% for asset in record.asset.all %}
-                                 <span class="badge bg-secondary">{{ asset.name }}</span>
-                                  {% empty %}
-                                    <span class="text-muted">No assets selected</span>
-                                 {% endfor %}
-                            </td>
-                            <td>{{ record.location }}</td>
-                            <td>{{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</td>
-                            <td>{{ record.end_date|date:"M d, Y" }} {{ record.end_time|time:"H:i" }}</td>
-                            <td>{{ record.duration }} hrs</td>
-                            <td>
-                                <span class="badge {% if record.type == 'Outage' %}bg-danger{% elif record.type == 'Warning' %}bg-warning{% elif record.type == 'Alarm' %}bg-info{% else %}bg-secondary{% endif %}">
-                                    {{ record.type }}
-                                </span>
-                            </td>
-                            <!-- <td>
-                                <a href="{% url 'maintenance_update' record.id %}" class="btn btn-sm btn-warning me-2" onclick="event.stopPropagation();">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <a href="{% url 'maintenance_delete' record.id %}" class="btn btn-sm btn-danger" onclick="event.stopPropagation();">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                            </td> -->
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-         {% if records.paginator.num_pages > 1 %}
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                     <div class="pagination-info">
-                        <small class="text-muted">
-                        Showing items {{ records.start_index }} to {{ records.end_index }} of {{ records.paginator.count }}
-                        </small>
-                      </div>
-                       <nav aria-label="Corrective Maintenance list navigation">
-                           <ul class="pagination mb-0">
-                                {% if records.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="First">
-                                        <i class="bi bi-chevron-double-left"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ records.previous_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Previous">
-                                        <i class="bi bi-chevron-left"></i>
-                                    </a>
-                                </li>
-                                {% else %}
-                                <li class="page-item disabled">
-                                    <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
-                                </li>
-                                <li class="page-item disabled">
-                                    <span class="page-link"><i class="bi bi-chevron-left"></i></span>
-                                </li>
-                                {% endif %}
-                
-                                {% for num in records.paginator.page_range %}
-                                    {% if records.number == num %}
-                                        <li class="page-item active">
-                                            <span class="page-link">{{ num }}</span>
-                                        </li>
-                                    {% elif num > records.number|add:'-3' and num < records.number|add:'3' %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ num }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
-                                        </li>
-                                    {% endif %}
+                                <span class="badge bg-secondary">{{ asset.name }}</span>
+                                 {% empty %}
+                                   <span class="text-muted">No assets selected</span>
                                 {% endfor %}
-                
-                                {% if records.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ records.next_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Next">
-                                        <i class="bi bi-chevron-right"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ records.paginator.num_pages }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Last">
-                                        <i class="bi bi-chevron-double-right"></i>
-                                    </a>
-                                </li>
-                                {% else %}
-                                <li class="page-item disabled">
-                                    <span class="page-link"><i class="bi bi-chevron-right"></i></span>
-                                </li>
-                                <li class="page-item disabled">
-                                    <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
-                                </li>
-                                {% endif %}
-                            </ul>
-                       </nav>
+                           </td>
+                           <td>{{ record.location }}</td>
+                           <td>{{ record.start_date|date:"M d, Y" }} {{ record.start_time|time:"H:i" }}</td>
+                           <td>{{ record.end_date|date:"M d, Y" }} {{ record.end_time|time:"H:i" }}</td>
+                           <td>{{ record.duration }} hrs</td>
+                           <td>
+                               <span class="badge {% if record.type == 'Outage' %}bg-danger{% elif record.type == 'Warning' %}bg-warning{% elif record.type == 'Alarm' %}bg-info{% else %}bg-secondary{% endif %}">
+                                   {{ record.type }}
+                               </span>
+                           </td>
+                           <!-- <td>
+                               <a href="{% url 'maintenance_update' record.id %}" class="btn btn-sm btn-warning me-2" onclick="event.stopPropagation();">
+                                   <i class="bi bi-pencil"></i>
+                               </a>
+                               <a href="{% url 'maintenance_delete' record.id %}" class="btn btn-sm btn-danger" onclick="event.stopPropagation();">
+                                   <i class="bi bi-trash"></i>
+                               </a>
+                           </td> -->
+                       </tr>
+                       {% endfor %}
+                   </tbody>
+               </table>
+           </div>
+       </div>
+        {% if records.paginator.num_pages > 1 %}
+               <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="pagination-info">
+                       <small class="text-muted">
+                       Showing items {{ records.start_index }} to {{ records.end_index }} of {{ records.paginator.count }}
+                       </small>
                      </div>
-               {% endif %}
-        </div>
+                      <nav aria-label="Corrective Maintenance list navigation">
+                          <ul class="pagination mb-0">
+                               {% if records.has_previous %}
+                               <li class="page-item">
+                                   <a class="page-link" href="?page=1{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.section %}§ion={{ request.GET.section }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.completed_by %}&completed_by={{ request.GET.completed_by }}{% endif %}{% if request.GET.asset %}&asset={{ request.GET.asset }}{% endif %}" aria-label="First">
+                                       <i class="bi bi-chevron-double-left"></i>
+                                   </a>
+                               </li>
+                               <li class="page-item">
+                                   <a class="page-link" href="?page={{ records.previous_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.section %}§ion={{ request.GET.section }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.completed_by %}&completed_by={{ request.GET.completed_by }}{% endif %}{% if request.GET.asset %}&asset={{ request.GET.asset }}{% endif %}" aria-label="Previous">
+                                       <i class="bi bi-chevron-left"></i>
+                                   </a>
+                               </li>
+                               {% else %}
+                               <li class="page-item disabled">
+                                   <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+                               </li>
+                               <li class="page-item disabled">
+                                   <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                               </li>
+                               {% endif %}
+               
+                               {% for num in records.paginator.page_range %}
+                                   {% if records.number == num %}
+                                       <li class="page-item active">
+                                           <span class="page-link">{{ num }}</span>
+                                       </li>
+                                   {% elif num > records.number|add:'-3' and num < records.number|add:'3' %}
+                                       <li class="page-item">
+                                           <a class="page-link" href="?page={{ num }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.section %}§ion={{ request.GET.section }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.completed_by %}&completed_by={{ request.GET.completed_by }}{% endif %}{% if request.GET.asset %}&asset={{ request.GET.asset }}{% endif %}">{{ num }}</a>
+                                       </li>
+                                   {% endif %}
+                               {% endfor %}
+               
+                               {% if records.has_next %}
+                               <li class="page-item">
+                                   <a class="page-link" href="?page={{ records.next_page_number }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.section %}§ion={{ request.GET.section }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.completed_by %}&completed_by={{ request.GET.completed_by }}{% endif %}{% if request.GET.asset %}&asset={{ request.GET.asset }}{% endif %}" aria-label="Next">
+                                       <i class="bi bi-chevron-right"></i>
+                                   </a>
+                               </li>
+                               <li class="page-item">
+                                   <a class="page-link" href="?page={{ records.paginator.num_pages }}{% if per_page %}&per_page={{per_page}}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.section %}§ion={{ request.GET.section }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.completed_by %}&completed_by={{ request.GET.completed_by }}{% endif %}{% if request.GET.asset %}&asset={{ request.GET.asset }}{% endif %}" aria-label="Last">
+                                       <i class="bi bi-chevron-double-right"></i>
+                                   </a>
+                               </li>
+                               {% else %}
+                               <li class="page-item disabled">
+                                   <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                               </li>
+                               <li class="page-item disabled">
+                                   <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+                               </li>
+                               {% endif %}
+                           </ul>
+                      </nav>
+                    </div>
+              {% endif %}
+       </div>
 </div>
 {% endblock %}
