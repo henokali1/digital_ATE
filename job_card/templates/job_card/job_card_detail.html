@@ -14,7 +14,7 @@
                     <i class="bi bi-check-circle"></i> Acknowledge
                  </a>
                  {% endif %}
-                 {% if user.userprofile.position.can_create_job_cards %}
+                 {% if user.is_superuser or job_card.created_by == user %}
                  <a href="{% url 'job_card_update' job_card.pk %}" class="btn btn-light btn-sm">
                      <i class="bi bi-pencil"></i> Edit
                  </a>
