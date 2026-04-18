@@ -42,12 +42,38 @@ class Asset(models.Model):
     corrective_maintenance_required = models.BooleanField(default=False)
     remarks = models.CharField(max_length=250, blank=True, null=True)
     photo = models.ImageField(upload_to='assets_photos/', blank=True, null=True)
-    installation_date = models.DateField(blank=True, null=True)  # Add this field
+    installation_date = models.DateField(blank=True, null=True)
+    oem_life_span = models.PositiveIntegerField(default=10, help_text="OEM recommended life span in years")
 
     def save(self, *args, **kwargs):
         if not self.tag_id:  # Only generate a tag_id if it doesn't already exist
             self.tag_id = f"TAG-{uuid.uuid4().hex[:8].upper()}"
         super().save(*args, **kwargs)
+
+    @property
+    def end_of_life_date(self):
+        if self.installation_date and self.oem_life_span:
+            try:
+                return self.installation_date.replace(year=self.installation_date.year + self.oem_life_span)
+            except ValueError:
+                return self.installation_date.replace(year=self.installation_date.year + self.oem_life_span, day=28)
+        return None
+
+    @property
+    def lifecycle_status(self):
+        """Returns 'expired', 'nearing' (within 1 year), or 'active'."""
+        from django.utils import timezone
+        eol = self.end_of_life_date
+        if not eol:
+            return 'unknown'
+        today = timezone.now().date()
+        if today > eol:
+            return 'expired'
+        from datetime import date
+        one_year_ahead = today.replace(year=today.year + 1)
+        if today >= eol.replace(year=eol.year - 1):
+            return 'nearing'
+        return 'active'
 
     def __str__(self):
         return f'{self.name} - {self.position_rack} | {self.serial_number}'
@@ -62,3 +88,28 @@ class AssetHistory(models.Model):
 
     def __str__(self):
         return f"History for {self.asset.name} at {self.timestamp}"
+
+
+class CalibrationHistory(models.Model):
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='calibration_history')
+    calibration_date = models.DateField()
+    next_calibration_date = models.DateField()
+    notes = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-calibration_date']
+
+    def __str__(self):
+        return f"Calibration – {self.asset.name} on {self.calibration_date}"
+
+
+class CalibrationDocument(models.Model):
+    calibration = models.ForeignKey(CalibrationHistory, on_delete=models.CASCADE, related_name='documents')
+    document = models.FileField(upload_to='calibration_certificates/')
+    name = models.CharField(max_length=255, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name or str(self.document)

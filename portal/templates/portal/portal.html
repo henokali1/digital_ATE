@@ -1,0 +1,448 @@
+{% extends 'base.html' %}
+{% block title %}Maintenance Portal — Digital ATE{% endblock %}
+{% block page_header_title %}Maintenance Portal{% endblock %}
+{% block heading_h1 %}Maintenance Request Portal{% endblock %}
+{% block heading_h2 %}Submit and track your maintenance requests{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Layout ──────────────────────────────────────────────── */
+.portal-wrap { max-width: 860px; margin: 0 auto; }
+
+/* ── Submit card ─────────────────────────────────────────── */
+.submit-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 28px 24px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-sm);
+}
+.submit-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+.submit-icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    background: rgba(104,178,227,0.12);
+    color: var(--primary, #68B2E3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+.submit-card-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 2px;
+}
+.submit-card-header p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+.desc-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    display: block;
+}
+.desc-textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    font-family: inherit;
+}
+.desc-textarea:focus {
+    outline: none;
+    border-color: var(--primary, #68B2E3);
+    box-shadow: 0 0 0 3px rgba(104,178,227,0.15);
+}
+.desc-textarea::placeholder { color: var(--text-secondary); opacity: 0.7; }
+.submit-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.char-hint { font-size: 0.75rem; color: var(--text-secondary); }
+.btn-submit {
+    background: var(--primary, #68B2E3);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 22px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.18s, transform 0.12s;
+}
+.btn-submit:hover { background: var(--primary-dk, #4a9ed8); transform: translateY(-1px); }
+.btn-submit:active { transform: none; }
+
+/* ── Alerts ──────────────────────────────────────────────── */
+.portal-alert {
+    border-radius: 10px;
+    padding: 11px 16px;
+    font-size: 0.84rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.portal-alert.success { background: rgba(34,197,94,0.10); color: #16a34a; border: 1px solid rgba(34,197,94,0.25); }
+.portal-alert.error   { background: rgba(239,68,68,0.10);  color: #dc2626; border: 1px solid rgba(239,68,68,0.25); }
+
+/* ── Requests section ────────────────────────────────────── */
+.requests-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.requests-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.requests-title .badge-count {
+    background: rgba(104,178,227,0.15);
+    color: var(--primary, #68B2E3);
+    border-radius: 20px;
+    padding: 1px 9px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+.search-wrap { position: relative; }
+.search-wrap i {
+    position: absolute;
+    left: 10px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    pointer-events: none;
+}
+.search-input {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px 7px 30px;
+    font-size: 0.82rem;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    width: 220px;
+    transition: border-color 0.18s;
+}
+.search-input:focus { outline: none; border-color: var(--primary, #68B2E3); }
+
+/* ── Requests table ──────────────────────────────────────── */
+.requests-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+.req-table { width: 100%; border-collapse: collapse; }
+.req-table thead th {
+    background: rgba(0,0,0,0.025);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+.req-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+}
+.req-table tbody tr:last-child { border-bottom: none; }
+.req-table tbody tr:hover { background: rgba(104,178,227,0.04); }
+.req-table tbody td { padding: 13px 16px; font-size: 0.84rem; vertical-align: middle; }
+
+.jc-num {
+    font-family: ui-monospace, "Cascadia Code", monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--primary, #68B2E3);
+    white-space: nowrap;
+}
+.jc-desc {
+    color: var(--text-primary);
+    max-width: 340px;
+}
+.jc-date { color: var(--text-secondary); white-space: nowrap; font-size: 0.78rem; }
+
+/* ── Status badges ───────────────────────────────────────── */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.status-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+.badge-pending     { background: rgba(245,158,11,0.12); color: #d97706; }
+.badge-inprogress  { background: rgba(59,130,246,0.12); color: #2563eb; }
+.badge-completed   { background: rgba(34,197,94,0.12);  color: #16a34a; }
+.badge-onhold      { background: rgba(249,115,22,0.12); color: #ea580c; }
+.badge-rejected    { background: rgba(239,68,68,0.12);  color: #dc2626; }
+
+/* ── Empty state ─────────────────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 52px 24px;
+    color: var(--text-secondary);
+}
+.empty-state i { font-size: 2.6rem; display: block; margin-bottom: 12px; opacity: 0.3; }
+.empty-state p { font-size: 0.88rem; margin: 0; }
+
+/* ── Dark mode ───────────────────────────────────────────── */
+body.dark-mode .submit-card,
+body.dark-mode .requests-card  { background: #1e2433; border-color: #2d3448; }
+body.dark-mode .desc-textarea  { background: #161d2e; border-color: #2d3448; color: #e2e8f0; }
+body.dark-mode .desc-textarea:focus { border-color: var(--primary); }
+body.dark-mode .req-table thead th { background: rgba(255,255,255,0.03); color: #64748b; border-color: #2d3448; }
+body.dark-mode .req-table tbody tr { border-color: #2d3448; }
+body.dark-mode .req-table tbody tr:hover { background: rgba(104,178,227,0.05); }
+body.dark-mode .jc-desc  { color: #e2e8f0; }
+body.dark-mode .search-input { background: #161d2e; border-color: #2d3448; color: #e2e8f0; }
+body.dark-mode .portal-alert.success { background: rgba(34,197,94,0.08); }
+body.dark-mode .portal-alert.error   { background: rgba(239,68,68,0.08); }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .submit-card { padding: 20px; }
+    .requests-header { flex-direction: column; align-items: flex-start; }
+    .search-input { width: 100%; }
+    .jc-desc { max-width: 180px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="portal-wrap">
+
+    {% for msg in messages %}
+    <div class="portal-alert {% if msg.tags == 'success' %}success{% else %}error{% endif %}">
+        <i class="bi bi-{% if msg.tags == 'success' %}check-circle-fill{% else %}exclamation-circle-fill{% endif %}"></i>
+        {{ msg }}
+    </div>
+    {% endfor %}
+
+    {# ── Submit form ── #}
+    <div class="submit-card">
+        <div class="submit-card-header">
+            <div class="submit-icon"><i class="bi bi-send-plus"></i></div>
+            <div>
+                <h2>Submit a Maintenance Request</h2>
+                <p>Describe the issue or task. The maintenance team will handle the rest.</p>
+            </div>
+        </div>
+        <form method="POST" id="submitForm">
+            {% csrf_token %}
+            <label class="desc-label" for="task_description">Task Description <span style="color:#ef4444">*</span></label>
+            <textarea
+                id="task_description"
+                name="task_description"
+                class="desc-textarea"
+                rows="4"
+                maxlength="255"
+                placeholder="e.g. AMHS link down."
+                required
+            ></textarea>
+            <div class="submit-footer">
+                <span class="char-hint"><span id="charCount">0</span> / 255 characters</span>
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-send"></i> Submit Request
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {# ── My requests ── #}
+    <div class="requests-header">
+        <div class="requests-title">
+            <i class="bi bi-list-check" style="color:var(--primary)"></i>
+            My Requests
+            <span class="badge-count" id="visibleCount">{{ my_requests|length }}</span>
+        </div>
+        <form method="GET" class="search-wrap" id="searchForm">
+            <i class="bi bi-search"></i>
+            <input
+                type="text"
+                name="q"
+                id="searchInput"
+                class="search-input"
+                placeholder="Search by JC number…"
+                value="{{ search }}"
+                autocomplete="off"
+            >
+        </form>
+    </div>
+
+    <div class="requests-card">
+        {% if my_requests %}
+        <div class="table-responsive">
+            <table class="req-table" id="reqTable">
+                <thead>
+                    <tr>
+                        <th>JC Number</th>
+                        <th>Task Description</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for jc in my_requests %}
+                    <tr class="req-row" data-jc-id="{{ jc.pk }}">
+                        <td>
+                            <a href="/job_card/{{ jc.pk }}/" class="jc-num">{{ jc.job_card_number }}</a>
+                        </td>
+                        <td class="jc-desc">
+                            {{ jc.task_description|truncatechars:80 }}
+                        </td>
+                        <td class="status-cell">
+                            {% if jc.status == 'Pending' %}
+                                <span class="status-badge badge-pending">Submitted</span>
+                            {% elif jc.status == 'In Progress' %}
+                                <span class="status-badge badge-inprogress">In Progress</span>
+                            {% elif jc.status == 'Completed' %}
+                                <span class="status-badge badge-completed">Completed</span>
+                            {% elif jc.status == 'On Hold' %}
+                                <span class="status-badge badge-onhold">On Hold</span>
+                            {% elif jc.status == 'Rejected' %}
+                                <span class="status-badge badge-rejected">Rejected</span>
+                            {% else %}
+                                <span class="status-badge badge-pending">{{ jc.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="jc-date">{{ jc.created_at|date:"d M Y, H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div id="emptySearch" class="empty-state d-none">
+            <i class="bi bi-search"></i>
+            <p>No requests match "<strong id="emptyTerm"></strong>"</p>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <p>You haven't submitted any requests yet.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    /* ── Character counter ── */
+    const ta    = document.getElementById('task_description');
+    const count = document.getElementById('charCount');
+    if (ta && count) {
+        const update = () => { count.textContent = ta.value.length; };
+        ta.addEventListener('input', update);
+        update();
+    }
+
+    /* ── Live client-side search ── */
+    const input   = document.getElementById('searchInput');
+    const rows    = document.querySelectorAll('.req-row');
+    const badge   = document.getElementById('visibleCount');
+    const emptyEl = document.getElementById('emptySearch');
+    const emptyTerm = document.getElementById('emptyTerm');
+
+    if (!input || !rows.length) return;
+
+    input.addEventListener('input', function () {
+        const q = this.value.toLowerCase().trim();
+        let visible = 0;
+        rows.forEach(row => {
+            const jcNum = row.querySelector('.jc-num')?.textContent.toLowerCase() || '';
+            const show  = !q || jcNum.includes(q);
+            row.classList.toggle('d-none', !show);
+            if (show) visible++;
+        });
+        if (badge) badge.textContent = visible;
+        if (emptyEl) {
+            emptyEl.classList.toggle('d-none', visible > 0 || !q);
+            if (emptyTerm) emptyTerm.textContent = this.value;
+        }
+    });
+
+    /* trigger live search if there's a server-side q param */
+    if (input.value) input.dispatchEvent(new Event('input'));
+})();
+
+/* ── Auto-refresh statuses every 30 s ── */
+(function () {
+    const STATUS_MAP = {
+        'Pending':     { cls: 'badge-pending',    label: 'Submitted'   },
+        'In Progress': { cls: 'badge-inprogress', label: 'In Progress' },
+        'Completed':   { cls: 'badge-completed',  label: 'Completed'   },
+        'On Hold':     { cls: 'badge-onhold',     label: 'On Hold'     },
+        'Rejected':    { cls: 'badge-rejected',   label: 'Rejected'    },
+    };
+
+    function badgeHTML(status) {
+        const s = STATUS_MAP[status] || { cls: 'badge-pending', label: status };
+        return `<span class="status-badge ${s.cls}">${s.label}</span>`;
+    }
+
+    function poll() {
+        fetch('/portal/api/')
+            .then(r => r.json())
+            .then(data => {
+                data.requests.forEach(item => {
+                    const row = document.querySelector(`.req-row[data-jc-id="${item.id}"]`);
+                    if (!row) return;
+                    const cell = row.querySelector('.status-cell');
+                    if (cell) cell.innerHTML = badgeHTML(item.status);
+                });
+            })
+            .catch(() => {});
+    }
+
+    setInterval(poll, 30000);
+})();
+</script>
+{% endblock %}

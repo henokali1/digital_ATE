@@ -1,25 +1,158 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Location List</title>
-</head>
-<body>
-    <h1>Location List</h1>
-    <a href="{% url 'location_create' %}">Add New Location</a>
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Actions</th>
-        </tr>
-        {% for location in locations %}
-        <tr>
-            <td>{{ location.name }}</td>
-            <td>
-                <a href="{% url 'location_update' location.id %}">Edit</a> |
-                <a href="{% url 'location_delete' location.id %}">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Locations{% endblock %}
+{% block heading_h1 %}Locations{% endblock %}
+{% block heading_h2 %}Manage site locations{% endblock %}
+
+{% block content %}
+<div class="loc-wrapper">
+
+    {# ── Toolbar ── #}
+    <div class="loc-toolbar">
+        <a href="{% url 'location_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Add Location
+        </a>
+        <div class="loc-search-wrap">
+            <i class="bi bi-search loc-search-icon"></i>
+            <input type="text" id="locSearch" class="form-control loc-search" placeholder="Filter locations…" autocomplete="off">
+        </div>
+        <span class="loc-count"><span id="visibleCount">{{ locations|length }}</span> location{{ locations|length|pluralize }}</span>
+    </div>
+
+    {# ── Table ── #}
+    <div class="loc-card">
+        {% if locations %}
+        <div class="table-responsive">
+            <table class="table loc-table mb-0" id="locTable">
+                <thead>
+                    <tr>
+                        <th style="width:3rem">#</th>
+                        <th>Name</th>
+                        <th style="width:10rem" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loc in locations %}
+                    <tr class="loc-row">
+                        <td class="loc-num text-muted">{{ forloop.counter }}</td>
+                        <td class="loc-name fw-medium">
+                            <i class="bi bi-geo-alt-fill me-2 loc-pin"></i>{{ loc.name }}
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'location_update' loc.id %}" class="btn btn-sm btn-outline-secondary me-1" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'location_delete' loc.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div id="emptySearch" class="loc-empty d-none">
+            <i class="bi bi-search"></i>
+            <p>No locations match your search.</p>
+        </div>
+        {% else %}
+        <div class="loc-empty">
+            <i class="bi bi-geo-alt"></i>
+            <p>No locations yet.</p>
+            <a href="{% url 'location_create' %}" class="btn btn-primary btn-sm">Add your first location</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.loc-wrapper { max-width: 720px; margin: 0 auto; }
+
+.loc-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.loc-search-wrap { flex: 1; min-width: 180px; position: relative; }
+.loc-search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary, #6b7280);
+    pointer-events: none;
+    font-size: 0.85rem;
+}
+.loc-search { padding-left: 32px; }
+.loc-count { font-size: 0.8rem; color: var(--text-secondary, #6b7280); white-space: nowrap; }
+
+.loc-card {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.loc-table thead th {
+    background: rgba(0,0,0,0.02);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary, #6b7280);
+    border-bottom: 1px solid var(--border, #e5e7eb);
+    padding: 12px 16px;
+}
+.loc-table tbody td { padding: 12px 16px; vertical-align: middle; }
+.loc-table tbody tr { border-bottom: 1px solid var(--border, #e5e7eb); transition: background 0.12s; }
+.loc-table tbody tr:last-child { border-bottom: none; }
+.loc-table tbody tr:hover { background: rgba(104,178,227,0.05); }
+.loc-pin { color: var(--primary, #68B2E3); }
+.loc-num { font-size: 0.8rem; }
+.loc-name { font-size: 0.93rem; }
+
+.loc-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-secondary, #6b7280);
+}
+.loc-empty i { font-size: 2.4rem; display: block; margin-bottom: 10px; opacity: 0.4; }
+.loc-empty p { margin-bottom: 14px; font-size: 0.9rem; }
+
+body.dark-mode .loc-card { background: #1e2433; border-color: #2d3448; }
+body.dark-mode .loc-table thead th { background: rgba(255,255,255,0.03); color: #94a3b8; border-color: #2d3448; }
+body.dark-mode .loc-table tbody tr { border-color: #2d3448; }
+body.dark-mode .loc-table tbody tr:hover { background: rgba(104,178,227,0.06); }
+body.dark-mode .loc-name { color: #e2e8f0; }
+body.dark-mode .loc-num  { color: #64748b; }
+body.dark-mode .loc-count { color: #64748b; }
+body.dark-mode .loc-search { background: #1e2433; color: #e2e8f0; border-color: #2d3448; }
+body.dark-mode .loc-search::placeholder { color: #64748b; }
+</style>
+
+<script>
+(function () {
+    const input   = document.getElementById('locSearch');
+    const rows    = document.querySelectorAll('.loc-row');
+    const counter = document.getElementById('visibleCount');
+    const empty   = document.getElementById('emptySearch');
+    if (!input) return;
+
+    input.addEventListener('input', function () {
+        const q = this.value.toLowerCase().trim();
+        let visible = 0;
+        rows.forEach(row => {
+            const name = row.querySelector('.loc-name').textContent.toLowerCase();
+            const show = !q || name.includes(q);
+            row.classList.toggle('d-none', !show);
+            if (show) visible++;
+        });
+        counter.textContent = visible;
+        if (empty) empty.classList.toggle('d-none', visible > 0);
+    });
+})();
+</script>
+{% endblock %}

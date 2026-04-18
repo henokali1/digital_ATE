@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %}{{ status|title }} Inspections — {{ asset.name }}{% endblock %}
+{% block page_header_title %}Daily Inspections{% endblock %}
+{% block heading_h1 %}{{ asset.name }}{% endblock %}
+{% block heading_h2 %}{{ status|title }} inspection records — {{ records|length }} result{{ records|length|pluralize }}{% endblock %}
+
+{% block content %}
+<div style="max-width:900px;margin:0 auto;">
+
+    {# Back link #}
+    <a href="/asset/{{ asset.id }}/#tab-di" class="filt-back">
+        <i class="bi bi-arrow-left"></i> Back to asset
+    </a>
+
+    {# Status header #}
+    <div class="filt-header filt-h-{{ status|lower }}">
+        <div class="filt-h-icon">
+            {% if status == 'ALARM' %}<i class="bi bi-exclamation-octagon-fill"></i>
+            {% elif status == 'WARNING' %}<i class="bi bi-exclamation-triangle-fill"></i>
+            {% elif status == 'OK' %}<i class="bi bi-check-circle-fill"></i>
+            {% elif status == 'DEGRADED' %}<i class="bi bi-arrow-down-circle-fill"></i>
+            {% elif status == 'DONE' %}<i class="bi bi-check-square-fill"></i>
+            {% elif status == 'OFF' %}<i class="bi bi-power"></i>
+            {% else %}<i class="bi bi-x-circle-fill"></i>{% endif %}
+        </div>
+        <div>
+            <div class="filt-h-status">{{ status|title }}</div>
+            <div class="filt-h-asset">{{ asset.name }}{% if asset.tag_id %} &middot; {{ asset.tag_id }}{% endif %}</div>
+        </div>
+        <span class="filt-h-count">{{ records|length }}</span>
+    </div>
+
+    {# Records table #}
+    {% if records %}
+    <div class="filt-card">
+        <div class="table-responsive">
+        <table class="filt-table">
+            <thead><tr>
+                <th>Date</th>
+                <th>Shift</th>
+                <th>Inspected At</th>
+                <th>Inspected By</th>
+                <th>Remarks</th>
+                <th>Photo</th>
+                <th>Inspection</th>
+            </tr></thead>
+            <tbody>
+            {% for rec in records %}
+            <tr>
+                <td class="filt-date">{{ rec.created_at|date:"d M Y" }}</td>
+                <td>
+                    <span class="filt-shift filt-shift-{{ rec.shift|lower }}">{{ rec.shift }}</span>
+                </td>
+                <td class="filt-date">{{ rec.inspected_at|date:"d M Y H:i"|default:"—" }}</td>
+                <td class="filt-by">
+                    {% for u in rec.inspected_by.all %}{{ u.get_full_name|default:u.username }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
+                </td>
+                <td class="filt-remarks">{{ rec.remarks|default:"—"|truncatechars:80 }}</td>
+                <td>
+                    {% if rec.photo %}
+                    <a href="{{ rec.photo.url }}" target="_blank">
+                        <img src="{{ rec.photo.url }}" class="filt-thumb" alt="photo">
+                    </a>
+                    {% else %}—{% endif %}
+                </td>
+                <td>
+                    {% if rec.inspection_ident %}
+                    <a href="/inspection/{{ rec.inspection_ident.inspection_ident }}/" class="filt-link">
+                        #{{ rec.inspection_ident.inspection_ident }} <i class="bi bi-arrow-right"></i>
+                    </a>
+                    {% else %}—{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="filt-empty">
+        <i class="bi bi-clipboard-x"></i>
+        <p>No <strong>{{ status|title }}</strong> inspection records found for this asset.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+.filt-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);
+    text-decoration: none; margin-bottom: 18px;
+    transition: color 0.15s;
+}
+.filt-back:hover { color: var(--primary, #68B2E3); }
+
+.filt-header {
+    display: flex; align-items: center; gap: 16px;
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 20px;
+}
+.filt-h-icon { font-size: 1.8rem; flex-shrink: 0; }
+.filt-h-status { font-size: 1.1rem; font-weight: 800; }
+.filt-h-asset  { font-size: 0.8rem; opacity: 0.75; margin-top: 2px; }
+.filt-h-count  {
+    margin-left: auto; font-size: 2rem; font-weight: 800;
+    opacity: 0.55; flex-shrink: 0;
+}
+
+.filt-h-ok           { background: rgba(34,197,94,0.12);  color: #16a34a; }
+.filt-h-warning      { background: rgba(245,158,11,0.12); color: #d97706; }
+.filt-h-alarm        { background: rgba(239,68,68,0.12);  color: #dc2626; }
+.filt-h-degraded     { background: rgba(249,115,22,0.12); color: #ea580c; }
+.filt-h-done         { background: rgba(20,184,166,0.12); color: #0d9488; }
+.filt-h-off          { background: rgba(107,114,128,0.12); color: #6b7280; }
+.filt-h-unserviceable{ background: rgba(127,29,29,0.12);  color: #991b1b; }
+
+.filt-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm);
+}
+.filt-table { width: 100%; border-collapse: collapse; }
+.filt-table thead th {
+    background: rgba(0,0,0,0.025); font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-secondary); padding: 11px 16px;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.filt-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+.filt-table tbody tr:last-child { border-bottom: none; }
+.filt-table tbody tr:hover { background: rgba(104,178,227,0.04); }
+.filt-table tbody td { padding: 11px 16px; font-size: 0.83rem; vertical-align: middle; }
+
+.filt-date    { white-space: nowrap; color: var(--text-secondary); font-size: 0.79rem; }
+.filt-by      { font-size: 0.79rem; color: var(--text-secondary); }
+.filt-remarks { max-width: 240px; color: var(--text-primary); }
+.filt-link    { color: var(--primary, #68B2E3); font-size: 0.78rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.filt-link:hover { text-decoration: underline; }
+.filt-thumb   { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+
+.filt-shift { display: inline-block; border-radius: 20px; padding: 2px 9px; font-size: 0.7rem; font-weight: 700; }
+.filt-shift-day   { background: rgba(245,158,11,0.12); color: #d97706; }
+.filt-shift-night { background: rgba(99,102,241,0.12); color: #6366f1; }
+
+.filt-empty {
+    text-align: center; padding: 60px 24px;
+    color: var(--text-secondary);
+}
+.filt-empty i { font-size: 2.8rem; display: block; margin-bottom: 12px; opacity: 0.3; }
+.filt-empty p { font-size: 0.9rem; }
+
+body.dark-mode .filt-card { background: #1e2433; border-color: #2d3448; }
+body.dark-mode .filt-table thead th { background: rgba(255,255,255,0.03); color: #64748b; border-color: #2d3448; }
+body.dark-mode .filt-table tbody tr { border-color: #2d3448; }
+body.dark-mode .filt-remarks { color: #e2e8f0; }
+body.dark-mode .filt-h-ok           { background: rgba(34,197,94,0.08); }
+body.dark-mode .filt-h-warning      { background: rgba(245,158,11,0.08); }
+body.dark-mode .filt-h-alarm        { background: rgba(239,68,68,0.08); }
+body.dark-mode .filt-h-degraded     { background: rgba(249,115,22,0.08); }
+body.dark-mode .filt-h-done         { background: rgba(20,184,166,0.08); }
+body.dark-mode .filt-h-off          { background: rgba(107,114,128,0.08); }
+body.dark-mode .filt-h-unserviceable{ background: rgba(127,29,29,0.08); }
+</style>
+{% endblock %}

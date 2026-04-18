@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a2a45"/>
+      <stop offset="100%" stop-color="#0c1422"/>
+    </linearGradient>
+    <linearGradient id="sig" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#68B2E3"/>
+      <stop offset="100%" stop-color="#a8d8f5"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background tile -->
+  <rect width="100" height="100" rx="22" fill="url(#bg)"/>
+
+  <!-- Ambient glow -->
+  <ellipse cx="50" cy="52" rx="36" ry="26" fill="#68B2E3" opacity="0.07"/>
+
+  <!-- Signal arcs — outermost → innermost -->
+  <path d="M12 72 Q50 10 88 72"
+        fill="none" stroke="url(#sig)" stroke-width="5.5" stroke-linecap="round" opacity="0.22"/>
+  <path d="M25 72 Q50 28 75 72"
+        fill="none" stroke="url(#sig)" stroke-width="5.5" stroke-linecap="round" opacity="0.50"/>
+  <path d="M38 72 Q50 46 62 72"
+        fill="none" stroke="url(#sig)" stroke-width="5.5" stroke-linecap="round" opacity="0.88"/>
+
+  <!-- Tower mast -->
+  <line x1="50" y1="72" x2="50" y2="84"
+        stroke="#68B2E3" stroke-width="5" stroke-linecap="round" filter="url(#glow)"/>
+
+  <!-- Cross-arm (crossbar) -->
+  <line x1="43" y1="78" x2="57" y2="78"
+        stroke="#68B2E3" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Support legs -->
+  <line x1="37" y1="88" x2="45" y2="78"
+        stroke="#68B2E3" stroke-width="3" stroke-linecap="round"/>
+  <line x1="63" y1="88" x2="55" y2="78"
+        stroke="#68B2E3" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Base platform -->
+  <line x1="35" y1="88" x2="65" y2="88"
+        stroke="#68B2E3" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Emitter — glowing dot at apex -->
+  <circle cx="50" cy="72" r="7" fill="#68B2E3" opacity="0.18"/>
+  <circle cx="50" cy="72" r="4.5" fill="url(#sig)" filter="url(#glow)"/>
+</svg>

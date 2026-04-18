@@ -1,12 +1,12 @@
 {% autoescape off %}
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const STATIC_CACHE  = 'digital-ate-static-' + CACHE_VERSION;
 const NAV_CACHE     = 'digital-ate-nav-' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
   '/',
   '/static/css/dark-mode.css',
-  '/static/fans-logo.png',
+  '/static/logo.svg',
   '/static/icons/icon-192.png',
   '/static/icons/icon-512.png',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',

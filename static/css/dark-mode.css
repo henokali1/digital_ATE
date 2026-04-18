@@ -199,18 +199,38 @@ body.dark-mode .table-responsive > .table-bordered { border-color: rgba(255,255,
 
 /* ── 6. Cards ────────────────────────────────────────────────── */
 body.dark-mode .card {
-    background-color: #161b22;
+    background-color: #161b22 !important;
     border-color: rgba(255,255,255,0.08);
 }
 body.dark-mode .card-header {
-    background-color: #21262d;
-    border-bottom-color: rgba(255,255,255,0.08);
-    color: #e2e8f0;
+    background: #21262d !important;
+    border-bottom-color: rgba(255,255,255,0.08) !important;
+    color: #e2e8f0 !important;
 }
 body.dark-mode .card-body { color: #e2e8f0; }
 body.dark-mode .card-footer {
-    background-color: #21262d;
+    background-color: #21262d !important;
     border-top-color: rgba(255,255,255,0.08);
+}
+
+/* Bootstrap .bg-light uses !important — override for dark mode */
+body.dark-mode .bg-light {
+    background-color: #21262d !important;
+    color: #e2e8f0 !important;
+}
+
+/* Asset detail — hardcoded light backgrounds in template style block */
+body.dark-mode .maintenance-item {
+    background-color: #1e2433 !important;
+}
+body.dark-mode .placeholder-image {
+    background-color: #21262d !important;
+}
+
+/* Asset create/edit form sections */
+body.dark-mode .form-section {
+    background-color: #1e2433 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 /* ── 7. Forms ────────────────────────────────────────────────── */

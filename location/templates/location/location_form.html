@@ -1,14 +1,57 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Location Form</title>
-</head>
-<body>
-    <h1>{{ form.instance.id|yesno:"Edit Location,Add New Location" }}</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}{% if location %}Edit Location{% else %}Add Location{% endif %}{% endblock %}
+{% block heading_h1 %}{% if location %}Edit Location{% else %}Add Location{% endif %}{% endblock %}
+{% block heading_h2 %}{% if location %}Update "{{ location.name }}"{% else %}Create a new site location{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6 col-lg-5">
+        <div class="loc-form-card">
+            <div class="loc-form-icon">
+                <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">Location Name</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <div class="text-danger small mt-1">{{ form.name.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-check-lg me-1"></i>Save
+                    </button>
+                    <a href="{% url 'location_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.loc-form-card {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    margin-top: 8px;
+}
+.loc-form-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(104,178,227,0.12);
+    color: var(--primary, #68B2E3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+}
+body.dark-mode .loc-form-card { background: #1e2433; border-color: #2d3448; }
+</style>
+{% endblock %}

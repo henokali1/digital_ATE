@@ -79,7 +79,7 @@
              
              <div class="row mt-3">
                  <div class="col-md-4">
-                     <div class="card bg-light">
+                     <div class="card">
                          <div class="card-body">
                              <h6 class="card-title text-muted">Status</h6>
                              <span class="badge {% if job_card.status == 'Completed' %}bg-success
@@ -94,7 +94,7 @@
                  </div>
                  
                  <div class="col-md-4">
-                     <div class="card bg-light">
+                     <div class="card">
                          <div class="card-body">
                              <h6 class="card-title text-muted">Priority Level</h6>
                              <span class="badge {% if job_card.priority_level == 'High' %}bg-danger
@@ -107,7 +107,7 @@
                  </div>
                  
                  <div class="col-md-4">
-                     <div class="card bg-light">
+                     <div class="card">
                          <div class="card-body">
                              <h6 class="card-title text-muted">Maintenance Type</h6>
                              <span class="badge bg-secondary fs-6">{{ job_card.maintenance_type }}</span>
@@ -117,7 +117,7 @@
              </div>
               <div class="row mt-3">
                      <div class="col-md-12">
-                        <div class="card bg-light">
+                        <div class="card">
                             <div class="card-body">
                               <h6 class="card-title text-muted">Acknowledgement Status</h6>
                              {% if job_card.acknowledged %}
@@ -137,7 +137,7 @@
                  
               <div class="row mt-3">
                      <div class="col-md-6">
-                        <div class="card bg-light">
+                        <div class="card">
                             <div class="card-body">
                                  <h6 class="card-title text-muted">
                                      <i class="bi bi-calendar"></i> Start Date
@@ -149,7 +149,7 @@
                          </div>
                      </div>
                     <div class="col-md-6">
-                        <div class="card bg-light">
+                        <div class="card">
                             <div class="card-body">
                                  <h6 class="card-title text-muted">
                                       <i class="bi bi-calendar-x"></i> Due Date
@@ -164,7 +164,7 @@
              
              <div class="row mt-3">
                  <div class="col-md-12">
-                     <div class="card bg-light">
+                     <div class="card">
                          <div class="card-body">
                              <h6 class="card-title text-muted">
                                  <i class="bi bi-gear"></i> Requires OEM Support?
@@ -183,7 +183,7 @@
               {% if user in job_card.assigned_users.all %}
               <div class="row mt-4">
                   <div class="col-12">
-                     <div class="card bg-light">
+                     <div class="card">
                       <div class="card-body">
                           <h5 class="text-muted"><i class="bi bi-gear"></i> Update Status & Remarks</h5>
                              {% if form.errors %}
@@ -235,7 +235,7 @@
                {% if job_card.status == 'Completed' %}
                      <div class="row mt-3">
                          <div class="col-md-12">
-                             <div class="card bg-light">
+                             <div class="card">
                                  <div class="card-body">
                                  <h6 class="card-title text-muted">Completion time</h6>
                                   

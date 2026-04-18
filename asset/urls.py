@@ -8,6 +8,10 @@ urlpatterns = [
     path('history/<int:id>/add/', views.add_asset_history, name='add_asset_history'),
     path('edit/<int:id>/', views.asset_edit, name='asset_edit'),
     path('delete/<int:id>/', views.asset_delete, name='asset_delete'),
+    path('lifecycle/', views.asset_lifecycle_list, name='asset_lifecycle_list'),
     path('import/', views.import_assets, name='import_assets'),
     path('download-sample-csv/', views.download_sample_csv, name='download_sample_csv'),
+    path('<int:id>/calibration/add/', views.add_calibration, name='add_calibration'),
+    path('calibration/<int:calibration_id>/delete/', views.delete_calibration, name='delete_calibration'),
+    path('<int:id>/inspections/filtered/<str:status>/', views.asset_inspections_filtered, name='asset_inspections_filtered'),
 ]

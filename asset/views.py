@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Asset, PositionRack, AssetHistory
+from .models import Asset, PositionRack, AssetHistory, CalibrationHistory, CalibrationDocument
 from .forms import AssetForm
 from django.contrib.auth.decorators import login_required
 import csv
@@ -72,9 +72,39 @@ def asset_create(request):
 
 @login_required
 def asset_detail(request, id):
+    from corrective_maintenance.models import CorrectiveMaintenance
+    from preventive_maintenance.models import PreventiveMaintenance
+    from daily_inspection.models import DailyInspection
+    from django.utils import timezone
+
     asset = get_object_or_404(Asset, id=id)
     history_form = AssetHistoryForm()
-    return render(request, 'asset/asset_detail.html', {'asset': asset, 'history_form': history_form })
+
+    from django.db.models import Count
+
+    corrective_records  = asset.corrective_maintenances.all().order_by('-start_date')
+    preventive_records  = asset.preventive_maintenances.all().order_by('-start_date')
+    calibration_records = asset.calibration_history.prefetch_related('documents').all()
+
+    insp_counts = (
+        DailyInspection.objects
+        .filter(asset=asset)
+        .values('status')
+        .annotate(count=Count('status'))
+        .order_by('status')
+    )
+    insp_total = sum(item['count'] for item in insp_counts)
+
+    return render(request, 'asset/asset_detail.html', {
+        'asset': asset,
+        'history_form': history_form,
+        'corrective_records':  corrective_records,
+        'preventive_records':  preventive_records,
+        'calibration_records': calibration_records,
+        'insp_counts': insp_counts,
+        'insp_total':  insp_total,
+        'today': timezone.now().date(),
+    })
 
 
 # Update an existing asset
@@ -221,3 +251,82 @@ def add_asset_history(request, id):
             history_form = AssetHistoryForm()
 
         return render(request, 'asset/asset_detail.html', {'asset': asset, 'history_form': history_form})
+
+
+@login_required
+def add_calibration(request, id):
+    asset = get_object_or_404(Asset, id=id)
+    if request.method == 'POST':
+        calibration_date      = request.POST.get('calibration_date', '').strip()
+        next_calibration_date = request.POST.get('next_calibration_date', '').strip()
+        notes                 = request.POST.get('notes', '').strip()
+
+        if not calibration_date or not next_calibration_date:
+            messages.error(request, 'Both calibration date and next calibration date are required.')
+            return redirect('asset_detail', id=id)
+
+        calibration = CalibrationHistory.objects.create(
+            asset=asset,
+            calibration_date=calibration_date,
+            next_calibration_date=next_calibration_date,
+            notes=notes or None,
+            created_by=request.user,
+        )
+        for doc in request.FILES.getlist('documents'):
+            CalibrationDocument.objects.create(
+                calibration=calibration,
+                document=doc,
+                name=doc.name,
+            )
+        messages.success(request, 'Calibration record added successfully.')
+    return redirect('asset_detail', id=id)
+
+
+@login_required
+def delete_calibration(request, calibration_id):
+    calibration = get_object_or_404(CalibrationHistory, id=calibration_id)
+    asset_id = calibration.asset.id
+    if request.method == 'POST':
+        calibration.delete()
+        messages.success(request, 'Calibration record deleted.')
+    return redirect('asset_detail', id=asset_id)
+
+
+@login_required
+def asset_inspections_filtered(request, id, status):
+    from daily_inspection.models import DailyInspection
+    asset = get_object_or_404(Asset, id=id)
+    records = (
+        DailyInspection.objects
+        .filter(asset=asset, status=status)
+        .select_related('inspection_ident')
+        .prefetch_related('inspected_by')
+        .order_by('-created_at')
+    )
+    return render(request, 'asset/asset_inspections_filtered.html', {
+        'asset': asset,
+        'records': records,
+        'status': status,
+    })
+
+
+@login_required
+def asset_lifecycle_list(request):
+    from django.utils import timezone
+    today = timezone.now().date()
+    assets = Asset.objects.select_related('location', 'position_rack').filter(installation_date__isnull=False).order_by('name')
+
+    # Annotate lifecycle status for sorting: expired first, nearing second, active last
+    expired = [a for a in assets if a.lifecycle_status == 'expired']
+    nearing  = [a for a in assets if a.lifecycle_status == 'nearing']
+    active   = [a for a in assets if a.lifecycle_status == 'active']
+    no_data  = Asset.objects.select_related('location').filter(installation_date__isnull=True).order_by('name')
+
+    return render(request, 'asset/asset_lifecycle_list.html', {
+        'expired': expired,
+        'nearing': nearing,
+        'active': active,
+        'no_data': no_data,
+        'today': today,
+        'total': len(expired) + len(nearing) + len(active) + no_data.count(),
+    })

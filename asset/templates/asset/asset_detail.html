@@ -46,7 +46,7 @@
             <div class="col-12 col-md-4">
                 <!-- Asset Image Card -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
+                    <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i class="bi bi-camera"></i> Asset Image
                         </h5>
@@ -61,7 +61,7 @@
                                 <i class="bi bi-zoom-in"></i> Click to enlarge
                             </div>
                         {% else %}
-                            <div class="placeholder-image p-4 bg-light rounded d-flex align-items-center justify-content-center" 
+                            <div class="placeholder-image p-4 rounded d-flex align-items-center justify-content-center" style="background: var(--bs-tertiary-bg, #f8f9fa);" 
                                  style="height: 200px;">
                                 <i class="bi bi-image text-secondary" style="font-size: 4rem;"></i>
                             </div>
@@ -71,7 +71,7 @@
 
                 <!-- Status Card -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
+                    <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i class="bi bi-info-circle"></i> Status Information
                         </h5>
@@ -118,7 +118,7 @@
             <div class="col-12 col-md-8">
                 <!-- Location Information Card -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
+                    <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i class="bi bi-geo-alt"></i> Location Information
                         </h5>
@@ -143,7 +143,7 @@
 
                 <!-- Technical Details Card -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
+                    <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i class="bi bi-gear"></i> Technical Details
                         </h5>
@@ -174,7 +174,7 @@
 
                 <!-- Maintenance Requirements Card -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
+                    <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i class="bi bi-tools"></i> Maintenance Requirements
                         </h5>
@@ -220,7 +220,7 @@
                 <!-- Remarks Card -->
                 {% if asset.remarks %}
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
+                    <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i class="bi bi-chat-square-text"></i> Remarks
                         </h5>
@@ -231,117 +231,476 @@
                 </div>
                 {% endif %}
 
-                <!-- Installation Date Card -->
-                    {% if asset.installation_date %}
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-header bg-light">
-                            <h5 class="card-title mb-0">
-                                <i class="bi bi-calendar"></i> Installation Date
-                            </h5>
-                        </div>
-                         <div class="card-body">
-                            <p class="mb-0 fw-bold">{{ asset.installation_date }}</p>
-                        </div>
+                <!-- Asset Life Cycle Card -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-hourglass-split"></i> Asset Life Cycle
+                        </h5>
                     </div>
-                    {% endif %}
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="text-muted small">Installation Date</span>
+                                <span class="fw-semibold">{{ asset.installation_date|date:"d M Y"|default:"—" }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="text-muted small">OEM Life Span</span>
+                                <span class="fw-semibold">{{ asset.oem_life_span }} yr{{ asset.oem_life_span|pluralize }}</span>
+                            </li>
+                            {% if asset.end_of_life_date %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="text-muted small">End of Life</span>
+                                <span class="fw-semibold">{{ asset.end_of_life_date|date:"d M Y" }}</span>
+                            </li>
+                            <li class="list-group-item">
+                                {% if asset.lifecycle_status == 'expired' %}
+                                <div class="lc-badge lc-expired">
+                                    <i class="bi bi-exclamation-octagon-fill"></i>
+                                    Past OEM Recommended Life Span
+                                </div>
+                                {% elif asset.lifecycle_status == 'nearing' %}
+                                <div class="lc-badge lc-nearing">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    Nearing End of Life (within 1 year)
+                                </div>
+                                {% else %}
+                                <div class="lc-badge lc-active">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Within OEM Life Span
+                                </div>
+                                {% endif %}
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Asset History Section -->
-       <div class="card shadow-sm mb-4">
-           <div class="card-header bg-primary text-white">
-               <h5 class="card-title mb-0"><i class="bi bi-clock-history"></i> Asset History</h5>
-           </div>
-          <div class="card-body">
-                 <div class="mb-4">
-                     <button class="btn btn-success btn-sm" type="button" data-bs-toggle="collapse"
-                             data-bs-target="#addHistoryForm" aria-expanded="false" aria-controls="addHistoryForm">
-                         <i class="bi bi-plus-lg me-2"></i> Add History
-                     </button>
-                     <div class="collapse mt-3" id="addHistoryForm">
-                         <div class="card card-body">
-                                <form method="POST" action="{% url 'add_asset_history' asset.id %}" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    
-                                    <div class="mb-3">
-                                        <label for="{{ history_form.remarks.id_for_label }}" class="form-label"><i class="bi bi-chat-text"></i> Remarks</label>
-                                        {{ history_form.remarks }}
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="{{ history_form.photo.id_for_label }}" class="form-label">
-                                            <i class="bi bi-image"></i> Photo (Optional)
-                                        </label>
-                                        {{ history_form.photo }}
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="{{ history_form.document.id_for_label }}" class="form-label">
-                                            <i class="bi bi-file-earmark"></i> Document (Optional)
-                                        </label>
-                                         {{ history_form.document }}
-                                    </div>
-                                    <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-primary">
-                                             <i class="bi bi-save"></i> Save History
-                                        </button>
-                                   </div>
-                                </form>
-                         </div>
-                     </div>
-                </div>
-                
-                {% if asset.history.all %}
-                <div class="table-responsive">
-                     <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Date/Time</th>
-                                <th>User</th>
-                                <th>Remarks</th>
-                                <th>Photo</th>
-                                <th>Document</th>
-                            </tr>
-                            </thead>
-                        <tbody>
-                            {% for history in asset.history.all|dictsort:"timestamp"|slice:":5" %}
-                                <tr>
-                                    <td>{{ history.timestamp }}</td>
-                                    <td>{{ history.user.get_full_name|default:history.user.username }}</td>
-                                    <td>{{ history.remarks }}</td>
-                                     <td>
-                                          {% if history.photo %}
-                                          <a href="{{ history.photo.url }}" target="_blank">
-                                           <img src="{{ history.photo.url }}" class="img-thumbnail" style="max-width: 50px; max-height:50px;"  alt="History Photo">
-                                         </a>
-                                          {% else %}
-                                            -
-                                         {% endif %}
-                                      </td>
-                                      <td>
-                                         {% if history.document %}
-                                           <a href="{{ history.document.url }}" target="_blank">
-                                               <i class="bi bi-file-earmark-arrow-down"></i> Download
-                                          </a>
-                                          {% else %}
-                                            -
-                                         {% endif %}
-                                      </td>
-                                </tr>
-                           {% endfor %}
-                           </tbody>
-                       </table>
-                 </div>
-                {% else %}
-                <p class="text-muted">No history available for this asset.</p>
-                {% endif %}
-                {% if asset.history.all|length > 5 %}
-                <div class="mt-2">
-                    <small><a href="#" data-bs-toggle="modal" data-bs-target="#fullHistoryModal">View full history <i class="bi bi-chevron-double-down"></i></a></small>
-                </div>
-                 {% endif %}
-           </div>
-       </div>
     </div>
 </div>
+
+    <!-- ══ Asset Summary Tabs ══════════════════════════════════════ -->
+    <div class="asum-wrap">
+
+        {# Messages #}
+        {% for msg in messages %}
+        <div class="asum-alert {% if msg.tags == 'success' %}asum-alert-ok{% else %}asum-alert-err{% endif %}">
+            <i class="bi bi-{% if msg.tags == 'success' %}check-circle-fill{% else %}exclamation-circle-fill{% endif %}"></i>
+            {{ msg }}
+        </div>
+        {% endfor %}
+
+        {# Tab nav #}
+        <ul class="asum-tabs" id="asumTabs">
+            <li><button class="asum-tab active" data-tab="tab-cm">
+                <i class="bi bi-wrench-adjustable"></i> Corrective
+                <span class="asum-badge">{{ corrective_records|length }}</span>
+            </button></li>
+            <li><button class="asum-tab" data-tab="tab-pm">
+                <i class="bi bi-tools"></i> Preventive
+                <span class="asum-badge">{{ preventive_records|length }}</span>
+            </button></li>
+            <li><button class="asum-tab" data-tab="tab-di">
+                <i class="bi bi-clipboard-check"></i> Daily Inspections
+                <span class="asum-badge">{{ inspection_records|length }}</span>
+            </button></li>
+            <li><button class="asum-tab" data-tab="tab-cal">
+                <i class="bi bi-patch-check"></i> Calibration History
+                <span class="asum-badge">{{ calibration_records|length }}</span>
+            </button></li>
+        </ul>
+
+        {# ── Corrective Maintenance ── #}
+        <div class="asum-panel active" id="tab-cm">
+            {% if corrective_records %}
+            <div class="table-responsive">
+            <table class="asum-table">
+                <thead><tr>
+                    <th>#</th>
+                    <th>Type</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Duration (h)</th>
+                    <th>Corrective Action</th>
+                    <th></th>
+                </tr></thead>
+                <tbody>
+                {% for cm in corrective_records %}
+                <tr>
+                    <td class="asum-mono">{{ cm.pk }}</td>
+                    <td><span class="asum-type-badge asum-type-{{ cm.type|lower|cut:' ' }}">{{ cm.type }}</span></td>
+                    <td class="asum-date">{{ cm.start_date|date:"d M Y" }}</td>
+                    <td class="asum-date">{{ cm.end_date|date:"d M Y" }}</td>
+                    <td class="asum-mono">{{ cm.duration }}</td>
+                    <td class="asum-desc">{{ cm.corrective_action|truncatechars:80 }}</td>
+                    <td><a href="/corrective_maintenance/detail/{{ cm.pk }}/" class="asum-link">View <i class="bi bi-arrow-right"></i></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            {% else %}
+            <div class="asum-empty"><i class="bi bi-wrench-adjustable"></i><p>No corrective maintenance records for this asset.</p></div>
+            {% endif %}
+        </div>
+
+        {# ── Preventive Maintenance ── #}
+        <div class="asum-panel" id="tab-pm">
+            {% if preventive_records %}
+            <div class="table-responsive">
+            <table class="asum-table">
+                <thead><tr>
+                    <th>#</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Duration (h)</th>
+                    <th>Remarks</th>
+                    <th></th>
+                </tr></thead>
+                <tbody>
+                {% for pm in preventive_records %}
+                <tr>
+                    <td class="asum-mono">{{ pm.pk }}</td>
+                    <td class="asum-date">{{ pm.start_date|date:"d M Y" }}</td>
+                    <td class="asum-date">{{ pm.end_date|date:"d M Y" }}</td>
+                    <td class="asum-mono">{{ pm.duration }}</td>
+                    <td class="asum-desc">{{ pm.remarks|truncatechars:80 }}</td>
+                    <td><a href="/preventive_maintenance/{{ pm.pk }}/" class="asum-link">View <i class="bi bi-arrow-right"></i></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            {% else %}
+            <div class="asum-empty"><i class="bi bi-tools"></i><p>No preventive maintenance records for this asset.</p></div>
+            {% endif %}
+        </div>
+
+        {# ── Daily Inspections ── #}
+        <div class="asum-panel" id="tab-di">
+            {% if insp_counts %}
+            <div class="di-summary-wrap">
+                <p class="di-total-label">{{ insp_total }} inspection record{{ insp_total|pluralize }} — click a status to see filtered results</p>
+                <div class="di-status-grid">
+                    {% for item in insp_counts %}
+                    <a href="/asset/{{ asset.id }}/inspections/filtered/{{ item.status }}/"
+                       class="di-status-card di-sc-{{ item.status|lower }}">
+                        <span class="di-sc-count">{{ item.count }}</span>
+                        <span class="di-sc-label">{{ item.status|title }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="asum-empty"><i class="bi bi-clipboard-check"></i><p>No daily inspection records for this asset.</p></div>
+            {% endif %}
+        </div>
+
+        {# ── Calibration History ── #}
+        <div class="asum-panel" id="tab-cal">
+
+            {# Add calibration form #}
+            <div class="asum-cal-add-wrap">
+                <button class="asum-cal-toggle" id="calToggle" type="button">
+                    <i class="bi bi-plus-lg"></i> Add Calibration Record
+                </button>
+                <div class="asum-cal-form-wrap" id="calForm" style="display:none">
+                    <form method="POST" enctype="multipart/form-data" action="{% url 'add_calibration' asset.id %}">
+                        {% csrf_token %}
+                        <div class="asum-form-grid">
+                            <div class="asum-form-group">
+                                <label class="asum-form-label">Calibration Date <span class="asum-req">*</span></label>
+                                <input type="date" name="calibration_date" class="asum-form-input" required>
+                            </div>
+                            <div class="asum-form-group">
+                                <label class="asum-form-label">Next Calibration Date <span class="asum-req">*</span></label>
+                                <input type="date" name="next_calibration_date" class="asum-form-input" required>
+                            </div>
+                        </div>
+                        <div class="asum-form-group" style="margin-top:14px">
+                            <label class="asum-form-label">Notes</label>
+                            <textarea name="notes" class="asum-form-textarea" rows="2" placeholder="Optional notes about this calibration…"></textarea>
+                        </div>
+                        <div class="asum-form-group" style="margin-top:14px">
+                            <label class="asum-form-label">Calibration Certificates (PDF) <span style="font-size:0.75rem;color:var(--text-secondary)">— select multiple</span></label>
+                            <input type="file" name="documents" class="asum-form-file" multiple accept=".pdf">
+                        </div>
+                        <div style="margin-top:16px;display:flex;gap:10px;">
+                            <button type="submit" class="asum-btn-primary"><i class="bi bi-save"></i> Save</button>
+                            <button type="button" class="asum-btn-ghost" id="calCancel">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {# Calibration records #}
+            {% if calibration_records %}
+            <div class="table-responsive" style="margin-top:18px">
+            <table class="asum-table">
+                <thead><tr>
+                    <th>Calibration Date</th>
+                    <th>Next Due</th>
+                    <th>Notes</th>
+                    <th>Certificates</th>
+                    <th>By</th>
+                    <th></th>
+                </tr></thead>
+                <tbody>
+                {% for cal in calibration_records %}
+                <tr>
+                    <td class="asum-date asum-mono">{{ cal.calibration_date|date:"d M Y" }}</td>
+                    <td>
+                        <span class="asum-due {% if cal.next_calibration_date < today %}asum-due-overdue{% endif %}">
+                            {{ cal.next_calibration_date|date:"d M Y" }}
+                        </span>
+                    </td>
+                    <td class="asum-desc">{{ cal.notes|default:"—"|truncatechars:60 }}</td>
+                    <td>
+                        {% for doc in cal.documents.all %}
+                        <a href="{{ doc.document.url }}" target="_blank" class="asum-doc-link" title="{{ doc.name }}">
+                            <i class="bi bi-file-earmark-pdf-fill"></i> {{ doc.name|truncatechars:20 }}
+                        </a>
+                        {% empty %}
+                        <span class="asum-no-doc">—</span>
+                        {% endfor %}
+                    </td>
+                    <td class="asum-date">{{ cal.created_by.get_full_name|default:cal.created_by.username|default:"—" }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'delete_calibration' cal.id %}" style="display:inline" onsubmit="return confirm('Delete this calibration record?')">
+                            {% csrf_token %}
+                            <button type="submit" class="asum-del-btn" title="Delete"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            {% else %}
+            <div class="asum-empty" style="margin-top:18px"><i class="bi bi-patch-check"></i><p>No calibration records yet. Add one above.</p></div>
+            {% endif %}
+        </div>
+
+    </div>{# /asum-wrap #}
+
+    <style>
+    /* ── Lifecycle badges ──────────────────────────────────────── */
+    .lc-badge {
+        display: flex; align-items: center; gap: 8px;
+        border-radius: 8px; padding: 8px 12px;
+        font-size: 0.8rem; font-weight: 600;
+    }
+    .lc-expired { background: rgba(239,68,68,0.12); color: #dc2626; }
+    .lc-nearing { background: rgba(245,158,11,0.12); color: #d97706; }
+    .lc-active  { background: rgba(34,197,94,0.12);  color: #16a34a; }
+
+    /* ── Asset Summary ─────────────────────────────────────────── */
+    .asum-wrap { margin-top: 24px; margin-bottom: 24px; }
+
+    .asum-alert {
+        border-radius: 10px; padding: 10px 16px; font-size: 0.84rem;
+        display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .asum-alert-ok  { background: rgba(34,197,94,0.1);  color: #16a34a; border: 1px solid rgba(34,197,94,0.25); }
+    .asum-alert-err { background: rgba(239,68,68,0.1);  color: #dc2626; border: 1px solid rgba(239,68,68,0.25); }
+
+    /* Tabs */
+    .asum-tabs {
+        list-style: none; margin: 0 0 0 0; padding: 0;
+        display: flex; gap: 4px; border-bottom: 2px solid var(--border, #e5e7eb);
+        flex-wrap: wrap;
+    }
+    .asum-tab {
+        background: none; border: none; cursor: pointer;
+        padding: 10px 16px; font-size: 0.83rem; font-weight: 600;
+        color: var(--text-secondary, #6b7280);
+        display: flex; align-items: center; gap: 7px;
+        border-bottom: 2px solid transparent; margin-bottom: -2px;
+        transition: color 0.16s, border-color 0.16s;
+        border-radius: 8px 8px 0 0;
+    }
+    .asum-tab:hover  { color: var(--text-primary, #111827); }
+    .asum-tab.active { color: var(--primary, #68B2E3); border-bottom-color: var(--primary, #68B2E3); }
+    .asum-badge {
+        background: rgba(104,178,227,0.15); color: var(--primary, #68B2E3);
+        border-radius: 20px; padding: 0 7px; font-size: 0.7rem; font-weight: 700;
+    }
+
+    /* Panels */
+    .asum-panel { display: none; background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb); border-top: none; border-radius: 0 0 12px 12px; overflow: hidden; }
+    .asum-panel.active { display: block; }
+
+    /* Table */
+    .asum-table { width: 100%; border-collapse: collapse; }
+    .asum-table thead th {
+        background: rgba(0,0,0,0.025); font-size: 0.7rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.07em;
+        color: var(--text-secondary, #6b7280); padding: 11px 16px;
+        border-bottom: 1px solid var(--border, #e5e7eb); white-space: nowrap;
+    }
+    .asum-table tbody tr { border-bottom: 1px solid var(--border, #e5e7eb); transition: background 0.12s; }
+    .asum-table tbody tr:last-child { border-bottom: none; }
+    .asum-table tbody tr:hover { background: rgba(104,178,227,0.04); }
+    .asum-table tbody td { padding: 11px 16px; font-size: 0.83rem; vertical-align: middle; }
+    .asum-mono { font-family: ui-monospace, monospace; font-size: 0.78rem; }
+    .asum-date { white-space: nowrap; color: var(--text-secondary, #6b7280); font-size: 0.79rem; }
+    .asum-desc { color: var(--text-primary, #111827); max-width: 280px; }
+    .asum-link { color: var(--primary, #68B2E3); font-size: 0.78rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+    .asum-link:hover { text-decoration: underline; }
+
+    /* CM type badges */
+    .asum-type-badge { display: inline-block; border-radius: 20px; padding: 2px 9px; font-size: 0.7rem; font-weight: 600; }
+    .asum-type-alarm          { background: rgba(239,68,68,0.12);  color: #dc2626; }
+    .asum-type-outage         { background: rgba(249,115,22,0.12); color: #ea580c; }
+    .asum-type-warning        { background: rgba(245,158,11,0.12); color: #d97706; }
+    .asum-type-generalproblem { background: rgba(99,102,241,0.12); color: #6366f1; }
+
+    /* Shift badges */
+    .asum-shift-badge { display: inline-block; border-radius: 20px; padding: 2px 9px; font-size: 0.7rem; font-weight: 700; }
+    .asum-shift-day   { background: rgba(245,158,11,0.12); color: #d97706; }
+    .asum-shift-night { background: rgba(99,102,241,0.12); color: #6366f1; }
+
+    /* Inspection status badges */
+    .asum-status-badge { display: inline-block; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; font-weight: 700; }
+    .asum-s-ok    { background: rgba(34,197,94,0.12);  color: #16a34a; }
+    .asum-s-warn  { background: rgba(245,158,11,0.12); color: #d97706; }
+    .asum-s-alarm { background: rgba(239,68,68,0.12);  color: #dc2626; }
+    .asum-s-deg   { background: rgba(249,115,22,0.12); color: #ea580c; }
+    .asum-s-done  { background: rgba(20,184,166,0.12); color: #0d9488; }
+    .asum-s-off   { background: rgba(107,114,128,0.12); color: #6b7280; }
+    .asum-s-unsvc { background: rgba(127,29,29,0.12);  color: #991b1b; }
+
+    /* Calibration */
+    .asum-cal-add-wrap { padding: 18px 20px 0; }
+    .asum-cal-toggle {
+        background: var(--primary, #68B2E3); color: #fff; border: none;
+        border-radius: 8px; padding: 8px 18px; font-size: 0.82rem; font-weight: 600;
+        cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+        transition: background 0.16s;
+    }
+    .asum-cal-toggle:hover { background: var(--primary-dk, #4a9ed8); }
+    .asum-cal-form-wrap {
+        margin-top: 16px; background: rgba(104,178,227,0.05);
+        border: 1px solid var(--border, #e5e7eb); border-radius: 10px;
+        padding: 20px;
+    }
+    .asum-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .asum-form-group { display: flex; flex-direction: column; gap: 6px; }
+    .asum-form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-primary, #111827); }
+    .asum-req { color: #ef4444; }
+    .asum-form-input, .asum-form-textarea {
+        border: 1px solid var(--border, #e5e7eb); border-radius: 8px;
+        padding: 8px 12px; font-size: 0.84rem; background: var(--card-bg, #fff);
+        color: var(--text-primary, #111827); font-family: inherit; width: 100%;
+        transition: border-color 0.16s;
+    }
+    .asum-form-input:focus, .asum-form-textarea:focus { outline: none; border-color: var(--primary, #68B2E3); }
+    .asum-form-file { font-size: 0.82rem; }
+    .asum-btn-primary {
+        background: var(--primary, #68B2E3); color: #fff; border: none; border-radius: 8px;
+        padding: 8px 20px; font-size: 0.84rem; font-weight: 600; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 7px; transition: background 0.16s;
+    }
+    .asum-btn-primary:hover { background: var(--primary-dk, #4a9ed8); }
+    .asum-btn-ghost {
+        background: none; border: 1px solid var(--border, #e5e7eb); border-radius: 8px;
+        padding: 8px 16px; font-size: 0.84rem; font-weight: 500; cursor: pointer;
+        color: var(--text-secondary, #6b7280); transition: border-color 0.16s;
+    }
+    .asum-btn-ghost:hover { border-color: var(--primary, #68B2E3); color: var(--primary, #68B2E3); }
+    .asum-doc-link {
+        display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem;
+        color: #ef4444; text-decoration: none; margin-right: 6px;
+    }
+    .asum-doc-link:hover { text-decoration: underline; }
+    .asum-no-doc { color: var(--text-secondary, #6b7280); }
+    .asum-due { font-size: 0.79rem; white-space: nowrap; }
+    .asum-due-overdue { color: #dc2626; font-weight: 700; }
+    .asum-del-btn {
+        background: none; border: none; cursor: pointer; color: #dc2626;
+        font-size: 0.85rem; padding: 4px 6px; border-radius: 6px;
+        transition: background 0.14s;
+    }
+    .asum-del-btn:hover { background: rgba(239,68,68,0.1); }
+
+    /* Empty */
+    .asum-empty { text-align: center; padding: 44px 24px; color: var(--text-secondary, #6b7280); }
+    .asum-empty i { font-size: 2.2rem; display: block; margin-bottom: 10px; opacity: 0.3; }
+    .asum-empty p { font-size: 0.86rem; margin: 0; }
+
+    /* Dark mode */
+    body.dark-mode .asum-tabs  { border-color: #2d3448; }
+    body.dark-mode .asum-panel { background: #1e2433; border-color: #2d3448; }
+    body.dark-mode .asum-table thead th { background: rgba(255,255,255,0.03); color: #64748b; border-color: #2d3448; }
+    body.dark-mode .asum-table tbody tr { border-color: #2d3448; }
+    body.dark-mode .asum-desc { color: #e2e8f0; }
+    body.dark-mode .asum-cal-form-wrap { background: rgba(104,178,227,0.04); border-color: #2d3448; }
+    body.dark-mode .asum-form-input, body.dark-mode .asum-form-textarea { background: #161d2e; border-color: #2d3448; color: #e2e8f0; }
+
+    /* ── DI status summary ───────────────────────────────────── */
+    .di-summary-wrap { padding: 20px; }
+    .di-total-label { font-size: 0.8rem; color: var(--text-secondary, #6b7280); margin-bottom: 16px; }
+    .di-status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 12px;
+    }
+    .di-status-card {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; border-radius: 12px; padding: 18px 10px;
+        text-decoration: none; border: 1px solid transparent;
+        transition: transform 0.15s, box-shadow 0.15s;
+        cursor: pointer;
+    }
+    .di-status-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.10); }
+    .di-sc-count { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+    .di-sc-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85; }
+
+    .di-sc-ok           { background: rgba(34,197,94,0.10);  color: #16a34a; border-color: rgba(34,197,94,0.25); }
+    .di-sc-warning      { background: rgba(245,158,11,0.10); color: #d97706; border-color: rgba(245,158,11,0.25); }
+    .di-sc-alarm        { background: rgba(239,68,68,0.10);  color: #dc2626; border-color: rgba(239,68,68,0.25); }
+    .di-sc-degraded     { background: rgba(249,115,22,0.10); color: #ea580c; border-color: rgba(249,115,22,0.25); }
+    .di-sc-done         { background: rgba(20,184,166,0.10); color: #0d9488; border-color: rgba(20,184,166,0.25); }
+    .di-sc-off          { background: rgba(107,114,128,0.10); color: #6b7280; border-color: rgba(107,114,128,0.25); }
+    .di-sc-unserviceable{ background: rgba(127,29,29,0.10);  color: #991b1b; border-color: rgba(127,29,29,0.25); }
+
+    body.dark-mode .di-sc-ok           { background: rgba(34,197,94,0.08); }
+    body.dark-mode .di-sc-warning      { background: rgba(245,158,11,0.08); }
+    body.dark-mode .di-sc-alarm        { background: rgba(239,68,68,0.08); }
+    body.dark-mode .di-sc-degraded     { background: rgba(249,115,22,0.08); }
+    body.dark-mode .di-sc-done         { background: rgba(20,184,166,0.08); }
+    body.dark-mode .di-sc-off          { background: rgba(107,114,128,0.08); }
+    body.dark-mode .di-sc-unserviceable{ background: rgba(127,29,29,0.08); }
+
+    @media (max-width: 600px) {
+        .asum-tab { padding: 8px 10px; font-size: 0.76rem; }
+        .asum-form-grid { grid-template-columns: 1fr; }
+        .di-status-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+    }
+    </style>
+
+    <script>
+    /* Tab switching */
+    document.querySelectorAll('.asum-tab').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.asum-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.asum-panel').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById(this.dataset.tab).classList.add('active');
+        });
+    });
+
+    /* Calibration form toggle */
+    const calToggle = document.getElementById('calToggle');
+    const calForm   = document.getElementById('calForm');
+    const calCancel = document.getElementById('calCancel');
+    if (calToggle) {
+        calToggle.addEventListener('click', () => { calForm.style.display = calForm.style.display === 'none' ? 'block' : 'none'; });
+        calCancel.addEventListener('click', () => { calForm.style.display = 'none'; });
+    }
+    </script>
 
     <!-- Full History Modal -->
 <div class="modal fade" id="fullHistoryModal" tabindex="-1" aria-labelledby="fullHistoryModalLabel" aria-hidden="true">
@@ -407,8 +766,8 @@
         transform: translateY(-2px);
     }
     .card-header {
-        background: linear-gradient(45deg, #f8f9fa, #ffffff);
-        border-bottom: 2px solid #e9ecef;
+        background: var(--card-bg, #f8f9fa);
+        border-bottom: 1px solid var(--border, #e9ecef);
     }
     .detail-item label {
         font-size: 0.875rem;
@@ -417,7 +776,7 @@
     .maintenance-item {
         padding: 0.75rem;
         border-radius: 0.375rem;
-        background-color: #f8f9fa;
+        background-color: var(--bs-tertiary-bg, #f8f9fa);
     }
     .badge {
         font-weight: 500;

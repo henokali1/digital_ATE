@@ -1,0 +1,30 @@
+<div class="table-responsive">
+<table class="lc-table">
+    <thead><tr>
+        <th>Asset</th>
+        <th>Tag ID</th>
+        <th>Section</th>
+        <th>Location</th>
+        <th>Install Date</th>
+        <th>OEM Life</th>
+        <th>End of Life</th>
+        <th>Asset Status</th>
+        <th></th>
+    </tr></thead>
+    <tbody>
+    {% for a in assets %}
+    <tr>
+        <td class="lc-name">{{ a.name }}</td>
+        <td class="lc-mono">{{ a.tag_id|default:"—" }}</td>
+        <td>{{ a.section }}</td>
+        <td>{{ a.location }}</td>
+        <td class="lc-date">{{ a.installation_date|date:"d M Y" }}</td>
+        <td class="lc-mono">{{ a.oem_life_span }} yr{{ a.oem_life_span|pluralize }}</td>
+        <td class="lc-date">{{ a.end_of_life_date|date:"d M Y" }}</td>
+        <td><span class="lc-asset-status lc-as-{{ a.status|lower|cut:' ' }}">{{ a.status }}</span></td>
+        <td><a href="/asset/{{ a.id }}/" class="lc-link">View <i class="bi bi-arrow-right"></i></a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>

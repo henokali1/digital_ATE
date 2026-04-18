@@ -21,7 +21,7 @@ class AssetForm(forms.ModelForm):
             'preventive_maintenance_required',
             'corrective_maintenance_required',
             # Additional Information
-            'remarks', 'photo', 'installation_date'
+            'remarks', 'photo', 'installation_date', 'oem_life_span'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter asset name'}),
@@ -36,7 +36,8 @@ class AssetForm(forms.ModelForm):
             'part_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter part number'}),
             'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter any additional remarks'}),
             'photo': forms.FileInput(attrs={'class': 'form-control'}),
-            'installation_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+            'installation_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'oem_life_span': forms.NumberInput(attrs={'class': 'form-control', 'min': '1', 'max': '99'}),
         }
         labels = {
             'morning_shift_daily_inspection_required': 'Morning Shift Inspection',
@@ -55,7 +56,7 @@ class AssetForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # Make certain fields optional
-        optional_fields = ['manufacturer', 'model_number', 'part_number', 'remarks', 'photo', 'installation_date']
+        optional_fields = ['manufacturer', 'model_number', 'part_number', 'remarks', 'photo', 'installation_date', 'oem_life_span']
         for field in optional_fields:
             self.fields[field].required = False
 

@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'spare_parts',
     'network_inventory',
     'om_manuals',
+    'portal',
 ]
 
 MIDDLEWARE = [

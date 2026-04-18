@@ -47,14 +47,6 @@
     color: rgba(240,246,252,0.6);
     margin: 0;
 }
-.welcome-logo {
-    width: 52px; height: 52px;
-    object-fit: contain;
-    opacity: 0.9;
-    flex-shrink: 0;
-    filter: drop-shadow(0 2px 8px rgba(104,178,227,0.3));
-}
-
 /* ── Section group ──────────────────────────────────── */
 .section-group { margin-bottom: 28px; }
 .section-label {
@@ -190,7 +182,20 @@ body.dark-mode .section-label { color: #4b5563; }
         <h2>Welcome{% if user.get_full_name %}, {{ user.get_full_name }}{% elif user.is_authenticated %}, {{ user.username }}{% endif %}</h2>
         <p>Air Traffic Engineering — Maintenance Management System</p>
     </div>
-    <img src="/static/fans-logo.png" alt="FANS" class="welcome-logo">
+
+</div>
+
+<!-- Quick Access -->
+<div class="section-group">
+    <div class="section-label">Quick Access</div>
+    <div class="home-grid">
+        <a href="/portal/" class="home-card" style="border-color: rgba(104,178,227,0.35); background: linear-gradient(135deg, rgba(104,178,227,0.06), transparent);">
+            <div class="card-icon-wrap icon-blue"><i class="bi bi-send-plus"></i></div>
+            <p class="card-title">Request Portal</p>
+            <p class="card-desc">Submit a maintenance request and track its progress</p>
+            <span class="card-arrow"><i class="bi bi-arrow-right"></i></span>
+        </a>
+    </div>
 </div>
 
 <!-- Operations -->
@@ -241,6 +246,12 @@ body.dark-mode .section-label { color: #4b5563; }
 <div class="section-group">
     <div class="section-label">Inventory</div>
     <div class="home-grid">
+        <a href="/asset/lifecycle/" class="home-card">
+            <div class="card-icon-wrap icon-amber"><i class="bi bi-hourglass-split"></i></div>
+            <p class="card-title">Asset Life Cycle</p>
+            <p class="card-desc">Track OEM recommended life span and expiry status</p>
+            <span class="card-arrow"><i class="bi bi-arrow-right"></i></span>
+        </a>
         <a href="/asset/" class="home-card">
             <div class="card-icon-wrap icon-purple"><i class="bi bi-cpu"></i></div>
             <p class="card-title">Assets</p>

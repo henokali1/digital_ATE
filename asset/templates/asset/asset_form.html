@@ -12,14 +12,15 @@
         margin-top: 0;
     }
     .form-section {
-        background-color: #f8f9fa;
+        background-color: var(--card-bg, #f8f9fa);
+        border: 1px solid var(--border, #e5e7eb);
         border-radius: 10px;
         padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.1));
     }
     .section-title {
-        color: #0d6efd;
+        color: var(--primary, #0d6efd);
         margin-bottom: 20px;
         font-size: 1.2rem;
         font-weight: 600;
@@ -217,9 +218,16 @@
                              <div class="invalid-feedback d-block">{{ form.photo.errors }}</div>
                              {% endif %}
                          </div>
-                         <div class="col-12">
+                         <div class="col-md-6">
                             <label for="{{ form.installation_date.id_for_label }}" class="form-label">Installation Date</label>
-                              {{ form.installation_date }}
+                            {{ form.installation_date }}
+                         </div>
+                         <div class="col-md-6">
+                            <label for="{{ form.oem_life_span.id_for_label }}" class="form-label">
+                                OEM Recommended Life Span (years)
+                            </label>
+                            {{ form.oem_life_span }}
+                            <div class="form-text">Default is 10 years. Used for asset life cycle tracking.</div>
                          </div>
                     </div>
                 </div>

@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% block title %}Asset Life Cycle{% endblock %}
+{% block page_header_title %}Asset Life Cycle{% endblock %}
+{% block heading_h1 %}Asset Life Cycle{% endblock %}
+{% block heading_h2 %}OEM recommended life span tracking for all assets{% endblock %}
+
+{% block content %}
+<div class="lc-wrap">
+
+    {# ── Summary KPIs ── #}
+    <div class="lc-kpi-row">
+        <button class="lc-kpi lc-kpi-expired" data-filter="expired">
+            <i class="bi bi-exclamation-octagon-fill lc-kpi-icon"></i>
+            <div class="lc-kpi-val">{{ expired|length }}</div>
+            <div class="lc-kpi-label">Expired</div>
+        </button>
+        <button class="lc-kpi lc-kpi-nearing" data-filter="nearing">
+            <i class="bi bi-exclamation-triangle-fill lc-kpi-icon"></i>
+            <div class="lc-kpi-val">{{ nearing|length }}</div>
+            <div class="lc-kpi-label">Nearing End (≤ 1 yr)</div>
+        </button>
+        <button class="lc-kpi lc-kpi-active" data-filter="active">
+            <i class="bi bi-check-circle-fill lc-kpi-icon"></i>
+            <div class="lc-kpi-val">{{ active|length }}</div>
+            <div class="lc-kpi-label">Within Life Span</div>
+        </button>
+        <button class="lc-kpi lc-kpi-nodata" data-filter="nodata">
+            <i class="bi bi-dash-circle lc-kpi-icon"></i>
+            <div class="lc-kpi-val">{{ no_data|length }}</div>
+            <div class="lc-kpi-label">No Install Date</div>
+        </button>
+    </div>
+
+    {# ── Expired ── #}
+    {% if expired %}
+    <div class="lc-section" data-section="expired">
+    <div class="lc-section-label lc-sl-expired">
+        <i class="bi bi-exclamation-octagon-fill"></i> Expired — Past OEM Life Span
+        <span class="lc-sl-count">{{ expired|length }}</span>
+    </div>
+    <div class="lc-card">
+        {% include 'asset/asset_lifecycle_table.html' with assets=expired status='expired' %}
+    </div>
+    </div>
+    {% endif %}
+
+    {# ── Nearing ── #}
+    {% if nearing %}
+    <div class="lc-section" data-section="nearing">
+    <div class="lc-section-label lc-sl-nearing">
+        <i class="bi bi-exclamation-triangle-fill"></i> Nearing End of Life (within 1 year)
+        <span class="lc-sl-count">{{ nearing|length }}</span>
+    </div>
+    <div class="lc-card">
+        {% include 'asset/asset_lifecycle_table.html' with assets=nearing status='nearing' %}
+    </div>
+    </div>
+    {% endif %}
+
+    {# ── Active ── #}
+    {% if active %}
+    <div class="lc-section" data-section="active">
+    <div class="lc-section-label lc-sl-active">
+        <i class="bi bi-check-circle-fill"></i> Within OEM Life Span
+        <span class="lc-sl-count">{{ active|length }}</span>
+    </div>
+    <div class="lc-card">
+        {% include 'asset/asset_lifecycle_table.html' with assets=active status='active' %}
+    </div>
+    </div>
+    {% endif %}
+
+    {# ── No install date ── #}
+    {% if no_data %}
+    <div class="lc-section" data-section="nodata">
+    <div class="lc-section-label lc-sl-nodata">
+        <i class="bi bi-dash-circle"></i> No Installation Date Set
+        <span class="lc-sl-count">{{ no_data|length }}</span>
+    </div>
+    <div class="lc-card">
+        <div class="table-responsive">
+        <table class="lc-table">
+            <thead><tr><th>Asset</th><th>Tag ID</th><th>Section</th><th>Location</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for a in no_data %}
+            <tr>
+                <td class="lc-name">{{ a.name }}</td>
+                <td class="lc-mono">{{ a.tag_id|default:"—" }}</td>
+                <td>{{ a.section }}</td>
+                <td>{{ a.location }}</td>
+                <td><span class="lc-asset-status lc-as-{{ a.status|lower|cut:' ' }}">{{ a.status }}</span></td>
+                <td><a href="/asset/{{ a.id }}/" class="lc-link">View <i class="bi bi-arrow-right"></i></a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if not expired and not nearing and not active and not no_data %}
+    <div class="lc-empty">
+        <i class="bi bi-hourglass"></i>
+        <p>No assets found.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+.lc-wrap { max-width: 1000px; margin: 0 auto; }
+
+/* KPIs */
+.lc-kpi-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px;
+}
+.lc-kpi {
+    /* button reset */
+    font-family: inherit; background: none; border: 1px solid transparent;
+    border-radius: 14px; padding: 20px 16px; text-align: center;
+    border: 1px solid transparent;
+}
+.lc-kpi-icon { font-size: 1.4rem; display: block; margin-bottom: 8px; }
+.lc-kpi-val   { font-size: 2rem; font-weight: 800; line-height: 1; }
+.lc-kpi-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; opacity: 0.8; }
+
+.lc-kpi { cursor: pointer; transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s; }
+.lc-kpi:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.lc-kpi.lc-kpi--active { outline: 3px solid currentColor; outline-offset: 2px; transform: translateY(-2px); }
+.lc-kpi.lc-kpi--dimmed { opacity: 0.38; }
+
+.lc-kpi-expired { background: rgba(239,68,68,0.10); color: #dc2626; border-color: rgba(239,68,68,0.2); }
+.lc-kpi-nearing { background: rgba(245,158,11,0.10); color: #d97706; border-color: rgba(245,158,11,0.2); }
+.lc-kpi-active  { background: rgba(34,197,94,0.10);  color: #16a34a; border-color: rgba(34,197,94,0.2); }
+.lc-kpi-nodata  { background: rgba(107,114,128,0.10); color: #6b7280; border-color: rgba(107,114,128,0.2); }
+
+/* Section labels */
+.lc-section-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 8px 0; margin-bottom: 8px; margin-top: 6px;
+}
+.lc-sl-count { margin-left: auto; font-size: 0.72rem; opacity: 0.7; }
+.lc-sl-expired { color: #dc2626; }
+.lc-sl-nearing { color: #d97706; }
+.lc-sl-active  { color: #16a34a; }
+.lc-sl-nodata  { color: #6b7280; }
+
+/* Card + table */
+.lc-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+}
+.lc-table { width: 100%; border-collapse: collapse; }
+.lc-table thead th {
+    background: rgba(0,0,0,0.025); font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-secondary); padding: 10px 16px;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.lc-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+.lc-table tbody tr:last-child { border-bottom: none; }
+.lc-table tbody tr:hover { background: rgba(104,178,227,0.04); }
+.lc-table tbody td { padding: 11px 16px; font-size: 0.83rem; vertical-align: middle; }
+.lc-name { font-weight: 600; color: var(--text-primary); }
+.lc-mono { font-family: ui-monospace, monospace; font-size: 0.76rem; color: var(--text-secondary); }
+.lc-date { white-space: nowrap; font-size: 0.79rem; color: var(--text-secondary); }
+.lc-link { color: var(--primary, #68B2E3); font-size: 0.78rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.lc-link:hover { text-decoration: underline; }
+
+/* Asset status badge */
+.lc-asset-status { display: inline-block; border-radius: 20px; padding: 2px 9px; font-size: 0.7rem; font-weight: 600; }
+.lc-as-inuse           { background: rgba(34,197,94,0.12);  color: #16a34a; }
+.lc-as-spare           { background: rgba(59,130,246,0.12); color: #2563eb; }
+.lc-as-undermaintenance{ background: rgba(245,158,11,0.12); color: #d97706; }
+.lc-as-unserviceable   { background: rgba(239,68,68,0.12);  color: #dc2626; }
+
+/* Lifecycle status badge (for table rows) */
+.lc-status { display: inline-flex; align-items: center; gap: 5px; border-radius: 20px; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
+.lc-status-expired { background: rgba(239,68,68,0.12);  color: #dc2626; }
+.lc-status-nearing { background: rgba(245,158,11,0.12); color: #d97706; }
+.lc-status-active  { background: rgba(34,197,94,0.12);  color: #16a34a; }
+
+.lc-empty { text-align: center; padding: 60px 24px; color: var(--text-secondary); }
+.lc-empty i { font-size: 2.8rem; display: block; margin-bottom: 12px; opacity: 0.3; }
+.lc-empty p { font-size: 0.9rem; }
+
+/* Dark mode */
+body.dark-mode .lc-card { background: #1e2433; border-color: #2d3448; }
+body.dark-mode .lc-table thead th { background: rgba(255,255,255,0.03); color: #64748b; border-color: #2d3448; }
+body.dark-mode .lc-table tbody tr { border-color: #2d3448; }
+body.dark-mode .lc-name { color: #e2e8f0; }
+body.dark-mode .lc-kpi-expired { background: rgba(239,68,68,0.07); }
+body.dark-mode .lc-kpi-nearing { background: rgba(245,158,11,0.07); }
+body.dark-mode .lc-kpi-active  { background: rgba(34,197,94,0.07); }
+body.dark-mode .lc-kpi-nodata  { background: rgba(107,114,128,0.07); }
+
+@media (max-width: 640px) {
+    .lc-kpi-row { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<script>
+(function () {
+    const cards    = document.querySelectorAll('.lc-kpi[data-filter]');
+    const sections = document.querySelectorAll('.lc-section[data-section]');
+    let   current  = null;
+
+    cards.forEach(card => {
+        card.addEventListener('click', function () {
+            const filter = this.dataset.filter;
+
+            if (current === filter) {
+                // Click same card again → reset to show all
+                current = null;
+                cards.forEach(c => c.classList.remove('lc-kpi--active', 'lc-kpi--dimmed'));
+                sections.forEach(s => { s.style.display = ''; });
+                return;
+            }
+
+            current = filter;
+            cards.forEach(c => {
+                c.classList.toggle('lc-kpi--active', c.dataset.filter === filter);
+                c.classList.toggle('lc-kpi--dimmed', c.dataset.filter !== filter);
+            });
+            sections.forEach(s => {
+                s.style.display = s.dataset.section === filter ? '' : 'none';
+            });
+        });
+    });
+})();
+</script>
+{% endblock %}

@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Digital ATE{% endblock %}</title>
-    <link rel="icon" href="{% static 'fans-logo.png' %}" type="image/png">
+    <link rel="icon" href="{% static 'logo.svg' %}" type="image/svg+xml">
+    <link rel="icon" href="{% static 'icons/icon-192.png' %}" type="image/png">
     <link rel="apple-touch-icon" href="{% static 'icons/icon-180.png' %}">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#68B2E3">
+    <meta name="theme-color" content="#0c1422">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -79,12 +80,11 @@
             flex-shrink: 0;
         }
         .sidebar-logo {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             object-fit: contain;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.08);
-            padding: 4px;
+            border-radius: 10px;
+            flex-shrink: 0;
         }
         .sidebar-brand {
             font-size: 0.95rem;
@@ -504,10 +504,11 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <a href="/">
-            <img src="{% static 'fans-logo.png' %}" alt="FANS Logo" class="sidebar-logo">
+            <img src="{% static 'logo.svg' %}" alt="Digital ATE Logo" class="sidebar-logo">
         </a>
         <div class="sidebar-brand">
             Digital ATE
+            <span>CNS MMS</span>
         </div>
         <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
             <i class="bi bi-x-lg"></i>
@@ -523,6 +524,9 @@
             </a>
             <a href="/dashboard/" class="nav-link {% if '/dashboard' in request.path %}active{% endif %}">
                 <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="/portal/" class="nav-link {% if '/portal' in request.path %}active{% endif %}">
+                <i class="bi bi-send-plus"></i> Request Portal
             </a>
         </div>
 
@@ -554,8 +558,11 @@
         <!-- Inventory -->
         <div class="nav-group">
             <div class="nav-group-label">Inventory</div>
-            <a href="/asset/" class="nav-link {% if '/asset' in request.path %}active{% endif %}">
+            <a href="/asset/" class="nav-link {% if '/asset' in request.path and '/lifecycle' not in request.path %}active{% endif %}">
                 <i class="bi bi-cpu"></i> Assets
+            </a>
+            <a href="/asset/lifecycle/" class="nav-link {% if '/asset/lifecycle' in request.path %}active{% endif %}">
+                <i class="bi bi-hourglass-split"></i> Asset Life Cycle
             </a>
             <a href="/spare_parts/" class="nav-link {% if '/spare_parts' in request.path %}active{% endif %}">
                 <i class="bi bi-box-seam"></i> Spare Parts
@@ -571,9 +578,11 @@
             <a href="/manuals/" class="nav-link {% if '/manuals' in request.path %}active{% endif %}">
                 <i class="bi bi-book"></i> OM Manuals
             </a>
+            {% if request.user.is_superuser %}
             <a href="/location/" class="nav-link {% if '/location' in request.path %}active{% endif %}">
                 <i class="bi bi-geo-alt"></i> Locations
             </a>
+            {% endif %}
         </div>
 
         <!-- System -->
