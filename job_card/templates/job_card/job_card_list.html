@@ -51,9 +51,16 @@
 
                 <form method="get" class="mb-3">
                     <div class="card shadow-sm mb-4">
-                      <div class="card-header">
-                        <i class="bi bi-filter"></i> Filter Job Cards
+                      <div class="card-header d-flex justify-content-between align-items-center"
+                           style="cursor:pointer; user-select:none;"
+                           data-bs-toggle="collapse"
+                           data-bs-target="#filterCollapse"
+                           aria-expanded="{% if request.GET.search or request.GET.status or request.GET.priority or request.GET.maintenance_type or request.GET.acknowledged or request.GET.assigned_to or request.GET.start_date or request.GET.end_date or request.GET.date_range or request.GET.filter %}true{% else %}false{% endif %}"
+                           aria-controls="filterCollapse">
+                        <span><i class="bi bi-filter me-1"></i> Filter Job Cards</span>
+                        <i class="bi bi-chevron-down filter-chevron" style="transition: transform 0.2s ease;"></i>
                       </div>
+                      <div class="collapse {% if request.GET.search or request.GET.status or request.GET.priority or request.GET.maintenance_type or request.GET.acknowledged or request.GET.assigned_to or request.GET.start_date or request.GET.end_date or request.GET.date_range or request.GET.filter %}show{% endif %}" id="filterCollapse">
                       <div class="card-body">
                         <div class="row align-items-center">
                           <div class="col-12 col-md-4 mb-2">
@@ -159,6 +166,7 @@
 
                         </div>
                       </div>
+                      </div><!-- /.collapse -->
                     </div>
                   </form>
             </div>
@@ -475,4 +483,19 @@
         }
     }
 </style>
+<script>
+(function () {
+    const el = document.getElementById('filterCollapse');
+    if (!el) return;
+    const header = el.previousElementSibling;
+    const chevron = header ? header.querySelector('.filter-chevron') : null;
+    if (!chevron) return;
+
+    // Set initial chevron state
+    if (el.classList.contains('show')) chevron.style.transform = 'rotate(180deg)';
+
+    el.addEventListener('show.bs.collapse',  () => { chevron.style.transform = 'rotate(180deg)'; });
+    el.addEventListener('hide.bs.collapse',  () => { chevron.style.transform = 'rotate(0deg)'; });
+})();
+</script>
 {% endblock %}

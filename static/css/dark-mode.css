@@ -351,13 +351,59 @@ body.dark-mode .asset-row:hover {
     background-color: rgba(255,255,255,0.06) !important;
 }
 
-/* network_inventory / location collapsible headers */
-body.dark-mode .location-header { background-color: #21262d; color: #e2e8f0; }
-body.dark-mode .location-header:hover { background-color: #2d333b; cursor: pointer; }
-body.dark-mode .rack-header     { background-color: #21262d; }
-body.dark-mode .rack-header:hover { background-color: #2d333b; }
-body.dark-mode .location-title,
-body.dark-mode .rack-title      { color: #e2e8f0; }
+/* inspection_detail / network_inventory collapsible headers */
+body.dark-mode .location-header {
+    background-color: #21262d !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(255,255,255,0.08) !important;
+}
+body.dark-mode .location-header:hover { background-color: #2d333b !important; cursor: pointer; }
+body.dark-mode .rack-header {
+    background-color: #161b22 !important;
+    border-color: rgba(255,255,255,0.06) !important;
+}
+body.dark-mode .rack-header:hover { background-color: #21262d !important; }
+body.dark-mode .location-title { color: #e2e8f0 !important; }
+body.dark-mode .rack-title     { color: #8b949e !important; }
+
+/* inspection-form cards (inspection_detail.html) */
+body.dark-mode .inspection-form {
+    background-color: #1e2433 !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    border-radius: 8px;
+}
+body.dark-mode .inspection-form .asset-name { color: #68B2E3; }
+body.dark-mode .inspection-form .form-label { color: #8b949e; }
+
+/* progress bar track */
+body.dark-mode .progress { background-color: #2d333b !important; }
+
+/* logbook user checkbox list */
+body.dark-mode .assigned-user-list {
+    background: #21262d;
+    border-color: rgba(255,255,255,0.10);
+}
+body.dark-mode .assigned-user-list label {
+    color: #e2e8f0;
+}
+body.dark-mode .assigned-user-list label:hover {
+    background: rgba(104,178,227,0.12);
+    color: #68B2E3;
+}
+body.dark-mode .assigned-user-list label:has(input[type="checkbox"]:checked) {
+    background: rgba(104,178,227,0.18);
+    color: #68B2E3;
+}
+
+/* logbook mobile cards */
+body.dark-mode .log-table tbody tr {
+    background: #161b22 !important;
+    border-color: rgba(255,255,255,0.08) !important;
+}
+body.dark-mode .log-table tbody td:nth-child(4) {
+    border-top-color: rgba(255,255,255,0.08) !important;
+    color: #8b949e;
+}
 
 /* generic hover */
 body.dark-mode .cursor-pointer:hover { background-color: #21262d; }

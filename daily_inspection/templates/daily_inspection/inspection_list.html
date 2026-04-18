@@ -92,27 +92,37 @@
     <div class="col-md-10">
         <div class="card shadow">
             <div class="card-body">
-             <div class="d-flex justify-content-between align-items-center mb-4">
-                  <form method="get" class="d-flex align-items-center">
-                         <select name="per_page" class="form-select me-2" onchange="this.form.submit()">
-                            <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
-                            <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
-                            <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
-                             <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
+             <form method="get" class="mb-4">
+                 <div class="row g-2 align-items-end">
+                     <div class="col-6 col-sm-auto">
+                         <label class="form-label small text-muted mb-1">Per page</label>
+                         <select name="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
+                             <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                             <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                             <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                             <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
                          </select>
-                          <div class="d-flex align-items-center">
-                              <label for="start_date" class="form-label me-1" style="margin-bottom: 0;">Start Date</label>
-                             <input type="date" name="start_date" class="form-control me-2" value="{{ request.GET.start_date }}" onchange="this.form.submit()" placeholder="Start Date">
-                              <label for="end_date" class="form-label mx-1" style="margin-bottom: 0;">End Date</label>
-                            <input type="date" name="end_date" class="form-control me-2" value="{{ request.GET.end_date }}" onchange="this.form.submit()" placeholder="End Date">
-                                  {% if request.GET.start_date or request.GET.end_date %}
-                                <a href="{% url 'inspection_list' %}" class="btn btn-outline-secondary ms-1" title="Clear date filter">
-                                  <i class="bi bi-x-lg"></i>
-                                </a>
-                            {% endif %}
-                       </div>
-                  </form>
-             </div>
+                     </div>
+                     <div class="col-6 col-sm">
+                         <label for="start_date" class="form-label small text-muted mb-1">Start Date</label>
+                         <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
+                                value="{{ request.GET.start_date }}" onchange="this.form.submit()">
+                     </div>
+                     <div class="col-6 col-sm">
+                         <label for="end_date" class="form-label small text-muted mb-1">End Date</label>
+                         <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
+                                value="{{ request.GET.end_date }}" onchange="this.form.submit()">
+                     </div>
+                     {% if request.GET.start_date or request.GET.end_date %}
+                     <div class="col-6 col-sm-auto">
+                         <label class="form-label small text-muted mb-1 d-none d-sm-block">&nbsp;</label>
+                         <a href="{% url 'inspection_list' %}" class="btn btn-sm btn-outline-secondary w-100" title="Clear date filter">
+                             <i class="bi bi-x-lg"></i> Clear
+                         </a>
+                     </div>
+                     {% endif %}
+                 </div>
+             </form>
 
                 <div class="table-responsive">
                     <table class="table">

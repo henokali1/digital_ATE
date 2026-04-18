@@ -1,0 +1,671 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block heading_h1 %}Dashboard{% endblock %}
+{% block heading_h2 %}{{ this_month }} overview &nbsp;<span class="refresh-badge" id="refreshBadge" title="Auto-refreshes every 30 seconds"><i class="bi bi-arrow-clockwise" id="refreshIcon"></i> <span id="lastUpdatedText">live</span></span>{% endblock %}
+
+{% block content %}
+<div class="dash-grid">
+
+    {# ── Job Cards ──────────────────────────────────────── #}
+    <section class="dash-section">
+        <div class="dash-section-header">
+            <i class="bi bi-card-list"></i>
+            <span>Job Cards</span>
+            <a href="/job_card/" class="dash-section-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="kpi-strip">
+            <a href="/job_card/?status=Pending" class="kpi-card kpi-orange">
+                <div class="kpi-icon"><i class="bi bi-hourglass-split"></i></div>
+                <div class="kpi-body">
+                    <div class="kpi-value" data-stat="jc_pending">{{ jc_pending }}</div>
+                    <div class="kpi-label">Pending</div>
+                </div>
+            </a>
+            <a href="/job_card/?status=In+Progress" class="kpi-card kpi-blue">
+                <div class="kpi-icon"><i class="bi bi-play-circle"></i></div>
+                <div class="kpi-body">
+                    <div class="kpi-value" data-stat="jc_in_progress">{{ jc_in_progress }}</div>
+                    <div class="kpi-label">In Progress</div>
+                </div>
+            </a>
+            <a href="/job_card/?status=On+Hold" class="kpi-card kpi-gray">
+                <div class="kpi-icon"><i class="bi bi-pause-circle"></i></div>
+                <div class="kpi-body">
+                    <div class="kpi-value" data-stat="jc_on_hold">{{ jc_on_hold }}</div>
+                    <div class="kpi-label">On Hold</div>
+                </div>
+            </a>
+            <a href="/job_card/" class="kpi-card kpi-red">
+                <div class="kpi-icon"><i class="bi bi-exclamation-circle"></i></div>
+                <div class="kpi-body">
+                    <div class="kpi-value" data-stat="jc_overdue">{{ jc_overdue }}</div>
+                    <div class="kpi-label">Overdue</div>
+                </div>
+            </a>
+            <a href="/job_card/" class="kpi-card kpi-yellow">
+                <div class="kpi-icon"><i class="bi bi-bell"></i></div>
+                <div class="kpi-body">
+                    <div class="kpi-value" data-stat="jc_unack">{{ jc_unack }}</div>
+                    <div class="kpi-label">Unacknowledged</div>
+                </div>
+            </a>
+            <a href="/job_card/?priority=High" class="kpi-card kpi-red-light">
+                <div class="kpi-icon"><i class="bi bi-fire"></i></div>
+                <div class="kpi-body">
+                    <div class="kpi-value" data-stat="jc_high">{{ jc_high }}</div>
+                    <div class="kpi-label">High Priority Open</div>
+                </div>
+            </a>
+            <a href="/job_card/?status=Completed" class="kpi-card kpi-green">
+                <div class="kpi-icon"><i class="bi bi-check-circle"></i></div>
+                <div class="kpi-body">
+                    <div class="kpi-value" data-stat="jc_completed_mo">{{ jc_completed_mo }}</div>
+                    <div class="kpi-label">Completed This Month</div>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    {# ── Maintenance + Inspections ─────────────────────── #}
+    <div class="dash-row-2">
+
+        {# Maintenance #}
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <i class="bi bi-tools"></i>
+                <span>Maintenance — {{ this_month }}</span>
+            </div>
+            <div class="maint-cards">
+                <a href="/preventive_maintenance/" class="maint-card maint-ppm">
+                    <div class="maint-card-top">
+                        <span class="maint-tag">PPM</span>
+                        <span class="maint-num" data-stat="ppm_this_month">{{ ppm_this_month }}</span>
+                    </div>
+                    <div class="maint-sub"><span data-stat="ppm_hours_month">{{ ppm_hours_month }}</span> hrs this month</div>
+                </a>
+                <a href="/corrective_maintenance/" class="maint-card maint-cm">
+                    <div class="maint-card-top">
+                        <span class="maint-tag">CM</span>
+                        <span class="maint-num" data-stat="cm_this_month">{{ cm_this_month }}</span>
+                    </div>
+                    <div class="maint-sub"><span data-stat="cm_hours_month">{{ cm_hours_month }}</span> hrs this month</div>
+                </a>
+            </div>
+            {% if cm_by_type %}
+            <div class="breakdown-list mt-3">
+                <div class="breakdown-title">CM by Type</div>
+                {% for row in cm_by_type %}
+                <div class="breakdown-row">
+                    <span class="breakdown-label">{{ row.type }}</span>
+                    <span class="breakdown-badge
+                        {% if row.type == 'Outage' %}badge-red
+                        {% elif row.type == 'Alarm' %}badge-orange
+                        {% elif row.type == 'Warning' %}badge-yellow
+                        {% else %}badge-blue{% endif %}">
+                        {{ row.count }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </section>
+
+        {# Daily Inspections #}
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Daily Inspections — Today</span>
+                <a href="/inspections/" class="dash-section-link">View all <i class="bi bi-arrow-right"></i></a>
+            </div>
+
+            <div class="shift-block">
+                <div class="shift-label"><i class="bi bi-sun-fill text-warning me-1"></i>Day Shift</div>
+                <div class="shift-progress{% if not day_stats.total %} d-none{% endif %}" id="dayProgress">
+                    <div class="progress-bar-outer">
+                        <div class="progress-bar-inner" id="dayBar" data-pct="{{ day_stats.pct }}"></div>
+                    </div>
+                    <span class="shift-pct"><span data-stat="day_inspected">{{ day_stats.inspected }}</span>/<span data-stat="day_total">{{ day_stats.total }}</span> (<span data-stat="day_pct">{{ day_stats.pct }}</span>%)</span>
+                </div>
+                <span class="text-muted small{% if day_stats.total %} d-none{% endif %}" id="dayEmpty">No inspection started</span>
+            </div>
+
+            <div class="shift-block mt-2">
+                <div class="shift-label"><i class="bi bi-moon-fill me-1" style="color:#8b5cf6"></i>Night Shift</div>
+                <div class="shift-progress{% if not night_stats.total %} d-none{% endif %}" id="nightProgress">
+                    <div class="progress-bar-outer">
+                        <div class="progress-bar-inner" id="nightBar" data-pct="{{ night_stats.pct }}"></div>
+                    </div>
+                    <span class="shift-pct"><span data-stat="night_inspected">{{ night_stats.inspected }}</span>/<span data-stat="night_total">{{ night_stats.total }}</span> (<span data-stat="night_pct">{{ night_stats.pct }}</span>%)</span>
+                </div>
+                <span class="text-muted small{% if night_stats.total %} d-none{% endif %}" id="nightEmpty">No inspection started</span>
+            </div>
+
+            <div class="breakdown-list mt-3{% if not insp_counts %} d-none{% endif %}" id="inspStatusList">
+                <div class="breakdown-title">Latest Inspection Status</div>
+                <a href="/inspections/{{ latest_insp.inspection_ident }}/filtered/ALARM/" class="breakdown-row breakdown-link{% if not insp_counts.ALARM %} d-none{% endif %}" data-insp-row="ALARM" data-insp-id="{{ latest_insp.inspection_ident|default:'' }}">
+                    <span class="breakdown-label"><i class="bi bi-exclamation-octagon text-danger me-1"></i>Alarm</span>
+                    <span class="breakdown-badge badge-red">{{ insp_counts.ALARM|default:0 }}</span>
+                </a>
+                <a href="/inspections/{{ latest_insp.inspection_ident }}/filtered/WARNING/" class="breakdown-row breakdown-link{% if not insp_counts.WARNING %} d-none{% endif %}" data-insp-row="WARNING" data-insp-id="{{ latest_insp.inspection_ident|default:'' }}">
+                    <span class="breakdown-label"><i class="bi bi-exclamation-triangle text-warning me-1"></i>Warning</span>
+                    <span class="breakdown-badge badge-yellow">{{ insp_counts.WARNING|default:0 }}</span>
+                </a>
+                <a href="/inspections/{{ latest_insp.inspection_ident }}/filtered/DEGRADED/" class="breakdown-row breakdown-link{% if not insp_counts.DEGRADED %} d-none{% endif %}" data-insp-row="DEGRADED" data-insp-id="{{ latest_insp.inspection_ident|default:'' }}">
+                    <span class="breakdown-label"><i class="bi bi-exclamation-triangle text-warning me-1"></i>Degraded</span>
+                    <span class="breakdown-badge badge-orange">{{ insp_counts.DEGRADED|default:0 }}</span>
+                </a>
+                <a href="/inspections/{{ latest_insp.inspection_ident }}/filtered/UNSERVICEABLE/" class="breakdown-row breakdown-link{% if not insp_counts.UNSERVICEABLE %} d-none{% endif %}" data-insp-row="UNSERVICEABLE" data-insp-id="{{ latest_insp.inspection_ident|default:'' }}">
+                    <span class="breakdown-label"><i class="bi bi-slash-circle text-secondary me-1"></i>Unserviceable</span>
+                    <span class="breakdown-badge badge-gray">{{ insp_counts.UNSERVICEABLE|default:0 }}</span>
+                </a>
+                <a href="/inspections/{{ latest_insp.inspection_ident }}/filtered/OK/" class="breakdown-row breakdown-link{% if not insp_counts.OK %} d-none{% endif %}" data-insp-row="OK" data-insp-id="{{ latest_insp.inspection_ident|default:'' }}">
+                    <span class="breakdown-label"><i class="bi bi-check-circle text-success me-1"></i>OK</span>
+                    <span class="breakdown-badge badge-green">{{ insp_counts.OK|default:0 }}</span>
+                </a>
+                <a href="/inspections/{{ latest_insp.inspection_ident }}/filtered/OFF/" class="breakdown-row breakdown-link{% if not insp_counts.OFF %} d-none{% endif %}" data-insp-row="OFF" data-insp-id="{{ latest_insp.inspection_ident|default:'' }}">
+                    <span class="breakdown-label"><i class="bi bi-power text-secondary me-1"></i>Off</span>
+                    <span class="breakdown-badge badge-gray">{{ insp_counts.OFF|default:0 }}</span>
+                </a>
+            </div>
+        </section>
+
+    </div>{# end .dash-row-2 #}
+
+    {# ── Assets + Spare Parts ─────────────────────────── #}
+    <div class="dash-row-2">
+
+        {# Assets #}
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <i class="bi bi-cpu"></i>
+                <span>Assets</span>
+                <a href="/asset/" class="dash-section-link">View all <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="asset-total"><span data-stat="asset_total">{{ asset_total }}</span> <span>total assets</span></div>
+            <div class="breakdown-list mt-2">
+                <div class="breakdown-row">
+                    <span class="breakdown-label"><span class="dot dot-green"></span>In Use</span>
+                    <span class="breakdown-badge badge-green" data-stat="asset_in_use">{{ asset_in_use }}</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="breakdown-label"><span class="dot dot-blue"></span>Spare</span>
+                    <span class="breakdown-badge badge-blue" data-stat="asset_spare">{{ asset_spare }}</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="breakdown-label"><span class="dot dot-yellow"></span>Under Maintenance</span>
+                    <span class="breakdown-badge badge-yellow" data-stat="asset_maint">{{ asset_maint }}</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="breakdown-label"><span class="dot dot-red"></span>Unserviceable</span>
+                    <span class="breakdown-badge badge-red" data-stat="asset_unsvc">{{ asset_unsvc }}</span>
+                </div>
+            </div>
+        </section>
+
+        {# Spare Parts #}
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <i class="bi bi-box-seam"></i>
+                <span>Spare Parts Alerts</span>
+                <a href="/spare_parts/" class="dash-section-link">View all <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="alert-ok{% if sp_out or sp_low or sp_unsvc %} d-none{% endif %}" id="spOkMsg">
+                <i class="bi bi-check-circle-fill text-success me-2"></i>All stock levels OK
+            </div>
+            <div class="alert-item alert-red{% if not sp_out %} d-none{% endif %}" id="spOutAlert">
+                <i class="bi bi-x-circle-fill"></i>
+                <div>
+                    <div class="alert-val" data-stat="sp_out">{{ sp_out }}</div>
+                    <div class="alert-lbl">Out of Stock</div>
+                </div>
+            </div>
+            <div class="alert-item alert-yellow{% if not sp_low %} d-none{% endif %}" id="spLowAlert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div>
+                    <div class="alert-val" data-stat="sp_low">{{ sp_low }}</div>
+                    <div class="alert-lbl">Low Stock</div>
+                </div>
+            </div>
+            <div class="alert-item alert-gray{% if not sp_unsvc %} d-none{% endif %}" id="spUnsvcAlert">
+                <i class="bi bi-slash-circle-fill"></i>
+                <div>
+                    <div class="alert-val" data-stat="sp_unsvc">{{ sp_unsvc }}</div>
+                    <div class="alert-lbl">Unserviceable</div>
+                </div>
+            </div>
+        </section>
+
+    </div>{# end .dash-row-2 #}
+
+    {# ── Recent Activity ──────────────────────────────── #}
+    <section class="dash-section">
+        <div class="dash-section-header">
+            <i class="bi bi-activity"></i>
+            <span>Recent Activity</span>
+        </div>
+        <div class="activity-grid">
+
+            {# Recent Logbook #}
+            <div class="activity-col">
+                <div class="activity-col-title"><i class="bi bi-journal-text me-1"></i>Logbook</div>
+                {% for log in recent_logs %}
+                <a href="{% url 'logbook:log_detail' log.id %}" class="activity-item">
+                    <div class="activity-meta">
+                        <span class="activity-date">{{ log.date|date:"M d" }} {{ log.time|time:"H:i" }}</span>
+                        <span class="activity-loc">{{ log.location.name }}</span>
+                    </div>
+                    <div class="activity-text">{{ log.remarks|truncatechars:80 }}</div>
+                </a>
+                {% empty %}
+                <div class="activity-empty">No entries yet</div>
+                {% endfor %}
+            </div>
+
+            {# Recent CM #}
+            <div class="activity-col">
+                <div class="activity-col-title"><i class="bi bi-wrench-adjustable me-1"></i>Corrective Maintenance</div>
+                {% for cm in recent_cm %}
+                <a href="/corrective_maintenance/detail/{{ cm.id }}/" class="activity-item">
+                    <div class="activity-meta">
+                        <span class="activity-date">{{ cm.start_date|date:"M d" }}</span>
+                        <span class="activity-badge
+                            {% if cm.type == 'Outage' %}badge-red
+                            {% elif cm.type == 'Alarm' %}badge-orange
+                            {% elif cm.type == 'Warning' %}badge-yellow
+                            {% else %}badge-blue{% endif %}">
+                            {{ cm.type }}
+                        </span>
+                    </div>
+                    <div class="activity-text">{{ cm.corrective_action|truncatechars:80 }}</div>
+                </a>
+                {% empty %}
+                <div class="activity-empty">No records yet</div>
+                {% endfor %}
+            </div>
+
+            {# Recent Job Cards #}
+            <div class="activity-col">
+                <div class="activity-col-title"><i class="bi bi-card-list me-1"></i>Job Cards</div>
+                {% for jc in recent_jc %}
+                <a href="/job_card/{{ jc.id }}/" class="activity-item">
+                    <div class="activity-meta">
+                        <span class="activity-date">{{ jc.created_at|date:"M d" }}</span>
+                        <span class="activity-badge
+                            {% if jc.status == 'Pending' %}badge-orange
+                            {% elif jc.status == 'In Progress' %}badge-blue
+                            {% elif jc.status == 'Completed' %}badge-green
+                            {% elif jc.status == 'On Hold' %}badge-gray
+                            {% else %}badge-gray{% endif %}">
+                            {{ jc.status }}
+                        </span>
+                    </div>
+                    <div class="activity-text">{{ jc.task_description|truncatechars:80 }}</div>
+                </a>
+                {% empty %}
+                <div class="activity-empty">No job cards yet</div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </section>
+
+</div>{# end .dash-grid #}
+
+<style>
+/* ── Layout ────────────────────────────────────────────── */
+.dash-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.dash-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+@media (max-width: 767px) {
+    .dash-row-2 { grid-template-columns: 1fr; }
+}
+
+/* ── Section card ──────────────────────────────────────── */
+.dash-section {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.dash-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary, #111827);
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+    padding-bottom: 10px;
+}
+.dash-section-header i { color: var(--primary, #68B2E3); font-size: 1.05rem; }
+.dash-section-link {
+    margin-left: auto;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--primary, #68B2E3);
+    text-decoration: none;
+    white-space: nowrap;
+}
+.dash-section-link:hover { color: var(--primary-dk, #4a9ed8); text-decoration: underline; }
+
+/* ── KPI Strip ─────────────────────────────────────────── */
+.kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+@media (max-width: 1100px) { .kpi-strip { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 600px)  { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+.kpi-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: transform 0.15s, box-shadow 0.15s;
+    overflow: hidden;
+}
+.kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.10); }
+.kpi-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.kpi-value { font-size: 1.6rem; font-weight: 700; line-height: 1; color: var(--text-primary, #111827); }
+.kpi-label { font-size: 0.73rem; font-weight: 500; color: var(--text-secondary, #6b7280); margin-top: 1px; white-space: nowrap; }
+
+.kpi-orange { background: rgba(251,146,60,0.08); border-color: rgba(251,146,60,0.2); }
+.kpi-orange .kpi-icon { background: rgba(251,146,60,0.15); color: #f97316; }
+.kpi-blue   { background: rgba(104,178,227,0.08); border-color: rgba(104,178,227,0.2); }
+.kpi-blue   .kpi-icon { background: rgba(104,178,227,0.15); color: #68B2E3; }
+.kpi-gray   { background: rgba(156,163,175,0.08); border-color: rgba(156,163,175,0.2); }
+.kpi-gray   .kpi-icon { background: rgba(156,163,175,0.15); color: #9ca3af; }
+.kpi-red    { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); }
+.kpi-red    .kpi-icon { background: rgba(239,68,68,0.15); color: #ef4444; }
+.kpi-yellow { background: rgba(234,179,8,0.08); border-color: rgba(234,179,8,0.2); }
+.kpi-yellow .kpi-icon { background: rgba(234,179,8,0.15); color: #ca8a04; }
+.kpi-red-light { background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.2); }
+.kpi-red-light .kpi-icon { background: rgba(248,113,113,0.15); color: #f87171; }
+.kpi-green  { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); }
+.kpi-green  .kpi-icon { background: rgba(34,197,94,0.15); color: #22c55e; }
+
+/* ── Maintenance cards ─────────────────────────────────── */
+.maint-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.maint-card {
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: transform 0.15s;
+}
+.maint-card:hover { transform: translateY(-2px); }
+.maint-ppm { background: rgba(104,178,227,0.10); border-color: rgba(104,178,227,0.25); }
+.maint-cm  { background: rgba(251,146,60,0.10); border-color: rgba(251,146,60,0.25); }
+.maint-card-top { display: flex; align-items: baseline; justify-content: space-between; }
+.maint-tag { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; color: var(--text-secondary, #6b7280); text-transform: uppercase; }
+.maint-num { font-size: 2rem; font-weight: 800; color: var(--text-primary, #111827); line-height: 1; }
+.maint-sub { font-size: 0.78rem; color: var(--text-secondary, #6b7280); margin-top: 4px; }
+
+/* ── Breakdown list ────────────────────────────────────── */
+.breakdown-title { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.breakdown-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border, #e5e7eb); }
+.breakdown-row:last-child { border-bottom: none; }
+.breakdown-link { text-decoration: none; border-radius: 6px; padding: 5px 6px; margin: 0 -6px; transition: background 0.12s; }
+.breakdown-link:hover { background: rgba(104,178,227,0.08); }
+body.dark-mode .breakdown-link:hover { background: rgba(104,178,227,0.12); }
+.breakdown-label { font-size: 0.85rem; color: var(--text-primary, #111827); display: flex; align-items: center; gap: 4px; }
+.breakdown-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+.badge-red    { background: rgba(239,68,68,0.12);  color: #dc2626; }
+.badge-orange { background: rgba(249,115,22,0.12); color: #ea580c; }
+.badge-yellow { background: rgba(234,179,8,0.12);  color: #ca8a04; }
+.badge-blue   { background: rgba(104,178,227,0.15); color: #2563eb; }
+.badge-green  { background: rgba(34,197,94,0.12);  color: #16a34a; }
+.badge-gray   { background: rgba(156,163,175,0.15); color: #4b5563; }
+
+/* ── Progress bars ─────────────────────────────────────── */
+.shift-block { display: flex; flex-direction: column; gap: 5px; }
+.shift-label { font-size: 0.83rem; font-weight: 600; color: var(--text-secondary, #6b7280); }
+.shift-progress { display: flex; align-items: center; gap: 10px; }
+.progress-bar-outer { flex: 1; height: 8px; background: var(--border, #e5e7eb); border-radius: 999px; overflow: hidden; }
+.progress-bar-inner { height: 100%; border-radius: 999px; transition: width 0.5s; }
+.bar-green  { background: #22c55e; }
+.bar-blue   { background: #68B2E3; }
+.bar-yellow { background: #f59e0b; }
+.shift-pct  { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary, #6b7280); white-space: nowrap; }
+
+/* ── Assets ────────────────────────────────────────────── */
+.asset-total { font-size: 2rem; font-weight: 800; color: var(--text-primary, #111827); }
+.asset-total span { font-size: 0.85rem; font-weight: 400; color: var(--text-secondary, #6b7280); margin-left: 6px; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.dot-green  { background: #22c55e; }
+.dot-blue   { background: #68B2E3; }
+.dot-yellow { background: #f59e0b; }
+.dot-red    { background: #ef4444; }
+
+/* ── Spare Parts alerts ────────────────────────────────── */
+.alert-ok { font-size: 0.88rem; color: var(--text-secondary, #6b7280); padding: 12px 0; }
+.alert-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+}
+.alert-item:last-child { margin-bottom: 0; }
+.alert-red    { background: rgba(239,68,68,0.08);  color: #dc2626; border: 1px solid rgba(239,68,68,0.2); }
+.alert-yellow { background: rgba(234,179,8,0.08);  color: #ca8a04; border: 1px solid rgba(234,179,8,0.2); }
+.alert-gray   { background: rgba(156,163,175,0.08); color: #6b7280; border: 1px solid rgba(156,163,175,0.2); }
+.alert-val { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+.alert-lbl { font-size: 0.78rem; font-weight: 500; margin-top: 2px; }
+
+/* ── Activity Feed ─────────────────────────────────────── */
+.activity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+@media (max-width: 991px) { .activity-grid { grid-template-columns: 1fr; } }
+.activity-col-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary, #6b7280);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+}
+.activity-item {
+    display: block;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+    text-decoration: none;
+    transition: background 0.12s;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-item:hover { background: rgba(104,178,227,0.05); }
+.activity-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+}
+.activity-date { font-size: 0.73rem; font-weight: 600; color: var(--text-secondary, #6b7280); }
+.activity-loc  { font-size: 0.73rem; color: var(--text-secondary, #6b7280); }
+.activity-text { font-size: 0.82rem; color: var(--text-primary, #111827); line-height: 1.4; }
+.activity-badge { font-size: 0.68rem; font-weight: 600; padding: 2px 7px; border-radius: 999px; }
+.activity-empty { font-size: 0.83rem; color: var(--text-secondary, #6b7280); padding: 12px 0; text-align: center; }
+
+/* ── Dark mode overrides ───────────────────────────────── */
+body.dark-mode .dash-section {
+    background: #1e2433;
+    border-color: #2d3448;
+}
+body.dark-mode .dash-section-header,
+body.dark-mode .dash-section-header i { color: #e2e8f0; }
+body.dark-mode .dash-section-header { border-color: #2d3448; }
+body.dark-mode .kpi-value { color: #f1f5f9; }
+body.dark-mode .kpi-label { color: #94a3b8; }
+body.dark-mode .maint-num { color: #f1f5f9; }
+body.dark-mode .maint-sub { color: #94a3b8; }
+body.dark-mode .maint-tag { color: #94a3b8; }
+body.dark-mode .breakdown-row { border-color: #2d3448; }
+body.dark-mode .breakdown-label { color: #e2e8f0; }
+body.dark-mode .asset-total { color: #f1f5f9; }
+body.dark-mode .asset-total span { color: #94a3b8; }
+body.dark-mode .progress-bar-outer { background: #2d3448; }
+body.dark-mode .activity-col-title { color: #94a3b8; border-color: #2d3448; }
+body.dark-mode .activity-item { border-color: #2d3448; }
+body.dark-mode .activity-date,
+body.dark-mode .activity-loc { color: #94a3b8; }
+body.dark-mode .activity-text { color: #e2e8f0; }
+body.dark-mode .badge-blue { color: #93c5fd; background: rgba(147,197,253,0.12); }
+body.dark-mode .badge-green { color: #86efac; background: rgba(134,239,172,0.12); }
+body.dark-mode .badge-gray { color: #94a3b8; background: rgba(148,163,184,0.12); }
+body.dark-mode .alert-red    { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); }
+body.dark-mode .alert-yellow { background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.25); }
+body.dark-mode .alert-gray   { background: rgba(148,163,184,0.10); border-color: rgba(148,163,184,0.2); color: #94a3b8; }
+body.dark-mode .shift-pct { color: #94a3b8; }
+
+/* ── Refresh badge ─────────────────────────────────────── */
+.refresh-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-secondary, #6b7280);
+    vertical-align: middle;
+}
+.refresh-badge i { font-size: 0.78rem; }
+.refresh-badge.spinning i { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<script>
+(function () {
+    const INTERVAL = 30000;
+
+    // ── Initialise progress bars from data-pct ──────────
+    function initBar(el) {
+        const pct = parseFloat(el.dataset.pct) || 0;
+        el.style.width = pct + '%';
+        el.classList.remove('bar-green', 'bar-blue', 'bar-yellow');
+        el.classList.add(pct === 100 ? 'bar-green' : pct > 50 ? 'bar-blue' : 'bar-yellow');
+    }
+    document.querySelectorAll('[data-pct]').forEach(initBar);
+
+    // ── Helpers ──────────────────────────────────────────
+    function setStat(key, val) {
+        document.querySelectorAll('[data-stat="' + key + '"]').forEach(el => { el.textContent = val; });
+    }
+
+    function setVisible(el, show) {
+        if (!el) return;
+        el.classList.toggle('d-none', !show);
+    }
+
+    function updateShift(prefix, stats) {
+        const progress = document.getElementById(prefix + 'Progress');
+        const empty    = document.getElementById(prefix + 'Empty');
+        const bar      = document.getElementById(prefix + 'Bar');
+        const hasData  = stats.total > 0;
+        setVisible(progress, hasData);
+        setVisible(empty, !hasData);
+        if (hasData && bar) {
+            bar.dataset.pct = stats.pct;
+            initBar(bar);
+        }
+        setStat(prefix + '_inspected', stats.inspected);
+        setStat(prefix + '_total',     stats.total);
+        setStat(prefix + '_pct',       stats.pct);
+    }
+
+    function updateInspStatus(counts, inspId) {
+        const list = document.getElementById('inspStatusList');
+        const anyCount = Object.values(counts).some(v => v > 0);
+        setVisible(list, anyCount);
+        ['ALARM','WARNING','DEGRADED','UNSERVICEABLE','OK','OFF'].forEach(status => {
+            const row = document.querySelector('[data-insp-row="' + status + '"]');
+            if (!row) return;
+            const count = counts[status] || 0;
+            row.querySelector('.breakdown-badge').textContent = count;
+            setVisible(row, count > 0);
+            if (inspId) row.href = '/inspections/' + inspId + '/filtered/' + status + '/';
+        });
+    }
+
+    function updateSpParts(data) {
+        setVisible(document.getElementById('spOkMsg'),    !data.sp_out && !data.sp_low && !data.sp_unsvc);
+        setVisible(document.getElementById('spOutAlert'),  data.sp_out   > 0);
+        setVisible(document.getElementById('spLowAlert'),  data.sp_low   > 0);
+        setVisible(document.getElementById('spUnsvcAlert'),data.sp_unsvc > 0);
+    }
+
+    // ── Last-updated indicator ───────────────────────────
+    const badge = document.getElementById('refreshBadge');
+    const icon  = document.getElementById('refreshIcon');
+    const txt   = document.getElementById('lastUpdatedText');
+    let lastTs  = Date.now();
+
+    function tickLabel() {
+        const secs = Math.round((Date.now() - lastTs) / 1000);
+        if (txt) txt.textContent = secs < 5 ? 'just now' : secs + 's ago';
+    }
+    setInterval(tickLabel, 5000);
+
+    // ── Poll ─────────────────────────────────────────────
+    function refresh() {
+        if (badge) badge.classList.add('spinning');
+        fetch('/dashboard/api/', { credentials: 'same-origin' })
+            .then(r => r.json())
+            .then(data => {
+                // Job cards
+                ['jc_pending','jc_in_progress','jc_on_hold','jc_overdue',
+                 'jc_unack','jc_high','jc_completed_mo'].forEach(k => setStat(k, data[k]));
+                // Maintenance
+                setStat('ppm_this_month',  data.ppm_this_month);
+                setStat('ppm_hours_month', data.ppm_hours_month);
+                setStat('cm_this_month',   data.cm_this_month);
+                setStat('cm_hours_month',  data.cm_hours_month);
+                // Inspections
+                updateShift('day',   data.day_stats);
+                updateShift('night', data.night_stats);
+                updateInspStatus(data.insp_counts || {}, data.latest_insp_id);
+                // Assets
+                ['asset_total','asset_in_use','asset_spare','asset_maint','asset_unsvc']
+                    .forEach(k => setStat(k, data[k]));
+                // Spare parts
+                updateSpParts(data);
+                lastTs = Date.now();
+                if (txt) txt.textContent = 'just now';
+            })
+            .catch(() => { if (txt) txt.textContent = 'error'; })
+            .finally(() => { if (badge) badge.classList.remove('spinning'); });
+    }
+
+    setInterval(refresh, INTERVAL);
+})();
+</script>
+{% endblock %}
