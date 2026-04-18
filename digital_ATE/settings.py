@@ -32,7 +32,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-ALLOWED_HOSTS = ['atemms.fans.ae','192.168.10.10', 'ate.henokcodes.com', 'localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['atemms.fans.ae','192.168.10.10', 'ate.henokcodes.com', 'mms.henokcodes.com', 'localhost', '127.0.0.1', '*']
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -55,6 +55,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://192.168.10.10',
     'https://ate.henokcodes.com',
     'http://ate.henokcodes.com',
+    'https://mms.henokcodes.com',
+    'http://mms.henokcodes.com',
     'http://localhost',
     'http://127.0.0.1',
 ]
