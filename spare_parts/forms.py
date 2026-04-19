@@ -5,12 +5,21 @@ from location.models import Location
 class SparePartForm(forms.ModelForm):
     class Meta:
         model = SparePart
-        # Exclude created_by and updated_by from the form
-        exclude = ['created_at', 'updated_at', 'created_by', 'updated_by', 'position_rack']  # Or specify the fields you want to include
-        # widgets = {
-        #     'description': forms.Textarea(attrs={'rows': 3}),
-        #     'installation_date': forms.DateInput(attrs={'type': 'date'}),
-        # }
+        exclude = ['created_at', 'updated_at', 'created_by', 'updated_by', 'position_rack']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            widget = field.widget
+            if isinstance(widget, (forms.Select, forms.SelectMultiple)):
+                widget.attrs['class'] = widget.attrs.get('class', '') + ' form-select'
+            elif isinstance(widget, forms.CheckboxInput):
+                widget.attrs['class'] = widget.attrs.get('class', '') + ' form-check-input'
+            elif isinstance(widget, forms.Textarea):
+                widget.attrs['class'] = widget.attrs.get('class', '') + ' form-control'
+                widget.attrs.setdefault('rows', 3)
+            else:
+                widget.attrs['class'] = widget.attrs.get('class', '') + ' form-control'
 
 class SparePartPhotoForm(forms.ModelForm):
     class Meta:
